@@ -1,0 +1,304 @@
+{
+  "common": {
+    "appName": "NOVARA",
+    "loading": "Loading…",
+    "error": "Something went wrong",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "free": "Free",
+    "skipToContent": "Skip to content"
+  },
+  "nav": {
+    "home": "Home",
+    "courses": "Courses",
+    "categories": "Categories",
+    "howItWorks": "How it works",
+    "myLearning": "My learning",
+    "profile": "My profile",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signOut": "Sign out",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "breadcrumbs": {
+    "home": "Home"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Verified online academy",
+      "headlineLine1": "Learn for real,",
+      "headlineEmphasis": "not halfway.",
+      "subheadline": "NOVARA runs on a single rule: if a course doesn't meet a high standard, it doesn't get published. Real progress, real exams, verifiable certificates.",
+      "primaryCta": "Explore courses",
+      "secondaryCta": "How it works",
+      "sealCaption": "Standard verified by NOVARA"
+    },
+    "brandStatement": {
+      "eyebrow": "The difference",
+      "title": "We don't publish hundreds of courses. We publish the ones worth finishing.",
+      "body": "Most platforms measure success in catalog size. We measure it in courses completed. Every course goes through a review process before it's published, and your progress is tracked lesson by lesson, not just at sign-up."
+    },
+    "categories": {
+      "eyebrow": "Catalog",
+      "title": "Explore by category",
+      "subtitle": "A multi-category catalog from day one, built to grow for years.",
+      "viewAll": "View all categories"
+    },
+    "courses": {
+      "eyebrow": "Featured",
+      "title": "Courses that meet the NOVARA standard",
+      "subtitle": "A selection of the latest courses approved by our quality review process.",
+      "viewAll": "View full catalog",
+      "levelLabel": "Level",
+      "durationLabel": "Duration",
+      "new": "New",
+      "viewCourse": "View course"
+    },
+    "benefits": {
+      "eyebrow": "Why NOVARA",
+      "title": "What actually changes the outcome",
+      "items": {
+        "quality": {
+          "title": "A demanding quality standard",
+          "body": "Every course goes through editorial review before publishing. No filler to pad the catalog."
+        },
+        "progress": {
+          "title": "Progress tracked for real",
+          "body": "We save exactly where you left off, lesson by lesson, not just whether you're \"enrolled.\""
+        },
+        "certificates": {
+          "title": "Verifiable certificates",
+          "body": "Every certificate has a unique code and a QR code anyone can verify publicly."
+        },
+        "payment": {
+          "title": "Flexible, human payment",
+          "body": "Bizum or bank transfer, with manual review. No payment gateway taking a cut of your trust."
+        }
+      }
+    },
+    "howItWorks": {
+      "eyebrow": "The process",
+      "title": "How NOVARA works",
+      "steps": {
+        "choose": {
+          "title": "Choose your course",
+          "body": "Free or premium, filter by category and level until you find what you actually need."
+        },
+        "learn": {
+          "title": "Learn at your pace",
+          "body": "Video, text, audio, or hands-on exercises. Your progress saves automatically on every lesson."
+        },
+        "assess": {
+          "title": "Prove what you learned",
+          "body": "A real exam with a real passing score, not a filler form to unlock the certificate."
+        },
+        "certify": {
+          "title": "Get your certificate",
+          "body": "Generated automatically, with a public verification code, the moment you pass."
+        }
+      }
+    },
+    "testimonials": {
+      "eyebrow": "Community",
+      "title": "Student stories",
+      "emptyState": "We're still writing the first chapters. As soon as the first students finish their courses, their stories will have a home here."
+    },
+    "faq": {
+      "eyebrow": "Frequently asked questions",
+      "title": "What you need to know",
+      "items": {
+        "free": {
+          "question": "Are the free courses really free?",
+          "answer": "Yes. Part of the catalog is free with no fine print. Premium courses exist because they involve more depth, exercises, or higher-stakes certification — not because the free content is deliberately cut short."
+        },
+        "payment": {
+          "question": "How does payment by Bizum or bank transfer work?",
+          "answer": "You make the payment and upload proof. An administrator reviews it and manually approves access, usually quickly. We prefer this over relying on a third-party gateway that takes a cut of every payment."
+        },
+        "certificate": {
+          "question": "Does the certificate actually mean something?",
+          "answer": "Every certificate includes a unique code and a QR code linking to a public verification page, so anyone — a company, a client — can confirm it's authentic."
+        },
+        "quality": {
+          "question": "How is course quality guaranteed?",
+          "answer": "Every course goes through a review pipeline (draft → in review → approved → published) before reaching the catalog. We don't publish by volume."
+        },
+        "mobile": {
+          "question": "Will there be a mobile app?",
+          "answer": "It's on the roadmap. The platform is built from day one so that step won't require rebuilding anything."
+        }
+      }
+    },
+    "cta": {
+      "title": "Your next finished course starts here",
+      "subtitle": "No filler, no pointless endless catalog. Just courses worth finishing.",
+      "primaryCta": "Create free account",
+      "secondaryCta": "Explore catalog"
+    }
+  },
+  "footer": {
+    "tagline": "Learn for real.",
+    "columns": {
+      "platform": {
+        "title": "Platform",
+        "courses": "Courses",
+        "categories": "Categories",
+        "howItWorks": "How it works"
+      },
+      "legal": {
+        "title": "Legal",
+        "terms": "Terms & conditions",
+        "privacy": "Privacy",
+        "cookies": "Cookies"
+      },
+      "help": {
+        "title": "Help",
+        "support": "Support",
+        "faq": "FAQ"
+      }
+    },
+    "rights": "All rights reserved."
+  },
+  "legalPages": {
+    "lastUpdated": "July 19, 2026",
+    "backToHome": "Back to home",
+    "terms": {
+      "metaTitle": "Terms & conditions",
+      "title": "Terms & conditions",
+      "intro": "These terms govern the use of NOVARA. By creating an account or using the platform, you agree to what's described below.",
+      "sections": [
+        {
+          "heading": "1. Who we are",
+          "body": "NOVARA is an online academy offering free and paid courses, exams, verifiable certificates, and related educational content. These terms apply to anyone accessing the platform, with or without a registered account."
+        },
+        {
+          "heading": "2. User account",
+          "body": "To access certain features (enrolling in courses, obtaining certificates, purchasing premium courses) you need to create an account with a valid email. You are responsible for keeping your password confidential and for all activity under your account."
+        },
+        {
+          "heading": "3. Free and premium courses",
+          "body": "Part of the catalog is free of charge. Premium courses require payment of the amount shown on each course, via Bizum or bank transfer, with manual review and approval by the NOVARA team before access is granted."
+        },
+        {
+          "heading": "4. Payments and refunds",
+          "body": "Access to a premium course is granted after verifying the proof of payment uploaded by the student. If a payment is rejected, the reason will be shown and you may upload a new proof. Refund requests are handled individually by contacting support."
+        },
+        {
+          "heading": "5. Certificates",
+          "body": "Certificates are generated automatically once a course's requirements are met (passing its final exam or completing 100% of the content, depending on the course) and can be verified publicly using the unique code and QR code included on each certificate."
+        },
+        {
+          "heading": "6. User conduct",
+          "body": "Sharing accounts, redistributing course content without authorization, or using the platform for fraudulent or unlawful purposes is not allowed. NOVARA may suspend or close accounts that violate these rules."
+        },
+        {
+          "heading": "7. Intellectual property",
+          "body": "Course content (videos, text, exercises, downloadable materials) is owned by NOVARA or its authors and protected by intellectual property rights. A personal, non-transferable license for use is granted — not for resale or redistribution."
+        },
+        {
+          "heading": "8. Changes",
+          "body": "These terms may be updated to reflect legal changes or changes in how the platform works. Material changes will be notified to registered users."
+        },
+        {
+          "heading": "9. Contact",
+          "body": "For any question about these terms, you can write to us from the Support page."
+        }
+      ]
+    },
+    "privacy": {
+      "metaTitle": "Privacy policy",
+      "title": "Privacy policy",
+      "intro": "At NOVARA we process your personal data solely to provide the educational service you signed up for. This policy explains what data we process, why, and what rights you have.",
+      "sections": [
+        {
+          "heading": "1. What data we process",
+          "body": "Account data (name, email, encrypted password), profile data you choose to add (bio, country, avatar), academic progress data (courses, lessons, exams, certificates), and payment data limited to the proof you upload and your purchase request history — we never store card details."
+        },
+        {
+          "heading": "2. What we use it for",
+          "body": "To create and manage your account, give you access to the courses you enroll in, generate your certificates, send you necessary communications about your account or purchases, and improve the platform using aggregated internal statistics."
+        },
+        {
+          "heading": "3. Legal basis",
+          "body": "We process your data because it's necessary to perform the contract for the educational service (GDPR, art. 6.1.b), and, for optional communications, based on your consent."
+        },
+        {
+          "heading": "4. Who we share your data with",
+          "body": "We do not sell your data to third parties. We share strictly necessary data with providers that help us run the service: transactional email delivery, AI processing for the course-creation assistant (which only accesses course editorial content, never your personal data), and, if enabled, web analytics tools."
+        },
+        {
+          "heading": "5. How long we keep your data",
+          "body": "As long as your account is active. If you request account deletion, we delete or anonymize your personal data except information we must keep for legal obligations (e.g., invoices)."
+        },
+        {
+          "heading": "6. Your rights",
+          "body": "You can access, rectify, delete, restrict the processing of, or object to the use of your data, and request data portability, by writing to us from the Support page. You also have the right to file a complaint with your local data protection authority."
+        },
+        {
+          "heading": "7. Security",
+          "body": "Passwords are stored encrypted, connections use HTTPS, and access to sensitive data is restricted by roles within the platform."
+        },
+        {
+          "heading": "8. Minors",
+          "body": "NOVARA is not directed at children under 16. If we become aware of an account created by a minor without guardian consent, we will proceed to delete it."
+        }
+      ]
+    },
+    "cookies": {
+      "metaTitle": "Cookie policy",
+      "title": "Cookie policy",
+      "intro": "We use cookies and similar technologies to make the platform work correctly and, if enabled, to better understand how it's used.",
+      "sections": [
+        {
+          "heading": "1. Technical cookies (always active)",
+          "body": "Necessary for basic operation: keeping you signed in, remembering your preferred language and theme, and protecting the platform against improper access. Without them, NOVARA couldn't function."
+        },
+        {
+          "heading": "2. Referral cookie",
+          "body": "If you arrive at NOVARA through an affiliate's link, we store their code in a cookie for 30 days so we can correctly attribute the commission if you sign up and purchase a course. It's used for no other purpose."
+        },
+        {
+          "heading": "3. Analytics cookies (optional)",
+          "body": "If enabled by the NOVARA team from settings, Google Analytics, Google Tag Manager, Microsoft Clarity, or Plausible may be used to understand, in aggregate, how the platform is used. You can ask support whether they're currently active."
+        },
+        {
+          "heading": "4. Managing cookies",
+          "body": "You can delete or block cookies from your browser settings. Note that blocking technical cookies may prevent you from signing in or keeping your preferences."
+        }
+      ]
+    },
+    "lastUpdatedLabel": "Last updated"
+  },
+  "support": {
+    "metaTitle": "Support",
+    "title": "How can we help?",
+    "subtitle": "Check the frequently asked questions or write to us directly.",
+    "contactEmailLabel": "You can also email us at",
+    "fields": {
+      "subject": "Subject",
+      "category": "Category",
+      "message": "Tell us what you need",
+      "categories": {
+        "pagos": "Payments",
+        "tecnico": "Technical issue",
+        "contenido": "Course content",
+        "cuenta": "My account"
+      }
+    },
+    "submit": "Send request",
+    "submitting": "Sending…",
+    "successTitle": "We've received your request",
+    "successBody": "We'll get back to you by email as soon as possible.",
+    "loginRequiredTitle": "Sign in to open a request",
+    "loginRequiredBody": "That way we can track your case from your account.",
+    "loginCta": "Sign in",
+    "faqCta": "View frequently asked questions"
+  }
+}

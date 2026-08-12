@@ -1,0 +1,1473 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                 String                  @id @default(uuid())
+  email              String                  @unique
+  passwordHash       String?                 @map("password_hash")
+  emailVerifiedAt    DateTime?               @map("email_verified_at")
+  statusId           String                  @map("status_id")
+  lastLoginAt        DateTime?               @map("last_login_at")
+  createdAt          DateTime                @default(now()) @map("created_at")
+  updatedAt          DateTime                @updatedAt @map("updated_at")
+  deletedAt          DateTime?               @map("deleted_at")
+  activityLogs       ActivityLog[]
+  referral           AffiliateReferral?
+  affiliate          Affiliate?
+  auditLogs          AuditLog[]
+  authProviders      AuthProvider[]
+  authoredCourses    Author?
+  blogPosts          BlogPost[]
+  certificates       Certificate[]
+  courseProgress     CourseProgressSummary[]
+  courseAnswers      CourseQuestionAnswer[]
+  courseQuestions    CourseQuestion[]
+  emailLogs          EmailLog[]
+  enrollments        Enrollment[]
+  examAttempts       ExamAttempt[]
+  favorites          Favorite[]
+  legalConsents      LegalConsent[]
+  lessonNotes        LessonNote[]
+  lessonProgress     LessonProgress[]
+  notifications      Notification[]
+  paymentsReviewed   Payment[]               @relation("PaymentReviewer")
+  payments           Payment[]
+  refundsProcessed   Refund[]                @relation("RefundProcessor")
+  uploadedResources  Resource[]
+  reviews            Review[]
+  streak             Streak?
+  supportMessages    SupportMessage[]
+  supportTickets     SupportTicket[]
+  userBadges         UserBadge[]
+  profile            UserProfile?
+  roles              UserRole[]
+  sessions           UserSession[]
+  status             UserStatus              @relation(fields: [statusId], references: [id])
+  verificationTokens VerificationToken[]
+  xpTransactions     XPTransaction[]
+  exerciseSubmissions     ExerciseSubmission[]
+  finalProjectSubmissions CourseFinalProjectSubmission[]
+  flashcardDecks          FlashcardDeck[]
+  exerciseAttempts        ExerciseAttempt[]
+
+  @@map("users")
+}
+
+/// Catálogo — estados de cuenta. Tabla y no enum: permite matizar
+/// estados a futuro (ej. "en periodo de prueba") sin migración estructural.
+model UserStatus {
+  id    String @id @default(uuid())
+  key   String @unique
+  label String
+  users User[]
+
+  @@map("user_statuses")
+}
+
+/// Un usuario puede tener varios métodos de acceso sin duplicar User.
+model AuthProvider {
+  id             String   @id @default(uuid())
+  userId         String   @map("user_id")
+  provider       String
+  providerUserId String   @map("provider_user_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId])
+  @@map("auth_providers")
+}
+
+model UserProfile {
+  id                 String    @id @default(uuid())
+  userId             String    @unique @map("user_id")
+  firstName          String    @map("first_name")
+  lastName           String    @map("last_name")
+  avatarUrl          String?   @map("avatar_url")
+  bio                String?
+  country            String?
+  timezone           String?
+  weeklyGoalMinutes  Int       @default(180) @map("weekly_goal_minutes")
+  showInRanking      Boolean   @default(true) @map("show_in_ranking")
+  acceptsMarketing   Boolean   @default(true) @map("accepts_marketing")
+  localePreferenceId String?   @map("locale_preference_id")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  localePreference   Language? @relation(fields: [localePreferenceId], references: [id])
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+/// Catálogo de roles — añadir un rol nuevo es una fila, no una migración.
+model Role {
+  id          String           @id @default(uuid())
+  name        String           @unique
+  description String?
+  createdAt   DateTime         @default(now()) @map("created_at")
+  permissions RolePermission[]
+  users       UserRole[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String           @id @default(uuid())
+  key         String           @unique
+  description String?
+  roles       RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  roleId       String     @map("role_id")
+  permissionId String     @map("permission_id")
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+/// Pivote user↔role: permite múltiples roles por usuario en el futuro
+/// (ej. alumno que también es editor de contenido) sin rehacer nada.
+model UserRole {
+  userId String @map("user_id")
+  roleId String @map("role_id")
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+/// Trazabilidad RGPD: qué versión de qué documento aceptó cada usuario.
+model LegalConsent {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  documentType    String   @map("document_type")
+  documentVersion String   @map("document_version")
+  acceptedAt      DateTime @default(now()) @map("accepted_at")
+  ipAddress       String?  @map("ip_address")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("legal_consents")
+}
+
+model UserSession {
+  id         String    @id @default(uuid())
+  userId     String    @map("user_id")
+  deviceInfo String?   @map("device_info")
+  ipAddress  String?   @map("ip_address")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  lastSeenAt DateTime  @updatedAt @map("last_seen_at")
+  revokedAt  DateTime? @map("revoked_at")
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_sessions")
+}
+
+/// Tokens de un solo uso para flujos propios de autenticación
+/// (verificación de email, recuperación de contraseña). Deliberadamente
+/// NO es la tabla genérica `VerificationToken` (identifier+token) que
+/// espera un adaptador estándar de Auth.js: al vincular cada token a un
+/// `userId` y a un `type` explícito, se pueden emitir varios tokens de
+/// tipos distintos para el mismo usuario sin colisión, y se audita
+/// cuándo se usó cada uno.
+model VerificationToken {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  token     String    @unique
+  type      String
+  expiresAt DateTime  @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@map("verification_tokens")
+}
+
+/// Catálogo genérico reutilizable (activo/inactivo/archivado...) para no
+/// repetir booleanos ad-hoc en cada tabla.
+model Status {
+  id              String           @id @default(uuid())
+  key             String           @unique
+  label           String
+  banners         Banner[]
+  blogPosts       BlogPost[]
+  categories      Category[]
+  courseQuestions CourseQuestion[]
+  homeBlocks      HomePageBlock[]
+  learningPaths   LearningPath[]
+  reviews         Review[]
+  supportTickets  SupportTicket[]
+
+  @@map("statuses")
+}
+
+/// Autorreferenciada → categorías y subcategorías ilimitadas en profundidad.
+model Category {
+  id              String           @id @default(uuid())
+  parentId        String?          @map("parent_id")
+  name            String
+  slug            String           @unique
+  icon            String?
+  imageUrl        String?          @map("image_url")
+  color           String?
+  sortOrder       Int              @default(0) @map("sort_order")
+  statusId        String           @map("status_id")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+  parent          Category?        @relation("CategoryToSubcategory", fields: [parentId], references: [id])
+  children        Category[]       @relation("CategoryToSubcategory")
+  status          Status           @relation(fields: [statusId], references: [id])
+  courseQuestions CourseQuestion[] @relation("CourseQuestionCategory")
+  courses         Course[]
+  questions       Question[]
+
+  @@map("categories")
+}
+
+model Tag {
+  id      String      @id @default(uuid())
+  name    String      @unique
+  slug    String      @unique
+  courses CourseTag[]
+
+  @@map("tags")
+}
+
+model CourseTag {
+  courseId String @map("course_id")
+  tagId    String @map("tag_id")
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  tag      Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([courseId, tagId])
+  @@map("course_tags")
+}
+
+/// Entidad "profesor" desde el día uno, aunque hoy el único autor sea
+/// NOVARA. Evita tener que tocar Course cuando haya autores externos.
+model Author {
+  id               String   @id @default(uuid())
+  userId           String?  @unique @map("user_id")
+  displayName      String   @map("display_name")
+  bio              String?
+  avatarUrl        String?  @map("avatar_url")
+  isPlatformAuthor Boolean  @default(false) @map("is_platform_author")
+  user             User?    @relation(fields: [userId], references: [id])
+  courses          Course[]
+
+  @@map("authors")
+}
+
+model CourseLevel {
+  id      String   @id @default(uuid())
+  key     String   @unique
+  label   String
+  courses Course[]
+
+  @@map("course_levels")
+}
+
+model Language {
+  id           String        @id @default(uuid())
+  code         String        @unique
+  name         String
+  courses      Course[]
+  userProfiles UserProfile[]
+
+  @@map("languages")
+}
+
+model CourseStatus {
+  id      String   @id @default(uuid())
+  key     String   @unique
+  label   String
+  courses Course[]
+
+  @@map("course_statuses")
+}
+
+model AccessType {
+  id      String   @id @default(uuid())
+  key     String   @unique
+  label   String
+  courses Course[]
+
+  @@map("access_types")
+}
+
+model Course {
+  id               String                  @id @default(uuid())
+  authorId         String                  @map("author_id")
+  categoryId       String                  @map("category_id")
+  levelId          String                  @map("level_id")
+  languageId       String                  @map("language_id")
+  statusId         String                  @map("status_id")
+  accessTypeId     String                  @map("access_type_id")
+  title            String
+  slug             String                  @unique
+  subtitle         String?
+  description      String
+  coverImageUrl    String?                 @map("cover_image_url")
+  bannerImageUrl   String?                 @map("banner_image_url")
+  durationMinutes  Int?                    @map("duration_minutes")
+  price            Decimal?                @db.Decimal(10, 2)
+  ratingAverage    Decimal                 @default(0) @map("rating_average") @db.Decimal(3, 2)
+  ratingCount      Int                     @default(0) @map("rating_count")
+  publishedAt      DateTime?               @map("published_at")
+  updatedContentAt DateTime?               @map("updated_content_at")
+  seoTitle         String?                 @map("seo_title")
+  seoDescription   String?                 @map("seo_description")
+  seoKeywords      String?                 @map("seo_keywords")
+  createdAt        DateTime                @default(now()) @map("created_at")
+  updatedAt        DateTime                @updatedAt @map("updated_at")
+  deletedAt        DateTime?               @map("deleted_at")
+  certificates     Certificate[]
+  coupons          Coupon[]
+  objectives       CourseObjective[]
+  prerequisitesOf  CoursePrerequisite[]    @relation("CourseRequires")
+  requiredBy       CoursePrerequisite[]    @relation("RequiredByCourse")
+  priceHistory     CoursePriceHistory[]
+  courseProgress   CourseProgressSummary[]
+  courseQuestions  CourseQuestion[]
+  requirements     CourseRequirement[]
+  resources        CourseResource[]
+  tags             CourseTag[]
+  accessType       AccessType              @relation(fields: [accessTypeId], references: [id])
+  author           Author                  @relation(fields: [authorId], references: [id])
+  category         Category                @relation(fields: [categoryId], references: [id])
+  language         Language                @relation(fields: [languageId], references: [id])
+  level            CourseLevel             @relation(fields: [levelId], references: [id])
+  status           CourseStatus            @relation(fields: [statusId], references: [id])
+  enrollments      Enrollment[]
+  exams            Exam[]
+  favorites        Favorite[]
+  finalProject     CourseFinalProject?
+  learningPaths    LearningPathCourse[]
+  modules          Module[]
+  payments         Payment[]
+  reviews          Review[]
+
+  @@map("courses")
+}
+
+model CourseObjective {
+  id        String @id @default(uuid())
+  courseId  String @map("course_id")
+  text      String
+  sortOrder Int    @default(0) @map("sort_order")
+  course    Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("course_objectives")
+}
+
+model CourseRequirement {
+  id        String @id @default(uuid())
+  courseId  String @map("course_id")
+  text      String
+  sortOrder Int    @default(0) @map("sort_order")
+  course    Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("course_requirements")
+}
+
+/// Relación formal curso-requiere-curso (además del texto libre de arriba).
+model CoursePrerequisite {
+  courseId         String @map("course_id")
+  requiredCourseId String @map("required_course_id")
+  course           Course @relation("CourseRequires", fields: [courseId], references: [id], onDelete: Cascade)
+  requiredCourse   Course @relation("RequiredByCourse", fields: [requiredCourseId], references: [id], onDelete: Cascade)
+
+  @@id([courseId, requiredCourseId])
+  @@map("course_prerequisites")
+}
+
+/// Histórico de precio — necesario para mostrar precios anteriores de
+/// forma honesta y auditable (y por requisitos legales de la UE).
+model CoursePriceHistory {
+  id            String    @id @default(uuid())
+  courseId      String    @map("course_id")
+  price         Decimal   @db.Decimal(10, 2)
+  discountPrice Decimal?  @map("discount_price") @db.Decimal(10, 2)
+  validFrom     DateTime  @map("valid_from")
+  validTo       DateTime? @map("valid_to")
+  course        Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("course_price_history")
+}
+
+model LearningPath {
+  id            String               @id @default(uuid())
+  title         String
+  slug          String               @unique
+  description   String?
+  coverImageUrl String?              @map("cover_image_url")
+  statusId      String               @map("status_id")
+  price         Decimal?             @db.Decimal(10, 2)
+  createdAt     DateTime             @default(now()) @map("created_at")
+  courses       LearningPathCourse[]
+  status        Status               @relation(fields: [statusId], references: [id])
+
+  @@map("learning_paths")
+}
+
+model LearningPathCourse {
+  learningPathId String       @map("learning_path_id")
+  courseId       String       @map("course_id")
+  sortOrder      Int          @default(0) @map("sort_order")
+  course         Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  learningPath   LearningPath @relation(fields: [learningPathId], references: [id], onDelete: Cascade)
+
+  @@id([learningPathId, courseId])
+  @@map("learning_path_courses")
+}
+
+model Module {
+  id          String   @id @default(uuid())
+  courseId    String   @map("course_id")
+  title       String
+  description String?
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  lessons     Lesson[]
+  exams       Exam[]
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("modules")
+}
+
+/// Catálogo de tipos de contenido — añadir uno nuevo (ej. "scorm") es
+/// una fila, no una migración de columnas nullable adicionales.
+model ContentType {
+  id       String          @id @default(uuid())
+  key      String          @unique
+  label    String
+  contents LessonContent[]
+  lessons  Lesson[]
+
+  @@map("content_types")
+}
+
+model Lesson {
+  id              String           @id @default(uuid())
+  moduleId        String           @map("module_id")
+  title           String
+  description     String?
+  contentTypeId   String           @map("content_type_id")
+  sortOrder       Int              @default(0) @map("sort_order")
+  durationSeconds Int?             @map("duration_seconds")
+  isPreview       Boolean          @default(false) @map("is_preview")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  questions       CourseQuestion[]
+  exams           Exam[]
+  blocks          LessonBlock[]
+  content         LessonContent?
+  exercise        LessonExercise?
+  exercises       Exercise[]
+  pedagogy            LessonPedagogy?
+  exerciseSubmissions ExerciseSubmission[]
+  notes           LessonNote[]
+  progress        LessonProgress[]
+  resources       LessonResource[]
+  contentType     ContentType      @relation(fields: [contentTypeId], references: [id])
+  module          Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@map("lessons")
+}
+
+/// Una tabla de contenido por lección, con `metadata` JSON para los
+/// atributos genuinamente distintos entre tipos (proveedor de streaming,
+/// transcripción, etc.). Es la única parte del esquema donde se usa JSON,
+/// de forma deliberada — ver razonamiento en el documento de arquitectura.
+model LessonContent {
+  id            String      @id @default(uuid())
+  lessonId      String      @unique @map("lesson_id")
+  contentTypeId String      @map("content_type_id")
+  body          String?
+  externalUrl   String?     @map("external_url")
+  metadata      Json?
+  contentType   ContentType @relation(fields: [contentTypeId], references: [id])
+  lesson        Lesson      @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@map("lesson_contents")
+}
+
+model LessonExercise {
+  id                String  @id @default(uuid())
+  lessonId          String  @unique @map("lesson_id")
+  instructions      String
+  expectsSubmission Boolean @default(false) @map("expects_submission")
+  maxScore          Int?    @map("max_score")
+  lesson            Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@map("lesson_exercises")
+}
+
+/// Notas personales del alumno sobre una lección concreta. Tabla nueva,
+/// aislada — no toca ningún modelo existente — para la Fase 5
+/// (experiencia de aprendizaje). Una nota por alumno y lección.
+model LessonNote {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  lessonId  String   @map("lesson_id")
+  body      String
+  updatedAt DateTime @updatedAt @map("updated_at")
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@map("lesson_notes")
+}
+
+model ResourceType {
+  id        String     @id @default(uuid())
+  key       String     @unique
+  label     String
+  resources Resource[]
+
+  @@map("resource_types")
+}
+
+model Resource {
+  id             String           @id @default(uuid())
+  title          String
+  fileUrl        String           @map("file_url")
+  resourceTypeId String           @map("resource_type_id")
+  fileSizeBytes  Int?             @map("file_size_bytes")
+  uploadedById   String?          @map("uploaded_by")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  courses        CourseResource[]
+  lessons        LessonResource[]
+  resourceType   ResourceType     @relation(fields: [resourceTypeId], references: [id])
+  uploadedBy     User?            @relation(fields: [uploadedById], references: [id])
+
+  @@map("resources")
+}
+
+model LessonResource {
+  lessonId   String   @map("lesson_id")
+  resourceId String   @map("resource_id")
+  lesson     Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@id([lessonId, resourceId])
+  @@map("lesson_resources")
+}
+
+model CourseResource {
+  courseId   String   @map("course_id")
+  resourceId String   @map("resource_id")
+  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+
+  @@id([courseId, resourceId])
+  @@map("course_resources")
+}
+
+model QuestionType {
+  id        String     @id @default(uuid())
+  key       String     @unique
+  label     String
+  questions Question[]
+
+  @@map("question_types")
+}
+
+model Question {
+  id             String           @id @default(uuid())
+  questionTypeId String           @map("question_type_id")
+  statement      String
+  explanation    String?
+  categoryId     String?          @map("category_id")
+  createdAt      DateTime         @default(now()) @map("created_at")
+  answers        ExamAnswer[]
+  examQuestions  ExamQuestion[]
+  options        QuestionOption[]
+  category       Category?        @relation(fields: [categoryId], references: [id])
+  questionType   QuestionType     @relation(fields: [questionTypeId], references: [id])
+
+  @@map("questions")
+}
+
+model QuestionOption {
+  id         String   @id @default(uuid())
+  questionId String   @map("question_id")
+  text       String
+  isCorrect  Boolean  @default(false) @map("is_correct")
+  matchKey   String?  @map("match_key")
+  sortOrder  Int      @default(0) @map("sort_order")
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("question_options")
+}
+
+model Exam {
+  id                 String         @id @default(uuid())
+  courseId           String?        @map("course_id")
+  lessonId           String?        @map("lesson_id")
+  moduleId           String?        @map("module_id")
+  title              String
+  passingScore       Decimal        @map("passing_score") @db.Decimal(5, 2)
+  timeLimitMinutes   Int?           @map("time_limit_minutes")
+  maxAttempts        Int?           @map("max_attempts")
+  // Composición por bloques de ejercicio (Fase 6): si `randomizeSections`,
+  // el orden de las secciones se baraja por intento.
+  randomizeSections  Boolean        @default(false) @map("randomize_sections")
+  createdAt          DateTime       @default(now()) @map("created_at")
+  attempts           ExamAttempt[]
+  parts              ExamPart[]
+  questions          ExamQuestion[]
+  sections           ExamSection[]
+  course             Course?        @relation(fields: [courseId], references: [id])
+  lesson             Lesson?        @relation(fields: [lessonId], references: [id])
+  module             Module?        @relation(fields: [moduleId], references: [id])
+
+  @@map("exams")
+}
+
+// Composición de examen (Fase 6): una sección referencia un `Exercise`
+// (Reading/Writing/Listening/Speaking) con su PESO en la nota final y un
+// tiempo opcional por sección. Reutiliza el motor de ejercicios; no
+// duplica la lógica de preguntas.
+model ExamSection {
+  id               String   @id @default(uuid())
+  examId           String   @map("exam_id")
+  exerciseId       String   @map("exercise_id")
+  weight           Decimal  @default(1) @db.Decimal(5, 2)
+  timeLimitMinutes Int?     @map("time_limit_minutes")
+  order            Int      @default(0)
+  exam             Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  exercise         Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@index([examId])
+  @@index([exerciseId])
+  @@map("exam_sections")
+}
+
+model ExamPart {
+  id        String         @id @default(uuid())
+  examId    String         @map("exam_id")
+  skill     String
+  part      Int
+  title     String
+  createdAt DateTime       @default(now()) @map("created_at")
+  exercises ExamExercise[]
+  exam      Exam           @relation(fields: [examId], references: [id], onDelete: Cascade)
+
+  @@map("exam_parts")
+}
+
+model ExamExercise {
+  id        String   @id @default(uuid())
+  partId    String   @map("part_id")
+  type      String
+  title     String?
+  content   Json
+  position  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  part      ExamPart @relation(fields: [partId], references: [id], onDelete: Cascade)
+
+  @@map("exam_exercises")
+}
+
+model ExamQuestion {
+  examId     String   @map("exam_id")
+  questionId String   @map("question_id")
+  sortOrder  Int      @default(0) @map("sort_order")
+  points     Decimal  @default(1) @db.Decimal(5, 2)
+  exam       Exam     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@id([examId, questionId])
+  @@map("exam_questions")
+}
+
+model ExamAttempt {
+  id               String       @id @default(uuid())
+  examId           String       @map("exam_id")
+  userId           String       @map("user_id")
+  startedAt        DateTime     @default(now()) @map("started_at")
+  submittedAt      DateTime?    @map("submitted_at")
+  score            Decimal?     @db.Decimal(5, 2)
+  passed           Boolean?
+  timeSpentSeconds Int?         @map("time_spent_seconds")
+  answers          ExamAnswer[]
+  exam             Exam         @relation(fields: [examId], references: [id], onDelete: Cascade)
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("exam_attempts")
+}
+
+model ExamAnswer {
+  id                String      @id @default(uuid())
+  attemptId         String      @map("attempt_id")
+  questionId        String      @map("question_id")
+  selectedOptionIds Json?       @map("selected_option_ids")
+  freeTextAnswer    String?     @map("free_text_answer")
+  isCorrect         Boolean?    @map("is_correct")
+  pointsAwarded     Decimal?    @map("points_awarded") @db.Decimal(5, 2)
+  attempt           ExamAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question          Question    @relation(fields: [questionId], references: [id])
+
+  @@map("exam_answers")
+}
+
+model CertificateTemplate {
+  id           String        @id @default(uuid())
+  name         String
+  designConfig Json          @map("design_config")
+  isDefault    Boolean       @default(false) @map("is_default")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  certificates Certificate[]
+
+  @@map("certificate_templates")
+}
+
+model Certificate {
+  id               String                       @id @default(uuid())
+  userId           String                       @map("user_id")
+  courseId         String?                      @map("course_id")
+  templateId       String                       @map("template_id")
+  uniqueCode       String                       @unique @map("unique_code")
+  qrUrl            String?                      @map("qr_url")
+  issuedAt         DateTime                     @default(now()) @map("issued_at")
+  pdfUrl           String?                      @map("pdf_url")
+  verificationLogs CertificateVerificationLog[]
+  course           Course?                      @relation(fields: [courseId], references: [id])
+  template         CertificateTemplate          @relation(fields: [templateId], references: [id])
+  user             User                         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("certificates")
+}
+
+model CertificateVerificationLog {
+  id            String      @id @default(uuid())
+  certificateId String      @map("certificate_id")
+  verifiedAt    DateTime    @default(now()) @map("verified_at")
+  ipAddress     String?     @map("ip_address")
+  certificate   Certificate @relation(fields: [certificateId], references: [id], onDelete: Cascade)
+
+  @@map("certificate_verification_logs")
+}
+
+model EnrollmentSource {
+  id          String       @id @default(uuid())
+  key         String       @unique
+  label       String
+  enrollments Enrollment[]
+
+  @@map("enrollment_sources")
+}
+
+/// Pieza central que faltaba modelar de forma explícita: conecta alumno
+/// y curso, con origen y validez propios.
+model Enrollment {
+  id         String           @id @default(uuid())
+  userId     String           @map("user_id")
+  courseId   String           @map("course_id")
+  sourceId   String           @map("source_id")
+  enrolledAt DateTime         @default(now()) @map("enrolled_at")
+  expiresAt  DateTime?        @map("expires_at")
+  status     String           @default("activo")
+  course     Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  source     EnrollmentSource @relation(fields: [sourceId], references: [id])
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@map("enrollments")
+}
+
+model LessonProgress {
+  id                  String    @id @default(uuid())
+  userId              String    @map("user_id")
+  lessonId            String    @map("lesson_id")
+  status              String    @default("no_iniciado")
+  watchedSeconds      Int       @default(0) @map("watched_seconds")
+  lastPositionSeconds Int       @default(0) @map("last_position_seconds")
+  isFavorite          Boolean   @default(false) @map("is_favorite")
+  completedAt         DateTime? @map("completed_at")
+  lastActivityAt      DateTime  @updatedAt @map("last_activity_at")
+  lesson              Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@map("lesson_progress")
+}
+
+/// Tabla de resumen/caché — el detalle real vive en LessonProgress.
+model CourseProgressSummary {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  courseId        String   @map("course_id")
+  percentComplete Decimal  @default(0) @map("percent_complete") @db.Decimal(5, 2)
+  lastActivityAt  DateTime @updatedAt @map("last_activity_at")
+  course          Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@map("course_progress_summaries")
+}
+
+model PaymentMethod {
+  id       String    @id @default(uuid())
+  key      String    @unique
+  label    String
+  payments Payment[]
+
+  @@map("payment_methods")
+}
+
+model PaymentStatus {
+  id       String                 @id @default(uuid())
+  key      String                 @unique
+  label    String
+  history  PaymentStatusHistory[] @relation("ToStatus")
+  payments Payment[]
+}
+
+model Payment {
+  id                String                 @id @default(uuid())
+  userId            String                 @map("user_id")
+  courseId          String?                @map("course_id")
+  learningPathId    String?                @map("learning_path_id")
+  paymentMethodId   String                 @map("payment_method_id")
+  amount            Decimal                @db.Decimal(10, 2)
+  currency          String                 @default("EUR")
+  statusId          String                 @map("status_id")
+  proofFileUrl      String?                @map("proof_file_url")
+  adminNotes        String?                @map("admin_notes")
+  reviewedById      String?                @map("reviewed_by")
+  reviewedAt        DateTime?              @map("reviewed_at")
+  createdAt         DateTime               @default(now()) @map("created_at")
+  affiliateReferral AffiliateReferral?
+  invoice           Invoice?
+  coupons           PaymentCoupon[]
+  statusHistory     PaymentStatusHistory[]
+  course            Course?                @relation(fields: [courseId], references: [id])
+  paymentMethod     PaymentMethod          @relation(fields: [paymentMethodId], references: [id])
+  reviewedBy        User?                  @relation("PaymentReviewer", fields: [reviewedById], references: [id])
+  status            PaymentStatus          @relation(fields: [statusId], references: [id])
+  user              User                   @relation(fields: [userId], references: [id])
+  refunds           Refund[]
+
+  @@map("payments")
+}
+
+/// Cada cambio de estado queda registrado — imprescindible para soporte
+/// y para poder responder "¿cuándo y por qué se rechazó este pago?".
+model PaymentStatusHistory {
+  id           String        @id @default(uuid())
+  paymentId    String        @map("payment_id")
+  fromStatusId String?       @map("from_status_id")
+  toStatusId   String        @map("to_status_id")
+  changedById  String?       @map("changed_by")
+  note         String?
+  createdAt    DateTime      @default(now()) @map("created_at")
+  payment      Payment       @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  toStatus     PaymentStatus @relation("ToStatus", fields: [toStatusId], references: [id])
+
+  @@map("payment_status_history")
+}
+
+model Invoice {
+  id             String   @id @default(uuid())
+  paymentId      String   @unique @map("payment_id")
+  invoiceNumber  String   @unique @map("invoice_number")
+  issuedAt       DateTime @default(now()) @map("issued_at")
+  pdfUrl         String?  @map("pdf_url")
+  billingName    String   @map("billing_name")
+  billingTaxId   String?  @map("billing_tax_id")
+  billingAddress String?  @map("billing_address")
+  payment        Payment  @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@map("invoices")
+}
+
+model Refund {
+  id            String    @id @default(uuid())
+  paymentId     String    @map("payment_id")
+  amount        Decimal   @db.Decimal(10, 2)
+  reason        String?
+  status        String    @default("pendiente")
+  requestedAt   DateTime  @default(now()) @map("requested_at")
+  processedAt   DateTime? @map("processed_at")
+  processedById String?   @map("processed_by")
+  payment       Payment   @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+  processedBy   User?     @relation("RefundProcessor", fields: [processedById], references: [id])
+
+  @@map("refunds")
+}
+
+model Coupon {
+  id                 String          @id @default(uuid())
+  code               String          @unique
+  discountType       String          @map("discount_type")
+  discountValue      Decimal         @map("discount_value") @db.Decimal(10, 2)
+  validFrom          DateTime        @map("valid_from")
+  validTo            DateTime?       @map("valid_to")
+  maxUses            Int?            @map("max_uses")
+  timesUsed          Int             @default(0) @map("times_used")
+  applicableCourseId String?         @map("applicable_course_id")
+  applicableCourse   Course?         @relation(fields: [applicableCourseId], references: [id])
+  payments           PaymentCoupon[]
+
+  @@map("coupons")
+}
+
+model PaymentCoupon {
+  paymentId String  @map("payment_id")
+  couponId  String  @map("coupon_id")
+  coupon    Coupon  @relation(fields: [couponId], references: [id])
+  payment   Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@id([paymentId, couponId])
+  @@map("payment_coupons")
+}
+
+model EmailTemplate {
+  id       String  @id @default(uuid())
+  key      String  @unique
+  subject  String
+  bodyHtml String  @map("body_html")
+  isActive Boolean @default(true) @map("is_active")
+
+  @@map("email_templates")
+}
+
+model EmailLog {
+  id                String    @id @default(uuid())
+  userId            String?   @map("user_id")
+  templateKey       String    @map("template_key")
+  sentTo            String    @map("sent_to")
+  status            String    @default("pendiente")
+  providerMessageId String?   @map("provider_message_id")
+  sentAt            DateTime? @map("sent_at")
+  user              User?     @relation(fields: [userId], references: [id])
+
+  @@map("email_logs")
+}
+
+/// Mismo evento de negocio, dos canales: email (arriba) y esto, dentro
+/// de la propia plataforma (campanita de notificaciones).
+model Notification {
+  id                String   @id @default(uuid())
+  userId            String   @map("user_id")
+  type              String
+  title             String
+  body              String
+  isRead            Boolean  @default(false) @map("is_read")
+  createdAt         DateTime @default(now()) @map("created_at")
+  relatedEntityType String?  @map("related_entity_type")
+  relatedEntityId   String?  @map("related_entity_id")
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model Badge {
+  id                  String        @id @default(uuid())
+  name                String
+  description         String?
+  iconUrl             String?       @map("icon_url")
+  criteriaDescription String?       @map("criteria_description")
+  achievements        Achievement[]
+  users               UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  userId    String   @map("user_id")
+  badgeId   String   @map("badge_id")
+  awardedAt DateTime @default(now()) @map("awarded_at")
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, badgeId])
+  @@map("user_badges")
+}
+
+/// Histórico de experiencia, no un campo único sumado — permite auditar
+/// y mostrar una línea de tiempo de progreso real.
+model XPTransaction {
+  id                String   @id @default(uuid())
+  userId            String   @map("user_id")
+  amount            Int
+  reason            String
+  relatedEntityType String?  @map("related_entity_type")
+  relatedEntityId   String?  @map("related_entity_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("xp_transactions")
+}
+
+model Streak {
+  id                String    @id @default(uuid())
+  userId            String    @unique @map("user_id")
+  currentStreakDays Int       @default(0) @map("current_streak_days")
+  longestStreakDays Int       @default(0) @map("longest_streak_days")
+  lastActivityDate  DateTime? @map("last_activity_date")
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("streaks")
+}
+
+/// Definición/regla del logro. Distinto de Badge (la recompensa visual).
+model Achievement {
+  id          String  @id @default(uuid())
+  key         String  @unique
+  name        String
+  description String?
+  badgeId     String? @map("badge_id")
+  xpReward    Int     @default(0) @map("xp_reward")
+  badge       Badge?  @relation(fields: [badgeId], references: [id])
+
+  @@map("achievements")
+}
+
+/// Nivel del alumno por gamificación — no confundir con CourseLevel.
+model UserLevel {
+  id      String  @id @default(uuid())
+  name    String
+  minXp   Int     @map("min_xp")
+  iconUrl String? @map("icon_url")
+
+  @@map("user_levels")
+}
+
+model Favorite {
+  userId    String   @map("user_id")
+  courseId  String   @map("course_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, courseId])
+  @@map("favorites")
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  courseId  String   @map("course_id")
+  rating    Int
+  comment   String?
+  statusId  String   @map("status_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  status    Status   @relation(fields: [statusId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@map("reviews")
+}
+
+/// Historial del propio alumno (distinto del AuditLog de administración).
+model ActivityLog {
+  id                String   @id @default(uuid())
+  userId            String   @map("user_id")
+  eventType         String   @map("event_type")
+  description       String
+  relatedEntityType String?  @map("related_entity_type")
+  relatedEntityId   String?  @map("related_entity_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("activity_logs")
+}
+
+model CourseQuestion {
+  id         String                 @id @default(uuid())
+  courseId   String                 @map("course_id")
+  lessonId   String?                @map("lesson_id")
+  userId     String                 @map("user_id")
+  body       String
+  statusId   String                 @map("status_id")
+  categoryId String?                @map("category_id")
+  createdAt  DateTime               @default(now()) @map("created_at")
+  answers    CourseQuestionAnswer[]
+  category   Category?              @relation("CourseQuestionCategory", fields: [categoryId], references: [id])
+  course     Course                 @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lesson     Lesson?                @relation(fields: [lessonId], references: [id])
+  status     Status                 @relation(fields: [statusId], references: [id])
+  user       User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("course_questions")
+}
+
+model CourseQuestionAnswer {
+  id         String         @id @default(uuid())
+  questionId String         @map("question_id")
+  userId     String         @map("user_id")
+  body       String
+  createdAt  DateTime       @default(now()) @map("created_at")
+  question   CourseQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user       User           @relation(fields: [userId], references: [id])
+
+  @@map("course_question_answers")
+}
+
+model SupportTicket {
+  id        String           @id @default(uuid())
+  userId    String           @map("user_id")
+  subject   String
+  category  String
+  statusId  String           @map("status_id")
+  priority  String           @default("normal")
+  createdAt DateTime         @default(now()) @map("created_at")
+  messages  SupportMessage[]
+  status    Status           @relation(fields: [statusId], references: [id])
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("support_tickets")
+}
+
+model SupportMessage {
+  id            String        @id @default(uuid())
+  ticketId      String        @map("ticket_id")
+  senderId      String        @map("sender_id")
+  body          String
+  attachmentUrl String?       @map("attachment_url")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  sender        User          @relation(fields: [senderId], references: [id])
+  ticket        SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  @@map("support_messages")
+}
+
+model GlobalSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("global_settings")
+}
+
+model Banner {
+  id        String    @id @default(uuid())
+  title     String
+  imageUrl  String    @map("image_url")
+  linkUrl   String?   @map("link_url")
+  position  String
+  statusId  String    @map("status_id")
+  sortOrder Int       @default(0) @map("sort_order")
+  validFrom DateTime? @map("valid_from")
+  validTo   DateTime? @map("valid_to")
+  status    Status    @relation(fields: [statusId], references: [id])
+
+  @@map("banners")
+}
+
+/// Permite componer la home desde el panel de admin sin desplegar código.
+model HomePageBlock {
+  id        String @id @default(uuid())
+  blockType String @map("block_type")
+  config    Json
+  sortOrder Int    @default(0) @map("sort_order")
+  statusId  String @map("status_id")
+  status    Status @relation(fields: [statusId], references: [id])
+
+  @@map("home_page_blocks")
+}
+
+model BlogPost {
+  id             String    @id @default(uuid())
+  authorId       String    @map("author_id")
+  title          String
+  slug           String    @unique
+  coverImageUrl  String?   @map("cover_image_url")
+  excerpt        String?
+  body           String
+  statusId       String    @map("status_id")
+  seoTitle       String?   @map("seo_title")
+  seoDescription String?   @map("seo_description")
+  publishedAt    DateTime? @map("published_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  author         User      @relation(fields: [authorId], references: [id])
+  status         Status    @relation(fields: [statusId], references: [id])
+
+  @@map("blog_posts")
+}
+
+/// Sistema de afiliados — Fase 6. Arquitectura completa desde ahora,
+/// aunque el programa permanezca desactivado por defecto (interruptor
+/// `affiliate_program_enabled` en `GlobalSetting`). Un usuario con
+/// cuenta normal puede convertirse en afiliado; nada de esto interfiere
+/// con el resto del modelo si el programa está apagado.
+model Affiliate {
+  id             String              @id @default(uuid())
+  userId         String              @unique @map("user_id")
+  code           String              @unique
+  commissionRate Decimal             @default(10) @map("commission_rate") @db.Decimal(5, 2)
+  isActive       Boolean             @default(true) @map("is_active")
+  createdAt      DateTime            @default(now()) @map("created_at")
+  payouts        AffiliatePayout[]
+  referrals      AffiliateReferral[]
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("affiliates")
+}
+
+/// Un referido concreto: alguien que se registró a través del enlace
+/// de un afiliado. La comisión se calcula y confirma cuando (si)
+/// ese referido completa una compra — no al registrarse.
+model AffiliateReferral {
+  id               String    @id @default(uuid())
+  affiliateId      String    @map("affiliate_id")
+  referredUserId   String    @unique @map("referred_user_id")
+  paymentId        String?   @unique @map("payment_id")
+  commissionAmount Decimal?  @map("commission_amount") @db.Decimal(10, 2)
+  status           String    @default("pendiente")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  affiliate        Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  payment          Payment?  @relation(fields: [paymentId], references: [id])
+  referredUser     User      @relation(fields: [referredUserId], references: [id], onDelete: Cascade)
+
+  @@map("affiliate_referrals")
+}
+
+/// Historial de pagos realizados a un afiliado por sus comisiones
+/// confirmadas — mismo patrón de histórico explícito que `Payment`.
+model AffiliatePayout {
+  id          String    @id @default(uuid())
+  affiliateId String    @map("affiliate_id")
+  amount      Decimal   @db.Decimal(10, 2)
+  status      String    @default("pendiente")
+  paidAt      DateTime? @map("paid_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  affiliate   Affiliate @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+
+  @@map("affiliate_payouts")
+}
+
+model AuditLog {
+  id               String   @id @default(uuid())
+  actorId          String   @map("actor_id")
+  action           String
+  targetEntityType String   @map("target_entity_type")
+  targetEntityId   String   @map("target_entity_id")
+  metadata         Json?
+  createdAt        DateTime @default(now()) @map("created_at")
+  actor            User     @relation(fields: [actorId], references: [id])
+
+  @@map("audit_logs")
+}
+
+model LessonBlock {
+  id        String         @id @default(uuid())
+  lessonId  String         @map("lesson_id")
+  type      String
+  order     Int            @default(0)
+  title     String?
+  content   String?
+  imageUrl  String?        @map("image_url")
+  videoUrl  String?        @map("video_url")
+  audioUrl  String?        @map("audio_url")
+  // Contenido estructurado por tipo (galería de imágenes, ítems de resumen,
+  // variante de nota, metadatos de PDF/recurso…). Validado en la capa de
+  // aplicación según `type`. Los bloques simples siguen usando las columnas.
+  data      Json?
+  // Bloque de flashcards: referencia a un mazo reutilizable (biblioteca).
+  deckId    String?        @map("deck_id")
+  createdAt DateTime       @default(now()) @map("created_at")
+  lesson    Lesson         @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  deck      FlashcardDeck? @relation(fields: [deckId], references: [id], onDelete: SetNull)
+
+  @@index([deckId])
+  @@map("lesson_blocks")
+}
+
+// Plantilla de lección (mejora 3.5): guarda el ESQUELETO de bloques (tipos y
+// orden, sin el contenido concreto) para reutilizarlo al crear lecciones con
+// estructura repetitiva. Global (compartida entre administradores).
+model LessonTemplate {
+  id        String   @id @default(uuid())
+  name      String
+  blocks    Json
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("lesson_templates")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Flashcards (Fase 3). Un mazo (FlashcardDeck) es una entidad de
+// primera clase reutilizable (biblioteca): puede vivir por sí solo en
+// el panel y, más adelante, referenciarse desde un bloque de lección.
+// El audio de pronunciación se genera con la capa de voz (modules/voice).
+// ─────────────────────────────────────────────────────────────
+
+model FlashcardDeck {
+  id          String      @id @default(uuid())
+  title       String
+  description String?
+  language    String?
+  authorId    String      @map("author_id")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+  author      User          @relation(fields: [authorId], references: [id])
+  cards       Flashcard[]
+  lessonBlocks LessonBlock[]
+
+  @@index([authorId])
+  @@map("flashcard_decks")
+}
+
+model Flashcard {
+  id            String        @id @default(uuid())
+  deckId        String        @map("deck_id")
+  term          String
+  translation   String
+  explanation   String?
+  example       String?
+  category      String?
+  level         String?
+  pronunciation String?
+  ipa           String?
+  audioUrl      String?       @map("audio_url")
+  notes         String?
+  sortOrder     Int           @default(0) @map("sort_order")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+  deck          FlashcardDeck @relation(fields: [deckId], references: [id], onDelete: Cascade)
+
+  @@index([deckId])
+  @@map("flashcards")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Ejercicios (Fase 5). Modelo flexible: una `Exercise` pertenece a las 4
+// categorías (reading/writing/listening/speaking); su `config` (JSON)
+// guarda lo específico de cada una (texto base, audio+transcripción,
+// rúbrica de writing, escenario de speaking). Las preguntas de Reading/
+// Listening se guardan como `ExerciseQuestion` con la definición completa
+// en `data` (motor de tipos reutilizable, ver modules/exercises/shared).
+// ─────────────────────────────────────────────────────────────
+
+model Exercise {
+  id           String             @id @default(uuid())
+  lessonId     String             @map("lesson_id")
+  category     String
+  title        String
+  instructions String?
+  config       Json?
+  sortOrder    Int                @default(0) @map("sort_order")
+  createdAt    DateTime           @default(now()) @map("created_at")
+  updatedAt    DateTime           @updatedAt @map("updated_at")
+  lesson       Lesson             @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  questions    ExerciseQuestion[]
+  examSections ExamSection[]
+  attempts     ExerciseAttempt[]
+
+  @@index([lessonId])
+  @@map("exercises")
+}
+
+// Intento de un alumno en un ejercicio (Fase 5, consumo): guarda la nota,
+// aciertos y las respuestas, para seguimiento del alumno y analítica.
+model ExerciseAttempt {
+  id                String   @id @default(uuid())
+  exerciseId        String   @map("exercise_id")
+  userId            String   @map("user_id")
+  score             Int
+  correctCount      Int      @map("correct_count")
+  total             Int
+  needsManualReview Boolean  @default(false) @map("needs_manual_review")
+  responses         Json?
+  createdAt         DateTime @default(now()) @map("created_at")
+  exercise          Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([exerciseId])
+  @@index([userId])
+  @@map("exercise_attempts")
+}
+
+model ExerciseQuestion {
+  id         String   @id @default(uuid())
+  exerciseId String   @map("exercise_id")
+  order      Int      @default(0)
+  kind       String
+  data       Json
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+
+  @@index([exerciseId])
+  @@map("exercise_questions")
+}
+
+// ─────────────────────────────────────────────────────────────
+// Estándar NOVARA — adiciones de la iteración más avanzada
+// (reconstruidas a partir del uso real en el código de src/):
+//   - LessonPedagogy: los 10 puntos pedagógicos por lección
+//   - ExerciseSubmission: entrega de ejercicio + corrección IA
+//   - CourseFinalProject + Submission: proyecto final por curso
+// ─────────────────────────────────────────────────────────────
+
+model LessonPedagogy {
+  id              String   @id @default(uuid())
+  lessonId        String   @unique @map("lesson_id")
+  objective       String?
+  examples        String[]
+  commonMistakes  String[] @map("common_mistakes")
+  visualSchemaUrl String?  @map("visual_schema_url")
+  mindMapUrl      String?  @map("mind_map_url")
+  summary         String?
+  reviewPrompts   String[] @map("review_prompts")
+  lesson          Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@map("lesson_pedagogy")
+}
+
+model ExerciseSubmission {
+  id          String    @id @default(uuid())
+  userId      String    @map("user_id")
+  lessonId    String    @map("lesson_id")
+  content     String
+  status      String    @default("pendiente")
+  aiScore     Decimal?  @map("ai_score") @db.Decimal(5, 2)
+  aiFeedback  String?   @map("ai_feedback")
+  submittedAt DateTime  @default(now()) @map("submitted_at")
+  correctedAt DateTime? @map("corrected_at")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@map("exercise_submissions")
+}
+
+model CourseFinalProject {
+  id           String                         @id @default(uuid())
+  courseId     String                         @unique @map("course_id")
+  title        String
+  instructions String
+  course       Course                         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  submissions  CourseFinalProjectSubmission[]
+
+  @@map("course_final_projects")
+}
+
+model CourseFinalProjectSubmission {
+  id             String             @id @default(uuid())
+  finalProjectId String             @map("final_project_id")
+  userId         String             @map("user_id")
+  content        String
+  status         String             @default("pendiente")
+  feedback       String?
+  submittedAt    DateTime           @default(now()) @map("submitted_at")
+  finalProject   CourseFinalProject @relation(fields: [finalProjectId], references: [id], onDelete: Cascade)
+  user           User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([finalProjectId, userId])
+  @@map("course_final_project_submissions")
+}

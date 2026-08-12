@@ -1,0 +1,304 @@
+{
+  "common": {
+    "appName": "NOVARA",
+    "loading": "Cargando…",
+    "error": "Ha ocurrido un error",
+    "retry": "Reintentar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "free": "Gratis",
+    "skipToContent": "Saltar al contenido"
+  },
+  "nav": {
+    "home": "Inicio",
+    "courses": "Cursos",
+    "categories": "Categorías",
+    "howItWorks": "Cómo funciona",
+    "myLearning": "Mi aprendizaje",
+    "profile": "Mi perfil",
+    "signIn": "Iniciar sesión",
+    "signUp": "Crear cuenta",
+    "signOut": "Cerrar sesión",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú"
+  },
+  "theme": {
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
+  },
+  "breadcrumbs": {
+    "home": "Inicio"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "Academia online verificada",
+      "headlineLine1": "Aprende de verdad,",
+      "headlineEmphasis": "no a medias.",
+      "subheadline": "NOVARA es una academia con un único criterio: si un curso no cumple un estándar alto, no se publica. Progreso real, exámenes de verdad y certificados verificables.",
+      "primaryCta": "Explorar cursos",
+      "secondaryCta": "Cómo funciona",
+      "sealCaption": "Estándar verificado por NOVARA"
+    },
+    "brandStatement": {
+      "eyebrow": "La diferencia",
+      "title": "No publicamos cientos de cursos. Publicamos los que merece la pena terminar.",
+      "body": "La mayoría de plataformas miden el éxito en catálogo. Nosotros lo medimos en cursos completados. Cada curso pasa por un proceso de revisión antes de publicarse, y tu progreso se mide lección a lección, no solo al matricularte."
+    },
+    "categories": {
+      "eyebrow": "Catálogo",
+      "title": "Explora por categoría",
+      "subtitle": "Un catálogo multi-categoría desde el primer día, pensado para crecer durante años.",
+      "viewAll": "Ver todas las categorías"
+    },
+    "courses": {
+      "eyebrow": "Destacados",
+      "title": "Cursos con estándar NOVARA",
+      "subtitle": "Una selección de lo último aprobado por nuestro proceso de revisión de calidad.",
+      "viewAll": "Ver todo el catálogo",
+      "levelLabel": "Nivel",
+      "durationLabel": "Duración",
+      "new": "Nuevo",
+      "viewCourse": "Ver curso"
+    },
+    "benefits": {
+      "eyebrow": "Por qué NOVARA",
+      "title": "Lo que de verdad cambia el resultado",
+      "items": {
+        "quality": {
+          "title": "Estándar de calidad exigente",
+          "body": "Cada curso pasa por revisión editorial antes de publicarse. Nada de relleno para completar catálogo."
+        },
+        "progress": {
+          "title": "Progreso medido de verdad",
+          "body": "Guardamos exactamente dónde te quedaste, lección a lección, no solo si «estás matriculado»."
+        },
+        "certificates": {
+          "title": "Certificados verificables",
+          "body": "Cada certificado tiene un código único y un QR que cualquiera puede verificar públicamente."
+        },
+        "payment": {
+          "title": "Pago flexible y humano",
+          "body": "Bizum o transferencia, con revisión manual. Sin pasarelas que se quedan con tu confianza."
+        }
+      }
+    },
+    "howItWorks": {
+      "eyebrow": "El proceso",
+      "title": "Cómo funciona NOVARA",
+      "steps": {
+        "choose": {
+          "title": "Elige tu curso",
+          "body": "Gratis o premium, filtra por categoría y nivel hasta encontrar el que necesitas de verdad."
+        },
+        "learn": {
+          "title": "Aprende a tu ritmo",
+          "body": "Vídeo, texto, audio o ejercicios prácticos. Tu progreso se guarda automáticamente en cada lección."
+        },
+        "assess": {
+          "title": "Demuestra lo aprendido",
+          "body": "Un examen con nota mínima real, no un formulario de relleno para desbloquear el certificado."
+        },
+        "certify": {
+          "title": "Obtén tu certificado",
+          "body": "Se genera automáticamente, con código de verificación público, en cuanto apruebas."
+        }
+      }
+    },
+    "testimonials": {
+      "eyebrow": "Comunidad",
+      "title": "Historias de alumnos",
+      "emptyState": "Todavía estamos escribiendo los primeros capítulos. En cuanto los primeros alumnos terminen sus cursos, sus historias tendrán su sitio aquí."
+    },
+    "faq": {
+      "eyebrow": "Preguntas frecuentes",
+      "title": "Lo que necesitas saber",
+      "items": {
+        "free": {
+          "question": "¿De verdad hay cursos gratis?",
+          "answer": "Sí. Parte del catálogo es gratuito sin letra pequeña. Los cursos premium existen porque implican más profundidad, ejercicios o certificación con mayor peso, no porque el contenido gratuito esté recortado a propósito."
+        },
+        "payment": {
+          "question": "¿Cómo funciona el pago por Bizum o transferencia?",
+          "answer": "Realizas el pago y subes el justificante. Un administrador lo revisa y aprueba manualmente el acceso, normalmente en poco tiempo. Preferimos este método antes que depender de una pasarela externa que se queda con parte de cada pago."
+        },
+        "certificate": {
+          "question": "¿El certificado sirve para algo real?",
+          "answer": "Cada certificado incluye un código único y un QR que enlaza a una página de verificación pública, para que cualquiera —una empresa, un cliente— pueda comprobar que es auténtico."
+        },
+        "quality": {
+          "question": "¿Cómo se garantiza que un curso tiene calidad?",
+          "answer": "Todo curso pasa por un flujo de revisión (borrador → en revisión → aprobado → publicado) antes de llegar al catálogo. No publicamos por volumen."
+        },
+        "mobile": {
+          "question": "¿Habrá aplicación móvil?",
+          "answer": "Está en el roadmap. La plataforma está construida desde el inicio para que ese salto no requiera rehacer nada."
+        }
+      }
+    },
+    "cta": {
+      "title": "Tu próximo curso terminado empieza aquí",
+      "subtitle": "Sin relleno, sin catálogo infinito sin sentido. Solo cursos que merece la pena acabar.",
+      "primaryCta": "Crear cuenta gratis",
+      "secondaryCta": "Explorar catálogo"
+    }
+  },
+  "footer": {
+    "tagline": "Aprende de verdad.",
+    "columns": {
+      "platform": {
+        "title": "Plataforma",
+        "courses": "Cursos",
+        "categories": "Categorías",
+        "howItWorks": "Cómo funciona"
+      },
+      "legal": {
+        "title": "Legal",
+        "terms": "Términos y condiciones",
+        "privacy": "Privacidad",
+        "cookies": "Cookies"
+      },
+      "help": {
+        "title": "Ayuda",
+        "support": "Soporte",
+        "faq": "Preguntas frecuentes"
+      }
+    },
+    "rights": "Todos los derechos reservados."
+  },
+  "legalPages": {
+    "lastUpdated": "19 de julio de 2026",
+    "backToHome": "Volver al inicio",
+    "terms": {
+      "metaTitle": "Términos y condiciones",
+      "title": "Términos y condiciones",
+      "intro": "Estos términos regulan el uso de NOVARA. Al crear una cuenta o usar la plataforma, aceptas lo que se describe a continuación.",
+      "sections": [
+        {
+          "heading": "1. Quiénes somos",
+          "body": "NOVARA es una academia online que ofrece cursos gratuitos y de pago, exámenes, certificados verificables y contenido educativo relacionado. Estos términos se aplican a cualquier persona que acceda a la plataforma, con o sin cuenta registrada."
+        },
+        {
+          "heading": "2. Cuenta de usuario",
+          "body": "Para acceder a determinadas funciones (inscribirte en cursos, obtener certificados, comprar cursos premium) necesitas crear una cuenta con un email válido. Eres responsable de mantener la confidencialidad de tu contraseña y de toda la actividad que ocurra en tu cuenta."
+        },
+        {
+          "heading": "3. Cursos gratuitos y premium",
+          "body": "Parte del catálogo es gratuito sin coste alguno. Los cursos premium requieren el pago del importe indicado en cada curso, mediante Bizum o transferencia bancaria, con revisión y aprobación manual por parte del equipo de NOVARA antes de conceder el acceso."
+        },
+        {
+          "heading": "4. Pagos y reembolsos",
+          "body": "El acceso a un curso premium se concede tras verificar el justificante de pago subido por el alumno. Si el pago es rechazado, se indicará el motivo y podrás subir un nuevo justificante. Las solicitudes de reembolso se gestionan de forma individual contactando con soporte."
+        },
+        {
+          "heading": "5. Certificados",
+          "body": "Los certificados se generan automáticamente al completar los requisitos de un curso (aprobar su examen final o completar el 100% del contenido, según el curso) y pueden verificarse públicamente mediante el código único y el código QR incluidos en cada certificado."
+        },
+        {
+          "heading": "6. Conducta del usuario",
+          "body": "No está permitido compartir cuentas, redistribuir el contenido de los cursos sin autorización, ni utilizar la plataforma con fines fraudulentos o contrarios a la ley. NOVARA puede suspender o cerrar cuentas que incumplan estas normas."
+        },
+        {
+          "heading": "7. Propiedad intelectual",
+          "body": "El contenido de los cursos (vídeos, textos, ejercicios, materiales descargables) es propiedad de NOVARA o de sus autores y está protegido por derechos de propiedad intelectual. Se concede una licencia personal e intransferible de uso, no de reventa ni redistribución."
+        },
+        {
+          "heading": "8. Modificaciones",
+          "body": "Estos términos pueden actualizarse para reflejar cambios legales o en el funcionamiento de la plataforma. Los cambios relevantes se notificarán a los usuarios registrados."
+        },
+        {
+          "heading": "9. Contacto",
+          "body": "Para cualquier duda sobre estos términos, puedes escribirnos desde la página de Soporte."
+        }
+      ]
+    },
+    "privacy": {
+      "metaTitle": "Política de privacidad",
+      "title": "Política de privacidad",
+      "intro": "En NOVARA tratamos tus datos personales con el único propósito de ofrecerte el servicio educativo por el que te has registrado. Esta política explica qué datos tratamos, para qué y qué derechos tienes.",
+      "sections": [
+        {
+          "heading": "1. Qué datos tratamos",
+          "body": "Datos de cuenta (nombre, email, contraseña cifrada), datos de perfil que decidas añadir (biografía, país, avatar), datos de progreso académico (cursos, lecciones, exámenes, certificados), y datos de pago limitados al justificante que subas y al historial de tu solicitud de compra — nunca almacenamos datos de tarjetas bancarias."
+        },
+        {
+          "heading": "2. Para qué los usamos",
+          "body": "Para crear y gestionar tu cuenta, darte acceso a los cursos en los que te inscribes, generar tus certificados, enviarte comunicaciones necesarias sobre tu cuenta o tus compras, y mejorar la plataforma a partir de estadísticas internas agregadas."
+        },
+        {
+          "heading": "3. Base legal",
+          "body": "Tratamos tus datos porque son necesarios para ejecutar el contrato de prestación del servicio educativo (Reglamento General de Protección de Datos, art. 6.1.b), y, en el caso de las comunicaciones opcionales, con tu consentimiento."
+        },
+        {
+          "heading": "4. Con quién compartimos tus datos",
+          "body": "No vendemos tus datos a terceros. Compartimos datos estrictamente necesarios con proveedores que nos ayudan a prestar el servicio: envío de email transaccional, procesamiento de IA para el asistente de creación de cursos (solo accede a contenido editorial del curso, nunca a tus datos personales), y, si están activadas, herramientas de analítica web."
+        },
+        {
+          "heading": "5. Cuánto tiempo conservamos tus datos",
+          "body": "Mientras tu cuenta esté activa. Si solicitas la baja, eliminamos o anonimizamos tus datos personales salvo la información que debamos conservar por obligación legal (por ejemplo, facturas)."
+        },
+        {
+          "heading": "6. Tus derechos",
+          "body": "Puedes acceder, rectificar, eliminar, limitar el tratamiento u oponerte al uso de tus datos, así como solicitar la portabilidad de estos, escribiéndonos desde la página de Soporte. También tienes derecho a reclamar ante la Agencia Española de Protección de Datos."
+        },
+        {
+          "heading": "7. Seguridad",
+          "body": "Las contraseñas se almacenan cifradas, las conexiones se realizan mediante HTTPS, y el acceso a datos sensibles está limitado por roles dentro de la plataforma."
+        },
+        {
+          "heading": "8. Menores de edad",
+          "body": "NOVARA no está dirigida a menores de 16 años. Si detectamos una cuenta creada por un menor sin el consentimiento de sus tutores, procederemos a su eliminación."
+        }
+      ]
+    },
+    "cookies": {
+      "metaTitle": "Política de cookies",
+      "title": "Política de cookies",
+      "intro": "Usamos cookies y tecnologías similares para que la plataforma funcione correctamente y, si las activas, para entender mejor cómo se usa.",
+      "sections": [
+        {
+          "heading": "1. Cookies técnicas (siempre activas)",
+          "body": "Necesarias para el funcionamiento básico: mantener tu sesión iniciada, recordar tu idioma y tema preferidos, y proteger la plataforma frente a accesos indebidos. Sin ellas, NOVARA no podría funcionar."
+        },
+        {
+          "heading": "2. Cookie de referido",
+          "body": "Si llegas a NOVARA a través del enlace de un afiliado, guardamos su código en una cookie durante 30 días para poder atribuirle correctamente la comisión si te registras y compras un curso. No se usa con ningún otro fin."
+        },
+        {
+          "heading": "3. Cookies de analítica (opcionales)",
+          "body": "Si el equipo de NOVARA las activa desde la configuración, se pueden usar Google Analytics, Google Tag Manager, Microsoft Clarity o Plausible para entender de forma agregada cómo se usa la plataforma. Puedes consultar en cada momento si están activas contactando con soporte."
+        },
+        {
+          "heading": "4. Cómo gestionar las cookies",
+          "body": "Puedes eliminar o bloquear las cookies desde la configuración de tu navegador. Ten en cuenta que bloquear las cookies técnicas puede impedir que puedas iniciar sesión o mantener tus preferencias."
+        }
+      ]
+    },
+    "lastUpdatedLabel": "Última actualización"
+  },
+  "support": {
+    "metaTitle": "Soporte",
+    "title": "¿Cómo podemos ayudarte?",
+    "subtitle": "Consulta las preguntas frecuentes o escríbenos directamente.",
+    "contactEmailLabel": "También puedes escribirnos a",
+    "fields": {
+      "subject": "Asunto",
+      "category": "Categoría",
+      "message": "Cuéntanos qué necesitas",
+      "categories": {
+        "pagos": "Pagos",
+        "tecnico": "Problema técnico",
+        "contenido": "Contenido de un curso",
+        "cuenta": "Mi cuenta"
+      }
+    },
+    "submit": "Enviar solicitud",
+    "submitting": "Enviando…",
+    "successTitle": "Hemos recibido tu solicitud",
+    "successBody": "Te responderemos por email lo antes posible.",
+    "loginRequiredTitle": "Inicia sesión para abrir una solicitud",
+    "loginRequiredBody": "Así podemos hacer seguimiento de tu caso desde tu cuenta.",
+    "loginCta": "Iniciar sesión",
+    "faqCta": "Ver preguntas frecuentes"
+  }
+}

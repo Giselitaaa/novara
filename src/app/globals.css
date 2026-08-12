@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/**
+ * Sistema de tokens de NOVARA.
+ *
+ * Identidad: "el rigor de una academia + la calidez de un estudio".
+ * Fondo cálido neutro (no el cliché crema+terracota), tinta violeta-noche
+ * como color de texto/superficie oscura, y un ORO DE CERTIFICACIÓN como
+ * único acento de marca — deliberado: ata el color de marca al concepto
+ * central del producto (certificación, estándar alto, logro), no es un
+ * acento decorativo intercambiable.
+ */
+@layer base {
+  :root {
+    --background: 45 20% 96%; /* paper */
+    --foreground: 249 27% 10%; /* ink */
+
+    --card: 0 0% 100%;
+    --card-foreground: 249 27% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 249 27% 10%;
+
+    --primary: 249 27% 10%; /* ink */
+    --primary-foreground: 45 20% 96%; /* paper */
+
+    --secondary: 254 36% 29%; /* nova indigo */
+    --secondary-foreground: 45 20% 96%;
+
+    --muted: 38 19% 91%;
+    --muted-foreground: 27 5% 40%;
+
+    --accent: 38 19% 91%;
+    --accent-foreground: 249 27% 10%;
+
+    --destructive: 4 53% 49%;
+    --destructive-foreground: 45 20% 96%;
+
+    --success: 157 44% 33%;
+    --success-foreground: 45 20% 96%;
+
+    --gold: 39 56% 51%; /* oro de certificación — el acento de marca */
+    --gold-foreground: 249 27% 10%;
+
+    --border: 38 19% 88%;
+    --input: 38 19% 88%;
+    --ring: 39 56% 51%;
+
+    --radius: 0.875rem;
+  }
+
+  .dark {
+    --background: 249 27% 10%; /* ink */
+    --foreground: 45 20% 96%; /* paper */
+
+    --card: 252 28% 14%;
+    --card-foreground: 45 20% 96%;
+
+    --popover: 252 28% 14%;
+    --popover-foreground: 45 20% 96%;
+
+    --primary: 45 20% 96%;
+    --primary-foreground: 249 27% 10%;
+
+    --secondary: 254 30% 66%;
+    --secondary-foreground: 249 27% 10%;
+
+    --muted: 255 24% 18%;
+    --muted-foreground: 253 24% 70%;
+
+    --accent: 255 24% 18%;
+    --accent-foreground: 45 20% 96%;
+
+    --destructive: 4 66% 60%;
+    --destructive-foreground: 249 27% 10%;
+
+    --success: 158 43% 44%;
+    --success-foreground: 249 27% 10%;
+
+    --gold: 38 65% 61%;
+    --gold-foreground: 249 27% 10%;
+
+    --border: 255 24% 23%;
+    --input: 255 24% 23%;
+    --ring: 38 65% 61%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  ::selection {
+    @apply bg-gold/25 text-foreground;
+  }
+}
+
+/* Ritmo tipográfico del display: tracking negativo a tamaños grandes,
+   propio de la identidad, no el ajuste por defecto del navegador. */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* La regla-ledger: divisor fino con anotación marginal en mayúsculas
+     y mono — el elemento de firma que recorre toda la plataforma. */
+  .ledger-rule {
+    @apply relative border-t border-border pt-6;
+  }
+  .ledger-label {
+    @apply font-mono text-xs uppercase tracking-widest text-muted-foreground;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

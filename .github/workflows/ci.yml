@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: novara
+          POSTGRES_PASSWORD: novara
+          POSTGRES_DB: novara
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U novara"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://novara:novara@localhost:5432/novara?schema=public
+      DIRECT_URL: postgresql://novara:novara@localhost:5432/novara?schema=public
+      AUTH_SECRET: ci-only-secret-not-for-production
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+      NEXT_PUBLIC_APP_NAME: NOVARA
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Generar cliente de Prisma
+        run: npx prisma generate
+
+      - name: Comprobar formato
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Comprobación de tipos
+        run: npm run typecheck
+
+      - name: Tests unitarios y de integración (Vitest)
+        run: npm run test
+
+      # ⚠️ Requiere que exista al menos una migración en
+      # prisma/migrations/ (generada con `prisma migrate dev` contra
+      # una base de datos real). Sin ella, este paso no falla pero
+      # tampoco crea ninguna tabla — ver el checklist de lanzamiento
+      # en el README. Es el primer paso pendiente antes de que este
+      # pipeline sea útil de verdad.
+      - name: Aplicar migraciones
+        run: npx prisma migrate deploy
+
+      - name: Build de producción
+        run: npm run build
