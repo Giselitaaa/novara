@@ -55,3 +55,6 @@ next-env.d.ts
 
 # Caché de TTS en tiempo real (efímera; el Listening pregenerado SÍ se versiona)
 public/uploads/voice/
+
+# CI de GitHub Actions (no necesario para el despliegue en Render)
+.github/workflows/
