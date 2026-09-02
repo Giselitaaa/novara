@@ -10,7 +10,10 @@ import { defineRouting } from "next-intl/routing";
 export const routing = defineRouting({
   locales: ["es", "en"],
   defaultLocale: "es",
-  localePrefix: "as-needed", // /es/... se sirve como / ; /en/... explícito
+  // "always": todas las URLs llevan prefijo de idioma (/es/…, /en/…) y "/"
+  // redirige a "/es". Es la opción fiable en producción (evita el bucle de
+  // redirección que "as-needed" provoca detrás de un proxy como Render).
+  localePrefix: "always",
 });
 
 export type Locale = (typeof routing.locales)[number];

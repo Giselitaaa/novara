@@ -19,10 +19,10 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   typedRoutes: true,
-  // "standalone": genera un servidor Node autocontenido en
-  // .next/standalone, sin necesitar node_modules completo en la
-  // imagen final de Docker — ver Dockerfile.
-  output: "standalone",
+  // Nota: NO usar `output: "standalone"` con `next start` (Render). El modo
+  // standalone requiere `node .next/standalone/server.js`; con `next start`
+  // provoca redirecciones/errores. Para Docker se puede reactivar cambiando
+  // también el comando de arranque.
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
   },
