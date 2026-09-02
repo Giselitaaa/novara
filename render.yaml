@@ -29,7 +29,7 @@ services:
       - key: LOCAL_AI_BASE_URL
         value: https://api.groq.com/openai/v1
       - key: AI_MODEL
-        value: llama-3.3-70b-versatile
+        value: openai/gpt-oss-120b
       # ── Secretos (rellenar en el panel de Render, NO en el repo) ──
       - key: LOCAL_AI_API_KEY # ← tu API key de Groq (gratis)
         sync: false
