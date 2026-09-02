@@ -8,6 +8,10 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
  * Único punto donde se componen los providers de la aplicación.
  * Añadir un provider nuevo en el futuro (ej. analítica, feature
  * flags) se hace aquí y en ningún otro sitio.
+ *
+ * `ThemeProvider` gestiona claro/oscuro (preferencia de cada usuario). El
+ * TEMA de color (paleta) lo fija SOLO la administración y se renderiza en
+ * el servidor (`data-theme` del <html>), igual para todos los usuarios.
  */
 export function AppProviders({ children }: { children: React.ReactNode }) {
   return (

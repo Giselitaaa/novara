@@ -170,6 +170,70 @@ export async function replyToSupportTicket(ticketId: string, body: string) {
   return { status: "success" as const };
 }
 
+/**
+ * Respuesta del ALUMNO en su propio ticket: crea el `SupportMessage`, reabre
+ * el ticket (estado "abierto") y avisa a las administradoras (notificación
+ * interna). Solo el dueño del ticket puede responder. Así la conversación es
+ * de ida y vuelta y sencilla para el alumno.
+ */
+export async function replyToMyTicket(ticketId: string, body: string) {
+  const session = await requireSession();
+  if (!session?.user?.id) {
+    return { status: "error" as const, message: "Inicia sesión para responder." };
+  }
+
+  const parsed = replySchema.safeParse({ ticketId, body });
+  if (!parsed.success) {
+    return { status: "error" as const, message: parsed.error.issues[0]?.message ?? "Escribe una respuesta." };
+  }
+
+  const rl = checkRateLimit(`support-reply:${session.user.id}`, 30, 60 * 60);
+  if (!rl.allowed) {
+    return { status: "error" as const, message: "Demasiados mensajes seguidos. Espera un poco." };
+  }
+
+  const ticket = await db.supportTicket.findUnique({
+    where: { id: parsed.data.ticketId },
+    select: { id: true, userId: true, subject: true },
+  });
+  if (!ticket) return { status: "error" as const, message: "La solicitud ya no existe." };
+  if (ticket.userId !== session.user.id) {
+    return { status: "error" as const, message: "No puedes responder a una solicitud que no es tuya." };
+  }
+
+  const openStatus = await db.status.findUnique({ where: { key: "abierto" } });
+  const admins = await db.user.findMany({
+    where: { roles: { some: { role: { name: "administrador" } } } },
+    select: { id: true },
+  });
+
+  await db.$transaction([
+    db.supportMessage.create({
+      data: { ticketId: ticket.id, senderId: session.user.id, body: parsed.data.body },
+    }),
+    ...(openStatus
+      ? [db.supportTicket.update({ where: { id: ticket.id }, data: { statusId: openStatus.id } })]
+      : []),
+    ...admins.map((a) =>
+      db.notification.create({
+        data: {
+          userId: a.id,
+          type: "sistema",
+          title: "Nueva respuesta en una solicitud de soporte",
+          body: `Un alumno ha respondido en "${ticket.subject}".`,
+          relatedEntityType: "SupportTicket",
+          relatedEntityId: ticket.id,
+        },
+      })
+    ),
+  ]);
+
+  revalidatePath("/soporte");
+  revalidatePath(`/admin/soporte/${ticket.id}`);
+  revalidatePath("/admin/soporte");
+  return { status: "success" as const };
+}
+
 /** Cambia el estado de un ticket (abierto / en_proceso / cerrada). */
 export async function setSupportTicketStatus(ticketId: string, statusKey: string) {
   const session = await requireAdmin();

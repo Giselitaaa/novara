@@ -70,6 +70,12 @@ export default async function LessonPlayerPage({ params }: Props) {
     contentType: l.contentType,
     isCompleted: data.progressByLessonId.get(l.id)?.status === "completado",
     isLocked: l.isLocked,
+    unlockLabel:
+      l.lockReason === "schedule" && l.availableAt
+        ? `Se desbloquea el ${new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long" }).format(l.availableAt)}`
+        : l.lockReason === "test"
+          ? "Aprueba el test anterior"
+          : null,
   }));
 
   const progress = data.progressByLessonId.get(lessonId);
@@ -186,6 +192,7 @@ export default async function LessonPlayerPage({ params }: Props) {
           <LessonBlocksRenderer
             blocks={currentLesson.blocks}
             exercisesById={exercisesById}
+            lessonId={currentLesson.id}
           />
 
           {unreferencedExercises.length > 0 && (
@@ -193,6 +200,7 @@ export default async function LessonPlayerPage({ params }: Props) {
               {unreferencedExercises.map((ex) => (
                 <ExercisePlayer
                   key={ex.id}
+                  lessonId={currentLesson.id}
                   exercise={{
                     id: ex.id,
                     category: ex.category,

@@ -51,6 +51,11 @@ export class StorageError extends Error {
  * pegar una URL en su lugar — nunca se finge una subida.
  */
 export async function getStorageProvider(): Promise<StorageProvider> {
+  if ((process.env.STORAGE_PROVIDER ?? "").toLowerCase() === "local") {
+    // Almacenamiento local en disco (coste cero, sin bucket) para el modo local.
+    const { LocalStorageProvider } = await import("./local-provider");
+    return new LocalStorageProvider();
+  }
   const { S3StorageProvider } = await import("./s3-provider");
   return new S3StorageProvider();
 }

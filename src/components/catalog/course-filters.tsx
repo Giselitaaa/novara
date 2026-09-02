@@ -104,8 +104,7 @@ export function CourseFilters({ levels, defaultValues }: CourseFiltersProps) {
           <SelectValue placeholder="Acceso" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="todos">Gratis y premium</SelectItem>
-          <SelectItem value="gratis">Solo gratis</SelectItem>
+          <SelectItem value="todos">Todos los cursos</SelectItem>
           <SelectItem value="premium">Solo premium</SelectItem>
         </SelectContent>
       </Select>

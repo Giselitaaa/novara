@@ -25,6 +25,7 @@ export const SETTINGS_KEYS = [
   "analytics_plausible_domain",
   "affiliate_program_enabled",
   "affiliate_default_commission",
+  "active_theme",
 ] as const;
 
 export type SettingsMap = Record<(typeof SETTINGS_KEYS)[number], string>;

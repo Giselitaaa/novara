@@ -119,6 +119,15 @@ export async function generateCertificatePdf(
     color: INK,
   });
 
+  // Aviso obligatorio: acreditación interna, NO título oficial de Cambridge.
+  center(
+    "Acreditación interna de NOVARA — no es un certificado oficial de Cambridge English.",
+    38,
+    sans,
+    8,
+    MUTED
+  );
+
   // QR (data URL PNG)
   if (data.qrDataUrl?.startsWith("data:image")) {
     try {

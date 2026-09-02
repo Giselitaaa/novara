@@ -23,9 +23,11 @@ export type ExerciseForPlayer = {
 export function LessonBlocksRenderer({
   blocks,
   exercisesById,
+  lessonId,
 }: {
   blocks: LessonBlock[];
   exercisesById?: Map<string, ExerciseForPlayer>;
+  lessonId?: string;
 }) {
   if (!blocks.length) return null;
 
@@ -37,7 +39,9 @@ export function LessonBlocksRenderer({
         if (block.type === "EXERCISE") {
           const exerciseId = data?.exerciseId as string | undefined;
           const exercise = exerciseId ? exercisesById?.get(exerciseId) : undefined;
-          return exercise ? <ExercisePlayer key={block.id} exercise={exercise} /> : null;
+          return exercise ? (
+            <ExercisePlayer key={block.id} exercise={exercise} lessonId={lessonId} />
+          ) : null;
         }
 
         if (block.type === "EXAM") {

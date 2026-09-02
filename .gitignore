@@ -48,3 +48,10 @@ next-env.d.ts
 /playwright-report
 /blob-report
 /playwright/.cache
+
+# Proteger TODOS los .env (secretos), menos el ejemplo
+.env*
+!.env.example
+
+# Caché de TTS en tiempo real (efímera; el Listening pregenerado SÍ se versiona)
+public/uploads/voice/

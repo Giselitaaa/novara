@@ -50,6 +50,17 @@ export function SettingsForm({ settings }: { settings: SettingsMap }) {
         </div>
       </section>
 
+      {/* El tema visual se gestiona en el apartado «Temas». Conservamos su
+          valor aquí para no sobrescribirlo al guardar esta configuración. */}
+      <input type="hidden" name="active_theme" defaultValue={settings.active_theme || "none"} />
+      <section>
+        <h2 className="mb-2 font-display text-lg tracking-tighter">Tema visual</h2>
+        <p className="text-sm text-muted-foreground">
+          El tema de color de la plataforma se elige ahora en el apartado{" "}
+          <strong>Temas</strong> del panel. Se aplica a todos los usuarios a la vez.
+        </p>
+      </section>
+
       <section>
         <h2 className="mb-4 font-display text-lg tracking-tighter">Redes sociales</h2>
         <div className="flex flex-col gap-4">

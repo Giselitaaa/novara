@@ -58,6 +58,11 @@ export async function getVoiceProvider(): Promise<VoiceProvider> {
   const providerKey = (process.env.VOICE_PROVIDER ?? "openai").toLowerCase();
 
   switch (providerKey) {
+    case "piper": {
+      // Voz local de coste cero (Piper, motor MIT), sin API de pago.
+      const { PiperVoiceProvider } = await import("./providers/piper-provider");
+      return new PiperVoiceProvider();
+    }
     // Preparado para más proveedores sin tocar el resto del sistema:
     // case "elevenlabs": { const { ElevenLabsProvider } = await import("./providers/elevenlabs-provider"); return new ElevenLabsProvider(); }
     case "openai":

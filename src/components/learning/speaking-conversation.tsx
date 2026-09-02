@@ -1,13 +1,21 @@
 "use client";
 
-import { Loader2, Mic, Square } from "lucide-react";
-import { useRef, useState } from "react";
+import { Loader2, Mic, Square, Volume2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-type Turn = { role: "ai" | "student"; text: string };
+type Turn = { role: "ai" | "student"; text: string; audioUrl?: string };
+
+/** Idioma del ejercicio → código BCP-47 para el TTS del navegador (fallback). */
+function toBCP47(language: string): string {
+  const l = language.toLowerCase();
+  if (/\bes|espa/.test(l)) return "es-ES";
+  if (/\bfr|franc/.test(l)) return "fr-FR";
+  return "en-US";
+}
 type Evaluation = {
   fluency: number;
   pronunciation: number;
@@ -40,47 +48,131 @@ export function SpeakingConversation({
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
 
+  // Precarga las voces del navegador (getVoices puede tardar en poblarse).
+  useEffect(() => {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
+      window.speechSynthesis.getVoices();
+    }
+  }, []);
+
+  /** Reproduce el turno de la IA: audio de Piper si lo hay; si no, TTS del navegador. */
+  function speak(turn: { text: string; audioUrl?: string }) {
+    if (turn.audioUrl) {
+      const audio = new Audio(turn.audioUrl);
+      audio.play().catch(() => fallbackTTS(turn.text));
+      return;
+    }
+    fallbackTTS(turn.text);
+  }
+
+  /** Elige una voz INGLESA del navegador (evita que una voz española lea inglés y suene raro). */
+  function englishVoice(): SpeechSynthesisVoice | null {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return null;
+    const voices = window.speechSynthesis.getVoices();
+    return (
+      voices.find((v) => /^en[-_]/i.test(v.lang)) ??
+      voices.find((v) => v.lang.toLowerCase().startsWith("en")) ??
+      null
+    );
+  }
+
+  function fallbackTTS(text: string) {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = toBCP47(language);
+    const voice = englishVoice();
+    if (voice) utterance.voice = voice;
+    utterance.rate = 0.95;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  }
+
+  async function errorMessage(res: Response, fallback: string): Promise<string> {
+    const msg = await res
+      .clone()
+      .json()
+      .then((d: { error?: string; message?: string }) => d?.message || d?.error)
+      .catch(() => null);
+    return typeof msg === "string" && msg ? msg : fallback;
+  }
+
   async function aiTurn(history: Turn[]): Promise<boolean> {
-    const res = await fetch("/api/speaking/turn", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ language, level, scenario, objective, keywords, history }),
-    });
+    let res: Response;
+    try {
+      res = await fetch("/api/speaking/turn", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ language, level, scenario, objective, keywords, history, withAudio: true }),
+      });
+    } catch {
+      toast.error("Sin conexión con el servidor. ¿Está arrancado NOVARA?");
+      return false;
+    }
     if (res.status === 503) {
       setStatus("unavailable");
       return false;
     }
     if (!res.ok) {
-      toast.error("No se pudo continuar la conversación.");
+      toast.error(
+        await errorMessage(res, "No se pudo continuar la conversación. ¿Está arrancado Ollama (LLM local)?")
+      );
       return false;
     }
-    const data = (await res.json()) as { text: string };
-    setTurns((t) => [...t, { role: "ai", text: data.text }]);
+    const data = (await res.json()) as { text: string; audioUrl?: string };
+    setTurns((t) => [...t, { role: "ai", text: data.text, audioUrl: data.audioUrl }]);
+    speak(data); // la IA "habla" en cuanto responde
     return true;
   }
 
   async function start() {
     setStatus("loading");
     const ok = await aiTurn([]);
-    if (ok) setStatus("active");
+    // Si falla, vuelve a "idle" para poder reintentar (no se queda en "Procesando…").
+    setStatus(ok ? "active" : "idle");
   }
 
   async function startRecording() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      chunksRef.current = [];
-      recorder.ondataavailable = (e) => e.data.size > 0 && chunksRef.current.push(e.data);
-      recorder.onstop = async () => {
-        stream.getTracks().forEach((t) => t.stop());
-        await handleAudio(new Blob(chunksRef.current, { type: recorder.mimeType }));
-      };
-      recorderRef.current = recorder;
-      recorder.start();
-      setStatus("recording");
-    } catch {
-      toast.error("No se pudo acceder al micrófono.");
+    // getUserMedia solo existe en contextos SEGUROS: localhost o HTTPS. Si la
+    // app se abre por la IP de red (http://192.168.x.x) el micrófono se bloquea.
+    if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
+      toast.error(
+        "Tu navegador bloquea el micrófono aquí. Abre la app en http://localhost:3001 (no en la IP de red) o usa HTTPS."
+      );
+      return;
     }
+    let stream: MediaStream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (err) {
+      const name = err instanceof Error ? err.name : "";
+      toast.error(
+        name === "NotAllowedError" || name === "SecurityError"
+          ? "Has bloqueado el micrófono. Permítelo en el icono de la barra de direcciones y reintenta."
+          : name === "NotFoundError"
+            ? "No se detecta ningún micrófono conectado."
+            : "No se pudo acceder al micrófono. Revisa los permisos del navegador."
+      );
+      setStatus("active");
+      return;
+    }
+    let recorder: MediaRecorder;
+    try {
+      recorder = new MediaRecorder(stream);
+    } catch {
+      stream.getTracks().forEach((t) => t.stop());
+      toast.error("Tu navegador no admite la grabación de audio. Prueba con Chrome o Edge actualizados.");
+      setStatus("active");
+      return;
+    }
+    chunksRef.current = [];
+    recorder.ondataavailable = (e) => e.data.size > 0 && chunksRef.current.push(e.data);
+    recorder.onstop = async () => {
+      stream.getTracks().forEach((t) => t.stop());
+      await handleAudio(new Blob(chunksRef.current, { type: recorder.mimeType }));
+    };
+    recorderRef.current = recorder;
+    recorder.start();
+    setStatus("recording");
   }
 
   function stopRecording() {
@@ -89,24 +181,42 @@ export function SpeakingConversation({
   }
 
   async function handleAudio(blob: Blob) {
+    if (blob.size === 0) {
+      toast.error("No se grabó audio. Habla un poco más largo antes de detener.");
+      setStatus("active");
+      return;
+    }
     const form = new FormData();
     form.append("audio", blob, "turn.webm");
     form.append("language", language);
-    const res = await fetch("/api/speaking/transcribe", { method: "POST", body: form });
+    let res: Response;
+    try {
+      res = await fetch("/api/speaking/transcribe", { method: "POST", body: form });
+    } catch {
+      toast.error("Sin conexión al transcribir tu voz.");
+      setStatus("active");
+      return;
+    }
     if (res.status === 503) {
       setStatus("unavailable");
       return;
     }
     if (!res.ok) {
-      toast.error("No se pudo transcribir el audio.");
+      toast.error(await errorMessage(res, "No se pudo transcribir tu voz. ¿Está arrancado Whisper?"));
       setStatus("active");
       return;
     }
     const { text } = (await res.json()) as { text: string };
+    if (!text.trim()) {
+      toast.error("No te he entendido bien. Inténtalo de nuevo, hablando claro.");
+      setStatus("active");
+      return;
+    }
     const history = [...turns, { role: "student" as const, text }];
     setTurns(history);
     const ok = await aiTurn(history);
-    setStatus(ok ? "active" : "unavailable");
+    if (ok) setStatus("active");
+    else setStatus((s) => (s === "unavailable" ? s : "active"));
   }
 
   async function finish() {
@@ -151,13 +261,23 @@ export function SpeakingConversation({
           {turns.map((t, i) => (
             <div
               key={i}
-              className={`max-w-[85%] rounded-lg px-3.5 py-2 text-sm ${
+              className={`flex max-w-[85%] items-start gap-2 rounded-lg px-3.5 py-2 text-sm ${
                 t.role === "ai"
                   ? "self-start bg-muted"
                   : "self-end bg-gold/15 text-gold-foreground dark:text-foreground"
               }`}
             >
-              {t.text}
+              <span className="flex-1">{t.text}</span>
+              {t.role === "ai" && (
+                <button
+                  type="button"
+                  onClick={() => speak(t)}
+                  aria-label="Escuchar de nuevo"
+                  className="mt-0.5 shrink-0 text-muted-foreground hover:text-foreground"
+                >
+                  <Volume2 className="size-4" />
+                </button>
+              )}
             </div>
           ))}
         </div>

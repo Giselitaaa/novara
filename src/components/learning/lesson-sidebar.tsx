@@ -32,6 +32,8 @@ type SidebarLesson = {
   contentType: { key: string };
   isCompleted: boolean;
   isLocked?: boolean;
+  /** Motivo del bloqueo para la UI (ej. "Se desbloquea el 14 de marzo"). */
+  unlockLabel?: string | null;
 };
 
 export function LessonSidebar({
@@ -66,10 +68,17 @@ export function LessonSidebar({
               if (lesson.isLocked) {
                 return (
                   <li key={lesson.id}>
-                    <span className="flex cursor-not-allowed items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-muted-foreground/50">
-                      <Lock className="size-4 shrink-0" />
-                      <Icon className="size-3.5 shrink-0" />
-                      <span className="truncate">{lesson.title}</span>
+                    <span className="flex cursor-not-allowed flex-col gap-0.5 rounded-md px-2.5 py-2 text-sm text-muted-foreground/50">
+                      <span className="flex items-center gap-2.5">
+                        <Lock className="size-4 shrink-0" />
+                        <Icon className="size-3.5 shrink-0" />
+                        <span className="truncate">{lesson.title}</span>
+                      </span>
+                      {lesson.unlockLabel && (
+                        <span className="pl-[26px] text-xs text-muted-foreground/70">
+                          {lesson.unlockLabel}
+                        </span>
+                      )}
                     </span>
                   </li>
                 );

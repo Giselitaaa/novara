@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 
 import { ReferralCapture } from "@/components/affiliates/referral-capture";
+import { SeasonAnimation } from "@/components/layout/season-animation";
+import { SeasonRibbon } from "@/components/layout/season-ribbon";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 
@@ -13,8 +15,12 @@ import { SiteHeader } from "@/components/layout/site-header";
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
+      <SeasonAnimation />
       <Suspense fallback={null}>
         <ReferralCapture />
+      </Suspense>
+      <Suspense fallback={null}>
+        <SeasonRibbon />
       </Suspense>
       <SiteHeader />
       <main id="main-content" className="flex-1">

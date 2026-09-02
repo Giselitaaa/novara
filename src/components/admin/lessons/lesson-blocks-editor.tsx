@@ -556,6 +556,51 @@ function BlockEditForm({
   const [images, setImages] = useState<string>(
     ((block.data?.images as string[]) ?? []).join("\n")
   );
+  const [genAudio, setGenAudio] = useState(false);
+
+  /**
+   * Genera el audio del texto con la capa de voz (Piper local u otro proveedor)
+   * y guarda la URL resultante. Degrada con honestidad: si la voz o el
+   * almacenamiento no están configurados, avisa y NO inventa audio.
+   */
+  async function generateAudio() {
+    const text = content.trim();
+    if (!text) {
+      toast.error("Escribe primero el texto/guion a locutar.");
+      return;
+    }
+    setGenAudio(true);
+    try {
+      const res = await fetch("/api/voice/synthesize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, language: "en" }),
+      });
+      if (res.status === 503) {
+        toast.error("Voz no disponible: configura VOICE_PROVIDER (p. ej. piper).");
+        return;
+      }
+      const ctype = res.headers.get("content-type") ?? "";
+      if (res.ok && ctype.includes("application/json")) {
+        const data = (await res.json()) as { url?: string };
+        if (data.url) {
+          setAudioUrl(data.url);
+          toast.success("Audio generado. Guarda el bloque para conservarlo.");
+          return;
+        }
+      }
+      if (res.ok) {
+        // El proveedor devolvió bytes (sin almacenamiento): no hay URL persistente.
+        toast.error("Configura almacenamiento (STORAGE_PROVIDER=local) para guardar el audio.");
+        return;
+      }
+      toast.error("No se pudo generar el audio.");
+    } catch {
+      toast.error("No se pudo generar el audio.");
+    } finally {
+      setGenAudio(false);
+    }
+  }
 
   function save() {
     const patch: BlockPatch = {};
@@ -593,6 +638,7 @@ function BlockEditForm({
         break;
       case "AUDIO":
         patch.audioUrl = audioUrl || null;
+        patch.content = content || null; // guion/transcripción para regenerar audio
         break;
       case "PRONUNCIATION":
         patch.content = content || null;
@@ -721,14 +767,37 @@ function BlockEditForm({
               <Input id={`w-${block.id}`} value={content} onChange={(e) => setContent(e.target.value)} />
             </FormField>
           )}
+          {block.type === "AUDIO" && (
+            <>
+              <Label htmlFor={`gs-${block.id}`}>Guion (texto para generar el audio)</Label>
+              <textarea
+                id={`gs-${block.id}`}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows={4}
+                placeholder="Escribe aquí el texto que se locutará (p. ej. el guion del Listening)…"
+                className="w-full rounded-md border border-input bg-background px-3.5 py-2.5 text-sm"
+              />
+            </>
+          )}
           <FormField id={`aud-${block.id}`} label="URL del audio">
             <Input
               id={`aud-${block.id}`}
               value={audioUrl}
               onChange={(e) => setAudioUrl(e.target.value)}
-              placeholder="https://…"
+              placeholder="https://… (o genera el audio con el botón)"
             />
           </FormField>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={generateAudio}
+            disabled={genAudio || !content.trim()}
+            className="w-fit"
+          >
+            <Volume2 className="size-4" /> {genAudio ? "Generando…" : "Generar audio"}
+          </Button>
         </>
       )}
 

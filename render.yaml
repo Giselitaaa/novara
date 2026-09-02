@@ -1,0 +1,57 @@
+# Blueprint de despliegue de NOVARA en Render (plan gratuito).
+# En Render: New → Blueprint → conecta este repo de GitHub. Render lee este
+# archivo y crea el servicio. Las variables marcadas `sync: false` NO se suben
+# al repo: se rellenan en el panel de Render (Environment) — ahí van los secretos.
+services:
+  - type: web
+    name: novara
+    runtime: node
+    plan: free
+    branch: main
+    buildCommand: npm ci && npx prisma generate && npm run build
+    startCommand: npm run start
+    healthCheckPath: /es
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Storage e IA de coste cero
+      - key: STORAGE_PROVIDER
+        value: local
+      - key: VOICE_PROVIDER
+        value: piper
+      - key: STT_PROVIDER
+        value: whisper-local
+      # IA LLM vía Groq (OpenAI-compatible, plan gratuito). El proveedor "local"
+      # ya manda el Bearer token, así que solo hay que apuntar la URL a Groq.
+      - key: AI_PROVIDER
+        value: local
+      - key: LOCAL_AI_BASE_URL
+        value: https://api.groq.com/openai/v1
+      - key: AI_MODEL
+        value: llama-3.3-70b-versatile
+      # ── Secretos (rellenar en el panel de Render, NO en el repo) ──
+      - key: LOCAL_AI_API_KEY # ← tu API key de Groq (gratis)
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: AUTH_SECRET
+        sync: false
+      - key: AUTH_URL # ← https://TU-APP.onrender.com
+        sync: false
+      - key: NEXT_PUBLIC_APP_URL # ← https://TU-APP.onrender.com
+        sync: false
+      - key: BREVO_API_KEY # ← tu API key de Brevo (gratis)
+        sync: false
+      - key: EMAIL_FROM
+        value: NOVARA <novaracademy@proton.me>
+      - key: STRIPE_SECRET_KEY # ← sk_test_… (o sk_live_… cuando cobres de verdad)
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET # ← whsec_… del webhook de producción
+        sync: false
+      - key: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: CRON_SECRET
+        sync: false

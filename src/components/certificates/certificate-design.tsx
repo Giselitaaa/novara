@@ -50,22 +50,31 @@ export function CertificateDesign({
           </h2>
         </div>
 
-        <div className="flex w-full items-end justify-between">
-          <div className="text-left">
-            <p className="font-mono text-xs text-muted-foreground">Fecha de emisión</p>
-            <p className="text-sm font-medium">
-              {new Intl.DateTimeFormat("es-ES", { dateStyle: "long" }).format(issuedAt)}
-            </p>
-            <p className="mt-2 font-mono text-xs text-muted-foreground">
-              Código de verificación
-            </p>
-            <p className="font-mono text-sm font-medium">{uniqueCode}</p>
+        <div className="flex w-full flex-col gap-4">
+          <div className="flex w-full items-end justify-between">
+            <div className="text-left">
+              <p className="font-mono text-xs text-muted-foreground">Fecha de emisión</p>
+              <p className="text-sm font-medium">
+                {new Intl.DateTimeFormat("es-ES", { dateStyle: "long" }).format(issuedAt)}
+              </p>
+              <p className="mt-2 font-mono text-xs text-muted-foreground">
+                Código de verificación
+              </p>
+              <p className="font-mono text-sm font-medium">{uniqueCode}</p>
+            </div>
+
+            {qrUrl && (
+              // eslint-disable-next-line @next/next/no-img-element -- data URI, no cabe en next/image remoto
+              <img src={qrUrl} alt="Código QR de verificación" className="size-20" />
+            )}
           </div>
 
-          {qrUrl && (
-            // eslint-disable-next-line @next/next/no-img-element -- data URI, no cabe en next/image remoto
-            <img src={qrUrl} alt="Código QR de verificación" className="size-20" />
-          )}
+          {/* Aviso obligatorio: es una acreditación interna, NO un título oficial. */}
+          <p className="w-full border-t border-border pt-3 text-center text-[11px] leading-snug text-muted-foreground print:text-black/60">
+            Acreditación interna de NOVARA que certifica la finalización de esta
+            preparación. <strong>No es un certificado oficial de Cambridge English</strong>{" "}
+            ni sustituye al examen oficial.
+          </p>
         </div>
       </div>
     </div>

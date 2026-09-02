@@ -11,19 +11,8 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 type SendTransactionalEmailInput = {
   userId?: string;
   to: string;
-  templateKey:
-    | "verificacion_email"
-    | "recuperar_contrasena"
-    | "bienvenida"
-    | "pago_aprobado"
-    | "pago_rechazado"
-    | "pago_recibido"
-    | "certificado_emitido"
-    | "soporte_respuesta"
-    | "retencion_7dias"
-    | "retencion_30dias"
-    | "curso_completado"
-    | "nueva_insignia";
+  /** Clave de plantilla (coincide con `emailTemplate.key`; ver seed de correos). */
+  templateKey: string;
   subject: string;
   html: string;
   /**
@@ -32,6 +21,59 @@ type SendTransactionalEmailInput = {
    */
   variables?: Record<string, string>;
 };
+
+/** Remitente configurado en `EMAIL_FROM` ("NOVARA <novaracademy@proton.me>"). */
+function parseFrom(): { name: string; email: string } {
+  const raw = process.env.EMAIL_FROM ?? `${siteConfig.name} <onboarding@resend.dev>`;
+  const m = raw.match(/^\s*(.*?)\s*<([^>]+)>\s*$/);
+  if (m && m[2]) return { name: m[1] || siteConfig.name, email: m[2] };
+  return { name: siteConfig.name, email: raw.trim() };
+}
+
+/**
+ * Entrega el correo por el proveedor ACTIVO, sin acoplar el resto del dominio:
+ *  • Brevo (gratis, 300/día, remitente verificado sin dominio) si hay BREVO_API_KEY.
+ *  • Resend si hay RESEND_API_KEY (requiere dominio verificado).
+ * Devuelve el id del proveedor. Lanza si el proveedor responde error.
+ */
+async function deliver(
+  to: string,
+  subject: string,
+  html: string
+): Promise<{ id?: string }> {
+  const from = parseFrom();
+  const brevoKey = process.env.BREVO_API_KEY;
+  if (brevoKey) {
+    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "api-key": brevoKey,
+        "content-type": "application/json",
+        accept: "application/json",
+      },
+      body: JSON.stringify({
+        sender: from,
+        to: [{ email: to }],
+        subject,
+        htmlContent: html,
+      }),
+    });
+    if (!res.ok) throw new Error(`Brevo ${res.status}: ${await res.text()}`);
+    const data = (await res.json().catch(() => ({}))) as { messageId?: string };
+    return { id: data.messageId };
+  }
+  if (resend) {
+    const result = await resend.emails.send({
+      from: `${from.name} <${from.email}>`,
+      to,
+      subject,
+      html,
+    });
+    if (result.error) throw new Error(String(result.error.message ?? result.error));
+    return { id: result.data?.id };
+  }
+  throw new Error("no-provider");
+}
 
 /**
  * Único punto de envío de correo transaccional de toda la plataforma.
@@ -69,7 +111,9 @@ export async function sendTransactionalEmail({
     // Si la consulta de plantilla falla, seguimos con el HTML por defecto.
   }
 
-  if (!resend) {
+  // Sin proveedor configurado (desarrollo): se registra "pendiente" y se
+  // imprime en consola, para probar el flujo sin credenciales reales.
+  if (!process.env.BREVO_API_KEY && !resend) {
     console.warn(`[mail:dev] → ${to} (${templateKey}): ${finalSubject}`);
     await db.emailLog.create({
       data: { userId, templateKey, sentTo: to, status: "pendiente" },
@@ -78,24 +122,17 @@ export async function sendTransactionalEmail({
   }
 
   try {
-    const result = await resend.emails.send({
-      from: process.env.EMAIL_FROM ?? `${siteConfig.name} <hola@novara.academy>`,
-      to,
-      subject: finalSubject,
-      html: finalHtml,
-    });
-
+    const { id } = await deliver(to, finalSubject, finalHtml);
     await db.emailLog.create({
       data: {
         userId,
         templateKey,
         sentTo: to,
         status: "enviado",
-        providerMessageId: result.data?.id,
+        providerMessageId: id,
         sentAt: new Date(),
       },
     });
-
     return { delivered: true };
   } catch (error) {
     console.error("[mail] Error al enviar correo:", error);

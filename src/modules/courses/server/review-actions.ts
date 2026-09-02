@@ -82,29 +82,86 @@ export async function submitReview(courseId: string, rating: number, comment?: s
   if (!pending)
     return { status: "error" as const, message: "No se pudo registrar la reseña." };
 
-  await db.review.upsert({
-    where: {
-      userId_courseId: { userId: session.user.id, courseId: parsed.data.courseId },
-    },
-    create: {
-      userId: session.user.id,
-      courseId: parsed.data.courseId,
-      rating: parsed.data.rating,
-      comment: parsed.data.comment || null,
-      statusId: pending.id,
-    },
-    update: {
-      rating: parsed.data.rating,
-      comment: parsed.data.comment || null,
-      statusId: pending.id,
-    },
+  // Una reseña por alumno y curso: se busca la suya y se actualiza; si no,
+  // se crea. (Ya no dependemos del @@unique, relajado para permitir también
+  // testimonios añadidos por la administración con nombre propio.)
+  const existing = await db.review.findFirst({
+    where: { userId: session.user.id, courseId: parsed.data.courseId, authorName: null },
+    select: { id: true },
   });
+  if (existing) {
+    await db.review.update({
+      where: { id: existing.id },
+      data: { rating: parsed.data.rating, comment: parsed.data.comment || null, statusId: pending.id },
+    });
+  } else {
+    await db.review.create({
+      data: {
+        userId: session.user.id,
+        courseId: parsed.data.courseId,
+        rating: parsed.data.rating,
+        comment: parsed.data.comment || null,
+        statusId: pending.id,
+      },
+    });
+  }
 
   revalidatePath("/admin/resenas");
   return {
     status: "success" as const,
     message: "¡Gracias! Tu reseña se publicará tras revisión.",
   };
+}
+
+/**
+ * La administración añade una reseña/testimonio manualmente (con nombre de
+ * autor propio, sin requerir un alumno real). Se publica directamente y se
+ * recalcula la valoración del curso. Queda ligada a la cuenta admin por el
+ * userId obligatorio del modelo, pero se muestra con `authorName`.
+ */
+const adminReviewSchema = z.object({
+  courseId: z.string().uuid(),
+  rating: z.coerce.number().int().min(1).max(5),
+  authorName: z.string().trim().min(2).max(80),
+  comment: z.string().trim().max(2000).optional(),
+});
+
+export async function addReviewAsAdmin(input: {
+  courseId: string;
+  rating: number;
+  authorName: string;
+  comment?: string;
+}) {
+  const session = await requireAdmin();
+  const parsed = adminReviewSchema.safeParse(input);
+  if (!parsed.success) {
+    return { status: "error" as const, message: parsed.error.issues[0]?.message ?? "Datos inválidos." };
+  }
+
+  const published = await db.status.findUnique({ where: { key: "publicada" } });
+  if (!published) return { status: "error" as const, message: "Estado 'publicada' no disponible." };
+
+  const course = await db.course.findUnique({ where: { id: parsed.data.courseId }, select: { id: true } });
+  if (!course) return { status: "error" as const, message: "Curso no encontrado." };
+
+  await db.review.create({
+    data: {
+      userId: session.user.id,
+      courseId: parsed.data.courseId,
+      rating: parsed.data.rating,
+      comment: parsed.data.comment || null,
+      authorName: parsed.data.authorName,
+      statusId: published.id,
+    },
+  });
+
+  await recalcCourseRating(parsed.data.courseId);
+  await logAdminAction(session.user.id, "review.add_manual", "Course", parsed.data.courseId, {
+    authorName: parsed.data.authorName,
+    rating: parsed.data.rating,
+  });
+  revalidatePath("/admin/resenas");
+  return { status: "success" as const };
 }
 
 /** Moderación de una reseña por un admin: publicar o rechazar. */

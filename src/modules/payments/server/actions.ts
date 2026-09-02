@@ -7,7 +7,9 @@ import { emailShell, sendTransactionalEmail } from "@/lib/mail";
 import { requireSession } from "@/lib/require-session";
 import { logAdminAction } from "@/modules/admin/server/audit";
 import { requireAdmin } from "@/modules/admin/server/guard";
-import { confirmReferralCommission } from "@/modules/affiliates/server/actions";
+
+import { grantAccessForPayment } from "./grant-access";
+import { StripePaymentProvider } from "./providers/stripe-provider";
 
 export type PaymentActionState = {
   status: "idle" | "success" | "error";
@@ -57,6 +59,44 @@ export async function requestPurchase(
   });
 
   return payment;
+}
+
+/**
+ * Pago con TARJETA (Stripe). Inicia una Checkout Session de Stripe y
+ * devuelve la URL a la que redirigir al alumno. Es un método ADICIONAL al
+ * flujo manual (Bizum/transferencia): solo se ofrece si Stripe está
+ * configurado. Sin claves, `StripePaymentProvider` lanza `not_configured`
+ * de forma explícita (no finge un cobro). La confirmación llega por el
+ * webhook `checkout.session.completed`, que concede el acceso por el mismo
+ * contrato compartido que la aprobación manual.
+ */
+export async function startCardCheckout(courseId: string): Promise<string> {
+  const session = await requireSession();
+  if (!session?.user?.id) throw new Error("Inicia sesión para comprar un curso.");
+
+  const course = await db.course.findUnique({
+    where: { id: courseId },
+    include: { accessType: true },
+  });
+  if (!course || course.accessType.key !== "premium" || !course.price) {
+    throw new Error("Este curso no está disponible para compra.");
+  }
+
+  const existingEnrollment = await db.enrollment.findUnique({
+    where: { userId_courseId: { userId: session.user.id, courseId } },
+  });
+  if (existingEnrollment) throw new Error("Ya tienes acceso a este curso.");
+
+  const result = await new StripePaymentProvider().createCheckout({
+    userId: session.user.id,
+    courseId,
+    amount: Number(course.price),
+    currency: "eur",
+  });
+  if (result.kind !== "redirect") {
+    throw new Error("El proveedor de tarjeta no devolvió una página de pago.");
+  }
+  return result.redirectUrl;
 }
 
 /**
@@ -128,89 +168,28 @@ export async function uploadPaymentProof(paymentId: string, proofFileUrl: string
 export async function approvePayment(paymentId: string) {
   const session = await requireAdmin();
 
+  // Concesión de acceso por el contrato COMPARTIDO (mismo que el webhook de
+  // Stripe): matrícula + factura + notificación + email + comisión de afiliado.
+  const { granted } = await grantAccessForPayment(paymentId, {
+    reviewedById: session.user.id,
+    note: "Pago aprobado.",
+  });
+
   const payment = await db.payment.findUnique({
     where: { id: paymentId },
-    include: { user: { include: { profile: true } }, course: true },
+    select: { courseId: true },
   });
-  if (!payment || !payment.courseId) throw new Error("Pago no encontrado.");
-
-  const [approvedStatus, purchaseSource] = await Promise.all([
-    db.paymentStatus.findUnique({ where: { key: "aprobado" } }),
-    db.enrollmentSource.findUnique({ where: { key: "compra" } }),
-  ]);
-  if (!approvedStatus || !purchaseSource) throw new Error("Catálogos base sin sembrar.");
-
-  const invoiceNumber = `NOV-${new Date().getFullYear()}-${payment.id.slice(0, 8).toUpperCase()}`;
-
-  await db.$transaction([
-    db.payment.update({
-      where: { id: paymentId },
-      data: {
-        statusId: approvedStatus.id,
-        reviewedById: session.user.id,
-        reviewedAt: new Date(),
-      },
-    }),
-    db.paymentStatusHistory.create({
-      data: {
-        paymentId,
-        toStatusId: approvedStatus.id,
-        changedById: session.user.id,
-        note: "Pago aprobado.",
-      },
-    }),
-    db.enrollment.upsert({
-      where: { userId_courseId: { userId: payment.userId, courseId: payment.courseId } },
-      create: {
-        userId: payment.userId,
-        courseId: payment.courseId,
-        sourceId: purchaseSource.id,
-      },
-      update: {},
-    }),
-    db.invoice.create({
-      data: {
-        paymentId,
-        invoiceNumber,
-        billingName: payment.user.profile
-          ? `${payment.user.profile.firstName} ${payment.user.profile.lastName}`
-          : payment.user.email,
-      },
-    }),
-    db.notification.create({
-      data: {
-        userId: payment.userId,
-        type: "pago",
-        title: "Pago aprobado",
-        body: `Ya tienes acceso a "${payment.course?.title}".`,
-        relatedEntityType: "Payment",
-        relatedEntityId: paymentId,
-      },
-    }),
-  ]);
-
-  await sendTransactionalEmail({
-    userId: payment.userId,
-    to: payment.user.email,
-    templateKey: "pago_aprobado",
-    subject: "Tu pago ha sido aprobado",
-    html: emailShell({
-      title: "Pago aprobado",
-      bodyHtml: `Ya tienes acceso completo a <strong>${payment.course?.title}</strong>. ¡A por ello!`,
-      ctaLabel: "Empezar el curso",
-      ctaUrl: `${process.env.NEXT_PUBLIC_APP_URL}/cursos/${payment.course?.slug}`,
-    }),
-  });
-
-  await confirmReferralCommission(paymentId);
 
   await logAdminAction(session.user.id, "payments.approve", "Payment", paymentId, {
-    courseId: payment.courseId,
+    courseId: payment?.courseId,
   });
 
   revalidatePath("/admin/pagos");
   revalidatePath(`/admin/pagos/${paymentId}`);
-  return { status: "success" as const, message: "Pago aprobado y acceso concedido." };
+  return {
+    status: "success" as const,
+    message: granted ? "Pago aprobado y acceso concedido." : "El pago ya estaba aprobado.",
+  };
 }
 
 /**

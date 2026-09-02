@@ -22,3 +22,24 @@ export async function updateGlobalSettings(formData: FormData) {
   revalidatePath("/admin/configuracion");
   return { status: "success" as const, message: "Configuración guardada." };
 }
+
+/**
+ * Fija el TEMA visual global de la plataforma (apartado "Temas" del panel).
+ * Lo elige SOLO la administración y se aplica a TODOS los usuarios a la vez
+ * (se renderiza en `data-theme` del <html> desde el layout). Acción dedicada
+ * para no tocar el resto de ajustes.
+ */
+export async function setActiveTheme(themeId: string) {
+  await requireAdmin();
+
+  await db.globalSetting.upsert({
+    where: { key: "active_theme" },
+    create: { key: "active_theme", value: themeId },
+    update: { value: themeId },
+  });
+
+  // Refresca el layout para todos los usuarios en la próxima carga.
+  revalidatePath("/", "layout");
+  revalidatePath("/admin/temas");
+  return { status: "success" as const, message: "Tema aplicado a toda la plataforma." };
+}

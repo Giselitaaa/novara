@@ -3,10 +3,12 @@
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
+import { EmojiRich } from "@/components/learning/emoji-rich";
 import { QuestionView, type Q } from "@/components/learning/question-view";
 import { SpeakingConversation } from "@/components/learning/speaking-conversation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { submitWritingForReview } from "@/modules/exercises/server/actions";
 import {
   submitExercise,
   type ExerciseResult,
@@ -29,7 +31,7 @@ const CAT_LABEL: Record<string, string> = {
   speaking: "Expresión oral",
 };
 
-export function ExercisePlayer({ exercise }: { exercise: ExerciseData }) {
+export function ExercisePlayer({ exercise, lessonId }: { exercise: ExerciseData; lessonId?: string }) {
   const [responses, setResponses] = useState<Record<string, Response>>({});
   const [result, setResult] = useState<ExerciseResult | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -60,7 +62,9 @@ export function ExercisePlayer({ exercise }: { exercise: ExerciseData }) {
         </p>
         <h3 className="font-display text-lg tracking-tighter">{exercise.title}</h3>
         {exercise.instructions && (
-          <p className="mt-1 text-sm text-muted-foreground">{exercise.instructions}</p>
+          <p className="mt-1 whitespace-pre-line text-sm text-muted-foreground">
+            <EmojiRich text={exercise.instructions} />
+          </p>
         )}
       </div>
 
@@ -75,7 +79,7 @@ export function ExercisePlayer({ exercise }: { exercise: ExerciseData }) {
         <audio controls src={cfg.audioUrl} className="w-full" />
       )}
       {exercise.category === "writing" && (
-        <WritingArea config={cfg} />
+        <WritingArea config={cfg} lessonId={lessonId} />
       )}
       {exercise.category === "speaking" && (
         <SpeakingConversation
@@ -139,13 +143,50 @@ export function ExercisePlayer({ exercise }: { exercise: ExerciseData }) {
   );
 }
 
-function WritingArea({ config }: { config: Record<string, unknown> }) {
+function WritingArea({
+  config,
+  lessonId,
+}: {
+  config: Record<string, unknown>;
+  lessonId?: string;
+}) {
   const [text, setText] = useState("");
+  const [sent, setSent] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
   const min = Number(config.minWords) || null;
   const max = Number(config.maxWords) || null;
+
+  function send() {
+    if (!lessonId) {
+      toast.error("No se puede enviar esta entrega aquí.");
+      return;
+    }
+    startTransition(async () => {
+      const res = await submitWritingForReview(lessonId, text);
+      if (res.status === "success") {
+        setSent(true);
+        toast.success("Enviado. Tu profesora lo corregirá y recibirás la nota.");
+      } else {
+        toast.error(res.message ?? "No se pudo enviar.");
+      }
+    });
+  }
+
+  if (sent) {
+    return (
+      <div className="rounded-md border border-gold/30 bg-gold/5 p-4 text-sm">
+        <p className="font-medium">Texto enviado ✓</p>
+        <p className="text-muted-foreground">
+          Tu profesora lo corregirá según los criterios de Cambridge y recibirás la nota y su
+          comentario en tus notificaciones.
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-2">
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
@@ -156,8 +197,17 @@ function WritingArea({ config }: { config: Record<string, unknown> }) {
       <p className="text-xs text-muted-foreground">
         {words} palabra(s)
         {min ? ` · mínimo ${min}` : ""}
-        {max ? ` · máximo ${max}` : ""} · Tu profesor corregirá esta entrega.
+        {max ? ` · máximo ${max}` : ""} · Tu profesora corregirá esta entrega.
       </p>
+      <Button
+        variant="gold"
+        size="sm"
+        onClick={send}
+        disabled={isPending || words < 10}
+        className="w-fit"
+      >
+        {isPending ? "Enviando…" : "Enviar para corregir"}
+      </Button>
     </div>
   );
 }

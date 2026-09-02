@@ -101,6 +101,214 @@
   }
 }
 
+/**
+ * PALETAS (eje de color, ortogonal al claro/oscuro).
+ * Se aplican con `data-theme` en <html>. Solo reescriben el ACENTO/marca
+ * (--secondary, --gold, --ring) sobre la base neutra; las festivas añaden
+ * además un ligero tinte de fondo y una decoración muy sutil. Claro va
+ * bajo `:not(.dark)`, oscuro bajo `.dark`, para no chocar entre sí.
+ */
+@layer base {
+  /* ── 12 temas de color (paleta oficial NOVARA; hex → HSL, contraste WCAG) ── */
+  :root[data-theme="morado-profundo"]:not(.dark){ --secondary: 263 70% 50%; --gold: 263 70% 50%; --gold-foreground: 0 0% 100%; --ring: 263 70% 50%; }
+  :root.dark[data-theme="morado-profundo"]{ --secondary: 258 90% 66%; --gold: 258 90% 66%; --gold-foreground: 0 0% 100%; --ring: 258 90% 66%; }
+  :root[data-theme="azul-energia"]:not(.dark){ --secondary: 221 83% 53%; --gold: 221 83% 53%; --gold-foreground: 0 0% 100%; --ring: 221 83% 53%; }
+  :root.dark[data-theme="azul-energia"]{ --secondary: 217 91% 60%; --gold: 217 91% 60%; --gold-foreground: 249 27% 10%; --ring: 217 91% 60%; }
+  :root[data-theme="verde-menta"]:not(.dark){ --secondary: 160 84% 39%; --gold: 160 84% 39%; --gold-foreground: 249 27% 10%; --ring: 160 84% 39%; }
+  :root.dark[data-theme="verde-menta"]{ --secondary: 158 64% 52%; --gold: 158 64% 52%; --gold-foreground: 249 27% 10%; --ring: 158 64% 52%; }
+  :root[data-theme="naranja-vitalidad"]:not(.dark){ --secondary: 25 95% 53%; --gold: 25 95% 53%; --gold-foreground: 249 27% 10%; --ring: 25 95% 53%; }
+  :root.dark[data-theme="naranja-vitalidad"]{ --secondary: 27 96% 61%; --gold: 27 96% 61%; --gold-foreground: 249 27% 10%; --ring: 27 96% 61%; }
+  :root[data-theme="rosa-inspiracion"]:not(.dark){ --secondary: 333 71% 51%; --gold: 333 71% 51%; --gold-foreground: 0 0% 100%; --ring: 333 71% 51%; }
+  :root.dark[data-theme="rosa-inspiracion"]{ --secondary: 330 81% 60%; --gold: 330 81% 60%; --gold-foreground: 249 27% 10%; --ring: 330 81% 60%; }
+  :root[data-theme="rojo-enfoque"]:not(.dark){ --secondary: 0 84% 60%; --gold: 0 84% 60%; --gold-foreground: 249 27% 10%; --ring: 0 84% 60%; }
+  :root.dark[data-theme="rojo-enfoque"]{ --secondary: 0 91% 71%; --gold: 0 91% 71%; --gold-foreground: 249 27% 10%; --ring: 0 91% 71%; }
+  :root[data-theme="amarillo-luz"]:not(.dark){ --secondary: 38 92% 50%; --gold: 38 92% 50%; --gold-foreground: 249 27% 10%; --ring: 38 92% 50%; }
+  :root.dark[data-theme="amarillo-luz"]{ --secondary: 48 96% 53%; --gold: 48 96% 53%; --gold-foreground: 249 27% 10%; --ring: 48 96% 53%; }
+  :root[data-theme="cian-oceano"]:not(.dark){ --secondary: 189 94% 43%; --gold: 189 94% 43%; --gold-foreground: 249 27% 10%; --ring: 189 94% 43%; }
+  :root.dark[data-theme="cian-oceano"]{ --secondary: 188 86% 53%; --gold: 188 86% 53%; --gold-foreground: 249 27% 10%; --ring: 188 86% 53%; }
+  :root[data-theme="azul-nocturno"]:not(.dark){ --secondary: 217 33% 17%; --gold: 217 33% 17%; --gold-foreground: 0 0% 100%; --ring: 217 33% 17%; }
+  :root.dark[data-theme="azul-nocturno"]{ --secondary: 215 25% 27%; --gold: 215 25% 27%; --gold-foreground: 0 0% 100%; --ring: 215 25% 27%; }
+  :root[data-theme="lila-suave"]:not(.dark){ --secondary: 262 83% 58%; --gold: 262 83% 58%; --gold-foreground: 0 0% 100%; --ring: 262 83% 58%; }
+  :root.dark[data-theme="lila-suave"]{ --secondary: 255 92% 76%; --gold: 255 92% 76%; --gold-foreground: 249 27% 10%; --ring: 255 92% 76%; }
+  :root[data-theme="gris-minimal"]:not(.dark){ --secondary: 217 19% 27%; --gold: 217 19% 27%; --gold-foreground: 0 0% 100%; --ring: 217 19% 27%; }
+  :root.dark[data-theme="gris-minimal"]{ --secondary: 220 9% 46%; --gold: 220 9% 46%; --gold-foreground: 0 0% 100%; --ring: 220 9% 46%; }
+  :root[data-theme="beige-calido"]:not(.dark){ --secondary: 32 95% 44%; --gold: 32 95% 44%; --gold-foreground: 249 27% 10%; --ring: 32 95% 44%; }
+  :root.dark[data-theme="beige-calido"]{ --secondary: 46 97% 65%; --gold: 46 97% 65%; --gold-foreground: 249 27% 10%; --ring: 46 97% 65%; }
+
+  /* ── Navidad (festiva) ── */
+  :root[data-theme="navidad"]:not(.dark) {
+    --background: 150 26% 97%;
+    --secondary: 158 50% 22%;
+    --gold: 43 74% 46%;
+    --gold-foreground: 0 0% 100%;
+    --ring: 43 74% 46%;
+  }
+  :root.dark[data-theme="navidad"] {
+    --background: 158 30% 8%;
+    --card: 158 24% 12%;
+    --popover: 158 24% 12%;
+    --muted: 158 20% 16%;
+    --accent: 158 20% 16%;
+    --border: 158 18% 20%;
+    --input: 158 18% 20%;
+    --secondary: 150 40% 62%;
+    --gold: 43 70% 58%;
+    --gold-foreground: 158 40% 10%;
+    --ring: 43 70% 58%;
+  }
+
+  /* ── Halloween (festiva) ── */
+  :root[data-theme="halloween"]:not(.dark) {
+    --background: 30 32% 96%;
+    --secondary: 270 45% 34%;
+    --gold: 27 90% 48%;
+    --gold-foreground: 0 0% 100%;
+    --ring: 27 90% 48%;
+  }
+  :root.dark[data-theme="halloween"] {
+    --background: 266 30% 9%;
+    --card: 268 24% 13%;
+    --popover: 268 24% 13%;
+    --muted: 268 20% 17%;
+    --accent: 268 20% 17%;
+    --border: 268 18% 22%;
+    --input: 268 18% 22%;
+    --secondary: 270 45% 74%;
+    --gold: 27 90% 58%;
+    --gold-foreground: 266 40% 10%;
+    --ring: 27 90% 58%;
+  }
+
+  /* ── San Valentín (festiva) ── */
+  :root[data-theme="san_valentin"]:not(.dark) {
+    --background: 345 42% 98%;
+    --secondary: 340 55% 38%;
+    --gold: 345 72% 56%;
+    --gold-foreground: 0 0% 100%;
+    --ring: 345 72% 56%;
+  }
+  :root.dark[data-theme="san_valentin"] {
+    --background: 340 26% 9%;
+    --card: 340 22% 13%;
+    --popover: 340 22% 13%;
+    --muted: 340 18% 17%;
+    --accent: 340 18% 17%;
+    --border: 340 16% 22%;
+    --input: 340 16% 22%;
+    --secondary: 340 55% 74%;
+    --gold: 345 74% 68%;
+    --gold-foreground: 340 40% 10%;
+    --ring: 345 74% 68%;
+  }
+
+  /* ── Verano (festiva) ── */
+  :root[data-theme="verano"]:not(.dark) {
+    --background: 45 62% 97%;
+    --secondary: 200 80% 36%;
+    --gold: 25 88% 52%;
+    --gold-foreground: 0 0% 100%;
+    --ring: 25 88% 52%;
+  }
+  :root.dark[data-theme="verano"] {
+    --background: 205 40% 10%;
+    --card: 205 30% 14%;
+    --popover: 205 30% 14%;
+    --muted: 205 24% 18%;
+    --accent: 205 24% 18%;
+    --border: 205 20% 22%;
+    --input: 205 20% 22%;
+    --secondary: 198 76% 64%;
+    --gold: 28 86% 60%;
+    --gold-foreground: 205 40% 10%;
+    --ring: 28 86% 60%;
+  }
+
+  /* ── Ramadán (festiva) — noche azul-morada, oro de faroles ── */
+  :root[data-theme="ramadan"]:not(.dark) {
+    --background: 250 40% 97%;
+    --secondary: 250 60% 30%;
+    --gold: 43 62% 45%;
+    --gold-foreground: 0 0% 100%;
+    --ring: 43 62% 45%;
+  }
+  :root.dark[data-theme="ramadan"] {
+    --background: 250 45% 9%;
+    --card: 250 38% 13%;
+    --popover: 250 38% 13%;
+    --muted: 250 30% 17%;
+    --accent: 250 30% 17%;
+    --border: 250 26% 22%;
+    --input: 250 26% 22%;
+    --secondary: 255 60% 74%;
+    --gold: 43 70% 60%;
+    --gold-foreground: 250 45% 10%;
+    --ring: 43 70% 60%;
+  }
+
+  /* ── Pascua / Primavera (festiva) — pastel lila-rosa ── */
+  :root[data-theme="pascua"]:not(.dark) {
+    --background: 300 50% 98%;
+    --secondary: 262 52% 55%;
+    --gold: 330 75% 62%;
+    --gold-foreground: 0 0% 100%;
+    --ring: 330 75% 62%;
+  }
+  :root.dark[data-theme="pascua"] {
+    --background: 285 25% 10%;
+    --card: 285 20% 14%;
+    --popover: 285 20% 14%;
+    --muted: 285 16% 18%;
+    --accent: 285 16% 18%;
+    --border: 285 14% 23%;
+    --input: 285 14% 23%;
+    --secondary: 265 70% 78%;
+    --gold: 330 78% 72%;
+    --gold-foreground: 285 25% 10%;
+    --ring: 330 78% 72%;
+  }
+}
+
+/* Decoración MUY sutil para las paletas festivas (solo el fondo del body;
+   patrones de puro CSS, sin imágenes, baja opacidad → texto siempre legible). */
+@layer base {
+  :root[data-theme="navidad"] body {
+    background-image:
+      radial-gradient(circle at 20% 15%, hsl(0 0% 100% / 0.5) 0.9px, transparent 1.4px),
+      radial-gradient(circle at 70% 45%, hsl(0 0% 100% / 0.4) 0.9px, transparent 1.4px),
+      radial-gradient(circle at 45% 80%, hsl(0 0% 100% / 0.35) 0.9px, transparent 1.4px);
+    background-size: 130px 130px, 170px 170px, 150px 150px;
+    background-attachment: fixed;
+  }
+  :root.dark[data-theme="navidad"] body {
+    background-image:
+      radial-gradient(circle at 20% 15%, hsl(0 0% 100% / 0.16) 0.9px, transparent 1.4px),
+      radial-gradient(circle at 70% 45%, hsl(0 0% 100% / 0.12) 0.9px, transparent 1.4px),
+      radial-gradient(circle at 45% 80%, hsl(0 0% 100% / 0.1) 0.9px, transparent 1.4px);
+    background-size: 130px 130px, 170px 170px, 150px 150px;
+    background-attachment: fixed;
+  }
+  :root[data-theme="halloween"] body {
+    background-image: repeating-linear-gradient(
+      45deg,
+      hsl(27 90% 48% / 0.05) 0 14px,
+      transparent 14px 28px
+    );
+    background-attachment: fixed;
+  }
+  :root[data-theme="san_valentin"] body {
+    background-image:
+      radial-gradient(circle at 12% 8%, hsl(345 72% 56% / 0.09), transparent 32%),
+      radial-gradient(circle at 88% 12%, hsl(345 72% 56% / 0.07), transparent 34%);
+    background-attachment: fixed;
+  }
+  :root[data-theme="verano"] body {
+    background-image:
+      radial-gradient(circle at 85% -5%, hsl(25 88% 52% / 0.12), transparent 30%),
+      radial-gradient(circle at 10% 0%, hsl(200 80% 45% / 0.08), transparent 28%);
+    background-attachment: fixed;
+  }
+}
+
 /* Ritmo tipográfico del display: tracking negativo a tamaños grandes,
    propio de la identidad, no el ajuste por defecto del navegador. */
 @layer utilities {
@@ -127,4 +335,56 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * ANIMACIONES de los temas festivos (punto 13). Partículas en un overlay
+ * fijo, no interactivo (pointer-events:none). Se ocultan si el usuario
+ * prefiere menos movimiento. Los renderiza <SeasonAnimation>.
+ * ───────────────────────────────────────────────────────────────────── */
+.season-anim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  overflow: hidden;
+}
+.season-anim > span {
+  position: absolute;
+  top: -8vh;
+  will-change: transform;
+  user-select: none;
+}
+/* Caída (nieve, pétalos): baja con deriva y giro. */
+@keyframes season-fall {
+  0% { transform: translateY(-10vh) translateX(0) rotate(0deg); opacity: 0; }
+  8% { opacity: 1; }
+  100% { transform: translateY(112vh) translateX(var(--drift, 24px)) rotate(360deg); opacity: 0.85; }
+}
+/* Vuelo lateral ondulante (murciélagos). */
+@keyframes season-fly {
+  0% { transform: translate(-12vw, 0) rotate(-4deg); }
+  25% { transform: translate(28vw, -7vh) rotate(4deg); }
+  50% { transform: translate(55vw, 3vh) rotate(-4deg); }
+  75% { transform: translate(82vw, -5vh) rotate(4deg); }
+  100% { transform: translate(114vw, 2vh) rotate(-4deg); }
+}
+/* Ascenso con desvanecido (corazones, burbujas). */
+@keyframes season-float {
+  0% { transform: translateY(112vh) scale(0.75); opacity: 0; }
+  12% { opacity: 0.95; }
+  100% { transform: translateY(-14vh) scale(1.12); opacity: 0; }
+}
+/* Destello (estrellas de Ramadán). */
+@keyframes season-twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+.season-anim .s-fall { animation: season-fall linear infinite; }
+.season-anim .s-fly { top: 12vh; animation: season-fly linear infinite; }
+.season-anim .s-float { top: auto; bottom: -8vh; animation: season-float ease-in infinite; }
+.season-anim .s-twinkle { animation: season-twinkle ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .season-anim { display: none !important; }
 }

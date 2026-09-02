@@ -1064,13 +1064,14 @@ model Review {
   courseId  String   @map("course_id")
   rating    Int
   comment   String?
+  authorName String?  @map("author_name")
   statusId  String   @map("status_id")
   createdAt DateTime @default(now()) @map("created_at")
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   status    Status   @relation(fields: [statusId], references: [id])
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, courseId])
+  @@index([userId, courseId])
   @@map("reviews")
 }
 

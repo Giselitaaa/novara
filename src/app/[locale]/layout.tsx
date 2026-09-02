@@ -8,6 +8,7 @@ import { siteConfig } from "@/config/site";
 import { routing } from "@/i18n/routing";
 import { fontDisplay, fontMono, fontSans } from "@/lib/fonts";
 import { JsonLd } from "@/lib/json-ld";
+import { paletteFromSeason } from "@/lib/palettes";
 import { buildOrganizationSchema } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 import { AnalyticsScripts } from "@/modules/analytics/client/analytics-scripts";
@@ -53,14 +54,19 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   const messages = await getMessages();
   const settings = await getAllSettings();
+  const defaultPalette = paletteFromSeason(settings.active_theme);
 
   return (
     <html
       lang={locale}
       suppressHydrationWarning
+      data-theme={defaultPalette}
       className={cn(fontDisplay.variable, fontSans.variable, fontMono.variable)}
     >
-      <body className="min-h-screen bg-background font-sans antialiased">
+      <body
+        className="min-h-screen bg-background font-sans antialiased"
+        data-season={settings.active_theme || "none"}
+      >
         <JsonLd data={buildOrganizationSchema()} />
         <AnalyticsScripts
           config={{

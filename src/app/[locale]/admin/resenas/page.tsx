@@ -1,6 +1,7 @@
 import { Star } from "lucide-react";
 import type { Metadata } from "next";
 
+import { AddReviewForm } from "@/components/admin/courses/add-review-form";
 import { ReviewModerationActions } from "@/components/admin/courses/review-moderation-actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,10 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
 import { Link } from "@/i18n/navigation";
 import { requireAdmin } from "@/modules/admin/server/guard";
-import { listReviewsForModeration } from "@/modules/courses/server/review-queries";
+import {
+  listCoursesForReview,
+  listReviewsForModeration,
+} from "@/modules/courses/server/review-queries";
 
 export const metadata: Metadata = { title: "Reseñas" };
 
@@ -33,10 +37,10 @@ export default async function AdminReviewsPage({ searchParams }: Props) {
   const { estado, page } = await searchParams;
   const statusKey = estado === undefined ? "pendiente_moderacion" : estado;
   const currentPage = Number(page) > 0 ? Number(page) : 1;
-  const { reviews, total, totalPages } = await listReviewsForModeration({
-    statusKey: statusKey || undefined,
-    page: currentPage,
-  });
+  const [{ reviews, total, totalPages }, courseOptions] = await Promise.all([
+    listReviewsForModeration({ statusKey: statusKey || undefined, page: currentPage }),
+    listCoursesForReview(),
+  ]);
 
   function buildHref(targetPage: number) {
     const params = new URLSearchParams();
@@ -54,6 +58,8 @@ export default async function AdminReviewsPage({ searchParams }: Props) {
           {total} reseña(s) en este filtro.
         </p>
       </div>
+
+      <AddReviewForm courses={courseOptions} />
 
       <div className="flex flex-wrap gap-2">
         {STATUS_FILTERS.map((filter) => (

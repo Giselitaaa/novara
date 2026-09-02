@@ -10,6 +10,7 @@ import {
   LifeBuoy,
   Mail,
   MessageCircleQuestion,
+  Palette,
   PenLine,
   Receipt,
   Settings,
@@ -45,6 +46,7 @@ export const adminNavItems: AdminNavItem[] = [
   { label: "Blog", href: "/admin/blog", icon: FileText },
   { label: "Correos", href: "/admin/correos", icon: Mail },
   { label: "Analíticas", href: "/admin/analiticas", icon: BarChart3 },
+  { label: "Temas", href: "/admin/temas", icon: Palette },
   { label: "Configuración", href: "/admin/configuracion", icon: Settings },
 ];
 

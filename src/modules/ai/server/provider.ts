@@ -41,6 +41,11 @@ export async function getAIProvider(): Promise<AIProvider> {
   const providerKey = (process.env.AI_PROVIDER ?? "anthropic").toLowerCase();
 
   switch (providerKey) {
+    case "local": {
+      // LLM local de coste cero (Ollama / llama.cpp), sin clave de pago.
+      const { LocalLLMProvider } = await import("./providers/local-provider");
+      return new LocalLLMProvider();
+    }
     case "openai": {
       const { OpenAIProvider } = await import("./providers/openai-provider");
       return new OpenAIProvider();

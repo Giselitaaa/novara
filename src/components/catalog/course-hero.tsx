@@ -24,9 +24,7 @@ export async function CourseHero({ course }: { course: CourseDetailDTO }) {
         <div className="mt-6 flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="outline">{course.categoryName}</Badge>
-            <Badge variant={course.accessType === "gratis" ? "success" : "gold"}>
-              {course.accessType === "gratis" ? "Gratis" : "Premium"}
-            </Badge>
+            {course.accessType !== "gratis" && <Badge variant="gold">Premium</Badge>}
           </div>
 
           <h1 className="max-w-2xl text-balance font-display text-3xl tracking-tighter sm:text-4xl md:text-5xl">

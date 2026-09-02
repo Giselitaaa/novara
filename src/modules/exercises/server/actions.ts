@@ -81,6 +81,55 @@ export async function submitExercise(
   }
 }
 
+/**
+ * Envío de un ejercicio de WRITING para CORRECCIÓN MANUAL de la profesora.
+ * A diferencia de `submitExercise`, no intenta autocorregir con IA: la entrega
+ * queda "pendiente" y aparece en el panel de revisión (/admin/ejercicios),
+ * donde la profesora la califica según los criterios de Cambridge y le envía
+ * al alumno la nota + su mensaje. Avisa a las administradoras al recibirse.
+ */
+export async function submitWritingForReview(lessonId: string, content: string) {
+  const session = await requireSession();
+  if (!session?.user?.id) {
+    return { status: "error" as const, message: "Inicia sesión para enviar tu texto." };
+  }
+  const text = content.trim();
+  if (text.length < 10) {
+    return { status: "error" as const, message: "Escribe tu texto antes de enviarlo." };
+  }
+  const rl = checkRateLimit(`writing:${session.user.id}`, 15, 60 * 60);
+  if (!rl.allowed) {
+    return { status: "error" as const, message: "Has enviado demasiados textos seguidos. Espera un poco." };
+  }
+
+  const lesson = await db.lesson.findUnique({ where: { id: lessonId }, select: { id: true, title: true } });
+  if (!lesson) return { status: "error" as const, message: "Lección no encontrada." };
+
+  const submission = await db.exerciseSubmission.create({
+    data: { userId: session.user.id, lessonId, content: text, status: "pendiente" },
+  });
+
+  const admins = await db.user.findMany({
+    where: { roles: { some: { role: { name: "administrador" } } } },
+    select: { id: true },
+  });
+  if (admins.length) {
+    await db.notification.createMany({
+      data: admins.map((a) => ({
+        userId: a.id,
+        type: "sistema",
+        title: "Nuevo Writing por corregir",
+        body: `Un alumno ha enviado su texto de "${lesson.title}".`,
+        relatedEntityType: "ExerciseSubmission",
+        relatedEntityId: submission.id,
+      })),
+    });
+  }
+
+  revalidatePath("/admin/ejercicios");
+  return { status: "success" as const };
+}
+
 export async function getLatestSubmission(userId: string, lessonId: string) {
   return db.exerciseSubmission.findFirst({
     where: { userId, lessonId },

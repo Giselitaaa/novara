@@ -140,6 +140,7 @@ async function main() {
     data: [
       { key: "bizum", label: "Bizum" },
       { key: "transferencia_bancaria", label: "Transferencia bancaria" },
+      { key: "tarjeta", label: "Tarjeta (Stripe)" },
     ],
     skipDuplicates: true,
   });

@@ -6,6 +6,7 @@ import { StatusBadge } from "@/components/admin/status-badge";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Container } from "@/components/layout/container";
 import { SupportTicketForm } from "@/components/support/support-ticket-form";
+import { TicketReplyForm } from "@/components/support/ticket-reply-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
@@ -106,6 +107,13 @@ export default async function SupportPage() {
                       );
                     })}
                   </div>
+                  {ticket.status.key !== "cerrada" && ticket.status.key !== "cerrado" ? (
+                    <TicketReplyForm ticketId={ticket.id} />
+                  ) : (
+                    <p className="mt-3 border-t border-border pt-3 text-xs text-muted-foreground">
+                      Esta solicitud está cerrada. Abre una nueva si necesitas más ayuda.
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             ))}

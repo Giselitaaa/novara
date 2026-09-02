@@ -10,8 +10,9 @@ import { requireAdmin } from "@/modules/admin/server/guard";
 export async function createBlogPost(formData: FormData) {
   const session = await requireAdmin();
 
-  const title = String(formData.get("title") ?? "").trim();
-  if (!title) throw new Error("El título es obligatorio.");
+  // El "Nuevo artículo" del panel crea un BORRADOR sin título todavía (se pone
+  // luego en el editor). Por eso no se exige título aquí: se usa uno por defecto.
+  const title = String(formData.get("title") ?? "").trim() || "Nuevo artículo";
 
   const draftStatus = await db.status.findUnique({ where: { key: "activo" } });
   if (!draftStatus) throw new Error("Catálogos base sin sembrar.");

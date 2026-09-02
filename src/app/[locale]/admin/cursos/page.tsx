@@ -121,7 +121,7 @@ export default async function AdminCoursesPage({ searchParams }: Props) {
                   {course.category.name}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {course.accessType.key === "gratis" ? "Gratis" : "Premium"}
+                  {course.accessType.key === "gratis" ? "Incluido" : "Premium"}
                 </TableCell>
                 <TableCell>
                   <StatusBadge

@@ -51,6 +51,7 @@ export default async function CheckoutPage({ params }: Props) {
         price={course.price ?? 0}
         instructions={instructions}
         existingPayment={existingPayment}
+        cardEnabled={Boolean(process.env.STRIPE_SECRET_KEY)}
       />
     </Container>
   );

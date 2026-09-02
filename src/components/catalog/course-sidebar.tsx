@@ -69,7 +69,9 @@ export function CourseSidebar({
       <CardContent className="flex flex-col gap-5 pt-6">
         <div className="flex items-baseline justify-between">
           <span className="font-display text-3xl tracking-tighter">
-            {course.accessType === "gratis" ? "Gratis" : formatPrice(course.price ?? 0)}
+            {course.accessType === "gratis"
+              ? "Acceso incluido"
+              : formatPrice(course.price ?? 0)}
           </span>
           <button
             type="button"
@@ -105,7 +107,7 @@ export function CourseSidebar({
         ) : course.accessType === "gratis" ? (
           <Button variant="gold" size="lg" onClick={handleEnroll} disabled={isPending}>
             <GraduationCap className="size-4" />
-            {isPending ? "Inscribiendo…" : "Inscribirme gratis"}
+            {isPending ? "Inscribiendo…" : "Empezar ahora"}
           </Button>
         ) : (
           <Button asChild variant="gold" size="lg">

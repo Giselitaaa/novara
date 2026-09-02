@@ -16,7 +16,6 @@ import type { CourseCardDTO } from "@/modules/courses/types/course-dto";
 
 export function CourseCard({ course }: { course: CourseCardDTO }) {
   const t = useTranslations("home.courses");
-  const tCommon = useTranslations("common");
 
   return (
     <Card className="flex flex-col overflow-hidden">
@@ -37,9 +36,7 @@ export function CourseCard({ course }: { course: CourseCardDTO }) {
           <Link href={`/categorias/${course.categorySlug}`}>
             <Badge variant="outline">{course.categoryName}</Badge>
           </Link>
-          {course.accessType === "gratis" && (
-            <Badge variant="success">{tCommon("free")}</Badge>
-          )}
+          {course.accessType !== "gratis" && <Badge variant="gold">Premium</Badge>}
         </div>
         <CardTitle>
           <Link
@@ -62,9 +59,7 @@ export function CourseCard({ course }: { course: CourseCardDTO }) {
 
       <CardFooter className="items-center justify-between border-t border-border pt-4">
         <span className="font-display text-lg tracking-tighter">
-          {course.accessType === "gratis"
-            ? tCommon("free")
-            : formatPrice(course.price ?? 0)}
+          {course.accessType === "gratis" ? "" : formatPrice(course.price ?? 0)}
         </span>
         <Link
           href={`/cursos/${course.slug}`}

@@ -19,6 +19,7 @@ import {
   RecentActivityCard,
 } from "@/components/dashboard/dashboard-lists";
 import { NextObjectivesCard } from "@/components/dashboard/next-objectives-card";
+import { ReadinessCard } from "@/components/dashboard/readiness-card";
 import { StatStrip } from "@/components/dashboard/stat-strip";
 import { StreakXPCard } from "@/components/dashboard/streak-xp-card";
 import { StudyCalendar } from "@/components/dashboard/study-calendar";
@@ -32,6 +33,7 @@ import { Link } from "@/i18n/navigation";
 import { requireSession } from "@/lib/require-session";
 import { getRecommendedCourses } from "@/modules/courses/server/recommendation-queries";
 import { getCurrentLevel, getUserBadges } from "@/modules/gamification/server/actions";
+import { getCourseReadinessBySlug } from "@/modules/readiness/server/queries";
 import { getNextObjectives } from "@/modules/users/server/objectives-queries";
 import { getProfileByUserId, getStudentOverview } from "@/modules/users/server/queries";
 import { getWeeklySummary } from "@/modules/users/server/weekly-summary-queries";
@@ -54,6 +56,12 @@ export default async function StudentDashboardPage() {
     ]);
 
   if (!profile?.profile) redirect("/auth/iniciar-sesion");
+
+  // Readiness real de la preparación en curso (rendimiento vs progreso).
+  const continueSlug = overview.continueCourse?.course.slug;
+  const readiness = continueSlug
+    ? await getCourseReadinessBySlug(session.user.id, continueSlug)
+    : null;
 
   return (
     <Container className="flex flex-col gap-8 py-10 sm:py-14">
@@ -113,6 +121,12 @@ export default async function StudentDashboardPage() {
           nextLevelXp={level.next?.minXp ?? null}
         />
       </div>
+
+      {readiness && (
+        <div className="grid grid-cols-1 gap-6">
+          <ReadinessCard data={readiness} />
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <WeeklyGoalCard

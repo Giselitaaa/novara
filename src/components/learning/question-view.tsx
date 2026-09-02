@@ -3,6 +3,7 @@
 import { CheckCircle2, ChevronDown, ChevronUp, XCircle } from "lucide-react";
 import { useEffect, useMemo } from "react";
 
+import { EmojiRich } from "@/components/learning/emoji-rich";
 import { Button } from "@/components/ui/button";
 import type { Response } from "@/modules/exercises/shared/question-types";
 
@@ -85,7 +86,9 @@ export function QuestionView({
     <div className="rounded-md border border-border p-3.5">
       <div className="mb-2 flex items-start gap-2">
         <span className="text-sm font-medium text-muted-foreground">{index + 1}.</span>
-        <p className="text-sm font-medium">{prompt}</p>
+        <p className="text-sm font-medium">
+          <EmojiRich text={prompt} />
+        </p>
         {result && result.autoGradable && (
           <span className="ml-auto">
             {result.correct ? (
@@ -117,7 +120,7 @@ export function QuestionView({
                     });
                   }}
                 />
-                {opt}
+                <EmojiRich text={opt} />
               </label>
             );
           })}

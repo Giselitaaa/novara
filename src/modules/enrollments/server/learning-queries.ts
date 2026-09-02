@@ -1,6 +1,7 @@
 import "server-only";
 
 import { db } from "@/lib/db";
+import { moduleGate, type ModuleGate } from "@/modules/enrollments/shared/pacing";
 
 /**
  * Estructura completa de aprendizaje de un curso para un alumno:
@@ -84,24 +85,58 @@ export async function getCourseLearningData(courseSlug: string, userId: string) 
     : [];
   const passedExamIds = new Set(passedAttempts.map((a) => a.examId));
 
-  const lockedModuleIds = new Set<string>();
+  // Bloqueo por TEST de módulo (comportamiento existente).
+  const testLockedModuleIds = new Set<string>();
   let blockedFromHere = false;
   for (const mod of course.modules) {
-    if (blockedFromHere) lockedModuleIds.add(mod.id);
+    if (blockedFromHere) testLockedModuleIds.add(mod.id);
     const moduleTest = mod.exams[0];
     if (moduleTest && !passedExamIds.has(moduleTest.id)) {
       blockedFromHere = true;
     }
   }
 
-  const flatLessons = course.modules.flatMap((m) =>
-    m.lessons.map((lesson) => ({
+  // Bloqueo por RITMO (drip): el contenido se libera semana a semana desde la
+  // matrícula, para que un nivel no se pueda completar en unos días. La
+  // administración queda EXENTA (previsualiza todo). Los cursos de niños (YLE)
+  // no se limitan por tiempo — son lúdicos, no una preparación cronometrada.
+  const adminRole = await db.userRole.findFirst({
+    where: { userId, role: { name: "administrador" } },
+    select: { userId: true },
+  });
+  const isAdmin = Boolean(adminRole);
+  const isYoungLearners = ["pre-a1-starters", "a1-movers", "a2-flyers"].includes(course.slug);
+  const applyPacing = !isAdmin && !isYoungLearners;
+
+  const now = new Date();
+  const moduleGates = new Map<string, ModuleGate>();
+  course.modules.forEach((mod, index) => {
+    const gate = applyPacing
+      ? moduleGate(enrollment.enrolledAt, index, now)
+      : { locked: false, availableAt: null, daysUntil: 0 };
+    moduleGates.set(mod.id, gate);
+  });
+
+  // Un módulo está bloqueado si lo está por test O por fecha.
+  const lockedModuleIds = new Set<string>(testLockedModuleIds);
+  for (const [id, gate] of moduleGates) if (gate.locked) lockedModuleIds.add(id);
+
+  const flatLessons = course.modules.flatMap((m) => {
+    const gate = moduleGates.get(m.id);
+    const lockReason: "test" | "schedule" | null = gate?.locked
+      ? "schedule"
+      : testLockedModuleIds.has(m.id)
+        ? "test"
+        : null;
+    return m.lessons.map((lesson) => ({
       ...lesson,
       moduleId: m.id,
       moduleTitle: m.title,
       isLocked: lockedModuleIds.has(m.id),
-    }))
-  );
+      lockReason,
+      availableAt: gate?.availableAt ?? null,
+    }));
+  });
 
   return {
     course,
@@ -109,6 +144,7 @@ export async function getCourseLearningData(courseSlug: string, userId: string) 
     lessons: flatLessons,
     progressByLessonId,
     lockedModuleIds,
+    moduleGates,
   };
 }
 

@@ -45,16 +45,18 @@ export async function getPublishedReviews(courseId: string) {
     rating: r.rating,
     comment: r.comment,
     createdAt: r.createdAt,
-    authorName: r.user.profile
-      ? `${r.user.profile.firstName} ${r.user.profile.lastName[0]}.`
-      : "Alumno de NOVARA",
+    authorName:
+      r.authorName ??
+      (r.user.profile
+        ? `${r.user.profile.firstName} ${r.user.profile.lastName[0]}.`
+        : "Alumno de NOVARA"),
   }));
 }
 
 /** La reseña del alumno actual para un curso (para prellenar su formulario). */
 export async function getMyReview(userId: string, courseId: string) {
-  const review = await db.review.findUnique({
-    where: { userId_courseId: { userId, courseId } },
+  const review = await db.review.findFirst({
+    where: { userId, courseId, authorName: null },
     include: { status: true },
   });
   if (!review) return null;
@@ -68,4 +70,15 @@ export async function getMyReview(userId: string, courseId: string) {
 
 export async function countPendingReviews() {
   return db.review.count({ where: { status: { key: "pendiente_moderacion" } } });
+}
+
+/** Cursos (id + título) para el selector de "añadir reseña" del admin. */
+export async function listCoursesForReview() {
+  const courses = await db.course.findMany({
+    where: { deletedAt: null },
+    orderBy: { title: "asc" },
+    select: { id: true, title: true },
+    take: 500,
+  });
+  return courses;
 }

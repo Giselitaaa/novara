@@ -2,12 +2,14 @@ import { CheckCircle2, XCircle } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
+import { FinalExamOutcome } from "@/components/dashboard/final-exam-outcome";
 import { Container } from "@/components/layout/container";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link, redirect } from "@/i18n/navigation";
 import { requireSession } from "@/lib/require-session";
 import { getAttemptResult } from "@/modules/exams/server/student-queries";
+import { getFinalExamOutcome } from "@/modules/readiness/server/final-outcome-queries";
 
 export const metadata: Metadata = { title: "Resultado del examen" };
 
@@ -21,6 +23,14 @@ export default async function ExamResultPage({ params }: Props) {
 
   const attempt = await getAttemptResult(attemptId, session.user.id);
   if (!attempt || !attempt.submittedAt) notFound();
+
+  // Punto 12: si es el SIMULACRO FINAL de un nivel, resultado adaptativo
+  // (directrices de inscripción si aprueba, o plan de refuerzo si no).
+  const finalOutcome = await getFinalExamOutcome(
+    session.user.id,
+    examId,
+    Number(attempt.score ?? 0)
+  );
 
   return (
     <Container className="max-w-2xl py-10 sm:py-14">
@@ -42,6 +52,10 @@ export default async function ExamResultPage({ params }: Props) {
           </p>
         </CardContent>
       </Card>
+
+      {finalOutcome && (
+        <FinalExamOutcome outcome={finalOutcome} courseSlug={finalOutcome.courseSlug} />
+      )}
 
       <h2 className="mb-4 font-display text-lg tracking-tighter">
         Revisión de respuestas

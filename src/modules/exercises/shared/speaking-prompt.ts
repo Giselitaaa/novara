@@ -34,22 +34,62 @@ export type ConversationParams = {
 };
 
 /**
- * Construye el `system` para la conversación: rol, escenario, objetivo
- * pedagógico y las reglas de adaptación al nivel. Determinista y testeable.
+ * Normaliza el idioma a su nombre en INGLÉS ("en" → "English"). Es clave:
+ * si al modelo se le pasa el código "en" en un prompt escrito en español,
+ * tiende a responder en español (y la voz inglesa lo lee con acento → suena
+ * a "español con acento inglés"). Con el nombre real del idioma + una orden
+ * tajante en ese idioma, el modelo se ancla al idioma correcto.
+ */
+export function languageName(language: string): string {
+  const key = language.trim().toLowerCase();
+  const map: Record<string, string> = {
+    en: "English",
+    "en-gb": "English",
+    "en-us": "English",
+    english: "English",
+    inglés: "English",
+    ingles: "English",
+    es: "Spanish",
+    español: "Spanish",
+    espanol: "Spanish",
+    spanish: "Spanish",
+    fr: "French",
+    francés: "French",
+    french: "French",
+    de: "German",
+    alemán: "German",
+    german: "German",
+  };
+  return map[key] ?? "English";
+}
+
+/**
+ * Construye el `system` para la conversación. La ORDEN de idioma va primero
+ * y en el propio idioma de práctica, para que el modelo no derive al español
+ * pese a que el escenario/objetivo estén descritos en español.
  */
 export function buildSpeakingSystemPrompt(params: ConversationParams): string {
+  const lang = languageName(params.language);
+  const isEnglish = lang === "English";
+
   const parts = [
-    `Eres un compañero de conversación para practicar ${params.language} en una academia de idiomas.`,
-    `Escenario / rol: ${params.scenario}.`,
+    // Orden de idioma tajante y EN el idioma de práctica (ancla al modelo).
+    isEnglish
+      ? "You are a friendly speaking partner in a language academy. You MUST speak ONLY in English. Every single word of your reply must be in natural English — never Spanish or any other language, even if the student writes in Spanish."
+      : `Responde SIEMPRE y ÚNICAMENTE en ${lang}. Cada palabra de tu respuesta debe estar en ${lang}, nunca en otro idioma.`,
+    `Escenario / rol (contexto): ${params.scenario}.`,
     `Objetivo lingüístico del ejercicio: ${params.objective}.`,
     `Nivel del alumno (MCER): ${params.level}. Adáptate ESTRICTAMENTE a este nivel:`,
     LEVEL_GUIDANCE[params.level],
-    "Mantén una conversación real: una intervención por turno, natural, y termina normalmente con una pregunta o un pie para que el alumno siga hablando.",
-    "Responde SIEMPRE en el idioma que se practica, nunca en otro idioma. No corrijas explícitamente salvo que el objetivo lo pida; el objetivo es que el alumno hable con fluidez.",
+    isEnglish
+      ? "Keep it a real conversation: ONE short turn at a time, natural, and normally end with a question so the student keeps talking. Do not correct explicitly unless asked; the goal is fluency. Output plain spoken English only — no stage directions, no translations, no quotation marks."
+      : "Mantén una conversación real: una intervención por turno, natural, terminando con una pregunta. No corrijas salvo que el objetivo lo pida. Devuelve solo el habla, sin acotaciones ni traducciones.",
   ];
   if (params.keywords?.length) {
     parts.push(
-      `Intenta introducir de forma NATURAL, si encaja, estas expresiones: ${params.keywords.join(", ")}.`
+      isEnglish
+        ? `If it fits naturally, try to use some of these expressions: ${params.keywords.join(", ")}.`
+        : `Intenta introducir de forma NATURAL, si encaja, estas expresiones: ${params.keywords.join(", ")}.`
     );
   }
   return parts.join("\n");

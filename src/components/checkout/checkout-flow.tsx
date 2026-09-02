@@ -1,6 +1,13 @@
 "use client";
 
-import { AlertCircle, Building2, CheckCircle2, Clock, Smartphone } from "lucide-react";
+import {
+  AlertCircle,
+  Building2,
+  CheckCircle2,
+  Clock,
+  CreditCard,
+  Smartphone,
+} from "lucide-react";
 import { useTransition } from "react";
 import { toast } from "sonner";
 
@@ -9,7 +16,11 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "@/i18n/navigation";
 import { formatPrice } from "@/lib/format";
-import { requestPurchase, uploadPaymentProof } from "@/modules/payments/server/actions";
+import {
+  requestPurchase,
+  startCardCheckout,
+  uploadPaymentProof,
+} from "@/modules/payments/server/actions";
 
 type PaymentState = {
   id: string;
@@ -24,6 +35,8 @@ interface CheckoutFlowProps {
   price: number;
   instructions: { bizumNumber: string; bankIban: string; bankHolder: string };
   existingPayment: PaymentState;
+  /** Solo true si Stripe está configurado (STRIPE_SECRET_KEY presente). */
+  cardEnabled?: boolean;
 }
 
 export function CheckoutFlow({
@@ -32,9 +45,25 @@ export function CheckoutFlow({
   price,
   instructions,
   existingPayment,
+  cardEnabled = false,
 }: CheckoutFlowProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+
+  function handleCardCheckout() {
+    startTransition(async () => {
+      try {
+        const url = await startCardCheckout(courseId);
+        window.location.href = url;
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "No se pudo iniciar el pago con tarjeta."
+        );
+      }
+    });
+  }
 
   function handleRequest(methodKey: "bizum" | "transferencia_bancaria") {
     startTransition(async () => {
@@ -86,6 +115,27 @@ export function CheckoutFlow({
           Elige cómo quieres pagar <strong>{formatPrice(price)}</strong> por «
           {courseTitle}».
         </p>
+
+        {cardEnabled && (
+          <>
+            <Button
+              variant="gold"
+              className="h-auto flex-col gap-2 py-6"
+              disabled={isPending}
+              onClick={handleCardCheckout}
+            >
+              <CreditCard className="size-6" />
+              Pagar con tarjeta
+              <span className="text-xs font-normal opacity-80">
+                Pago inmediato y seguro con Stripe
+              </span>
+            </Button>
+            <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground">
+              <span className="h-px flex-1 bg-border" />o paga manualmente
+              <span className="h-px flex-1 bg-border" />
+            </div>
+          </>
+        )}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Button
