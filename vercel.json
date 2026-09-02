@@ -1,0 +1,18 @@
+{
+  "services": {
+    "novara": {
+      "root": ".",
+      "framework": "nextjs",
+      "buildCommand": "npm ci --include=dev && npx prisma generate && npm run build"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": {
+        "type": "service",
+        "service": "novara"
+      }
+    }
+  ]
+}

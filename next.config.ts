@@ -18,11 +18,8 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
  */
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  typedRoutes: true,
-  // Nota: NO usar `output: "standalone"` con `next start` (Render). El modo
-  // standalone requiere `node .next/standalone/server.js`; con `next start`
-  // provoca redirecciones/errores. Para Docker se puede reactivar cambiando
-  // también el comando de arranque.
+  // typedRoutes desactivado: en Next 15.5 se volvió estricto y rechaza rutas
+  // con query (?callbackUrl=…) usadas en redirect(); no aporta en runtime.
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
   },
