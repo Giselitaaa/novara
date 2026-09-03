@@ -1,11 +1,11 @@
 "use client";
 
-import { Loader2, RotateCw, Volume2, WalletCards } from "lucide-react";
+import { RotateCw, Volume2, WalletCards } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
-type Card = {
+export type FlashcardCard = {
   id: string;
   term: string;
   translation: string;
@@ -17,37 +17,19 @@ type Card = {
   audioUrl: string | null;
 };
 
-type Deck = { id: string; title: string; cards: Card[] };
-
 /**
- * Visor de flashcards del alumno dentro de una lección. Carga las cartas del
- * mazo por `deckId` y permite girar la carta, avanzar/retroceder y ESCUCHAR la
- * pronunciación del término. Honestidad de audio: si la carta trae `audioUrl`
- * real se reproduce ese fichero; si no, cae a la voz INGLESA del navegador
- * (SpeechSynthesis en-GB) — nunca se queda mudo ni finge un audio inexistente.
+ * Visor de flashcards del alumno dentro de una lección. Recibe las cartas YA
+ * cargadas desde el servidor (props) para que se vean al instante — nada de
+ * fetch en el cliente que pueda quedarse colgado. Permite girar la carta,
+ * avanzar/retroceder y ESCUCHAR la pronunciación del término. Honestidad de
+ * audio: si la carta trae `audioUrl` real se reproduce ese fichero; si no, cae
+ * a la voz INGLESA del navegador (SpeechSynthesis en-GB) — nunca finge audio.
  */
-export function FlashcardsViewer({ deckId }: { deckId: string }) {
-  const [deck, setDeck] = useState<Deck | null>(null);
-  const [error, setError] = useState<string | null>(null);
+export function FlashcardsViewer({ cards, title }: { cards: FlashcardCard[]; title?: string | null }) {
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  useEffect(() => {
-    let alive = true;
-    fetch(`/api/flashcards/${deckId}`)
-      .then(async (res) => {
-        if (!res.ok) throw new Error(String(res.status));
-        return (await res.json()) as Deck;
-      })
-      .then((d) => alive && setDeck(d))
-      .catch(() => alive && setError("No se pudieron cargar las flashcards."));
-    return () => {
-      alive = false;
-    };
-  }, [deckId]);
-
-  /** Elige una voz INGLESA (preferentemente británica) del navegador. */
   const britishVoice = useCallback((): SpeechSynthesisVoice | null => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return null;
     const voices = window.speechSynthesis.getVoices();
@@ -58,21 +40,6 @@ export function FlashcardsViewer({ deckId }: { deckId: string }) {
       null
     );
   }, []);
-
-  const speak = useCallback(
-    (card: Card) => {
-      // 1) Audio real pregrabado si existe.
-      if (card.audioUrl) {
-        if (!audioRef.current) audioRef.current = new Audio();
-        audioRef.current.src = card.audioUrl;
-        audioRef.current.play().catch(() => speakBrowser(card.term));
-        return;
-      }
-      speakBrowser(card.term);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
 
   function speakBrowser(text: string) {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
@@ -85,6 +52,17 @@ export function FlashcardsViewer({ deckId }: { deckId: string }) {
     window.speechSynthesis.speak(utterance);
   }
 
+  const speak = useCallback((card: FlashcardCard) => {
+    if (card.audioUrl) {
+      if (!audioRef.current) audioRef.current = new Audio();
+      audioRef.current.src = card.audioUrl;
+      audioRef.current.play().catch(() => speakBrowser(card.term));
+      return;
+    }
+    speakBrowser(card.term);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Precarga la lista de voces (en algunos navegadores llega asíncrona).
   useEffect(() => {
     if (typeof window !== "undefined" && "speechSynthesis" in window) {
@@ -92,24 +70,7 @@ export function FlashcardsViewer({ deckId }: { deckId: string }) {
     }
   }, []);
 
-  if (error) {
-    return (
-      <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm">
-        {error}
-      </div>
-    );
-  }
-
-  if (!deck) {
-    return (
-      <div className="flex items-center gap-3 rounded-lg border border-gold/25 bg-gold/5 p-4 text-sm">
-        <Loader2 className="size-4 animate-spin text-gold" />
-        Cargando flashcards…
-      </div>
-    );
-  }
-
-  if (deck.cards.length === 0) {
+  if (!cards || cards.length === 0) {
     return (
       <div className="flex items-center gap-3 rounded-lg border border-gold/25 bg-gold/5 p-4 text-sm">
         <WalletCards className="size-5 shrink-0 text-gold" />
@@ -118,20 +79,20 @@ export function FlashcardsViewer({ deckId }: { deckId: string }) {
     );
   }
 
-  const card = deck.cards[index] ?? deck.cards[0]!;
+  const card = cards[index] ?? cards[0]!;
   const go = (delta: number) => {
     setFlipped(false);
-    setIndex((i) => (i + delta + deck.cards.length) % deck.cards.length);
+    setIndex((i) => (i + delta + cards.length) % cards.length);
   };
 
   return (
     <div className="rounded-lg border border-gold/25 bg-gold/5 p-4">
       <div className="mb-3 flex items-center justify-between text-xs text-muted-foreground">
         <span className="flex items-center gap-1.5 font-medium">
-          <WalletCards className="size-4 text-gold" /> {deck.title}
+          <WalletCards className="size-4 text-gold" /> {title || "Flashcards"}
         </span>
         <span>
-          {index + 1} / {deck.cards.length}
+          {index + 1} / {cards.length}
         </span>
       </div>
 
@@ -175,13 +136,7 @@ export function FlashcardsViewer({ deckId }: { deckId: string }) {
         <Button type="button" variant="outline" size="sm" onClick={() => go(-1)}>
           ← Anterior
         </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          onClick={() => speak(card)}
-          className="gap-1.5"
-        >
+        <Button type="button" variant="secondary" size="sm" onClick={() => speak(card)} className="gap-1.5">
           <Volume2 className="size-4" /> Escuchar
         </Button>
         <Button type="button" variant="outline" size="sm" onClick={() => go(1)}>

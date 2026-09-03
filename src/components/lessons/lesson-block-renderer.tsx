@@ -1,7 +1,13 @@
 import type { LessonBlock } from "@prisma/client";
 import { Download, FileText, Lightbulb, WalletCards } from "lucide-react";
 
-import { FlashcardsViewer } from "@/components/learning/flashcards-viewer";
+import { FlashcardsViewer, type FlashcardCard } from "@/components/learning/flashcards-viewer";
+
+// El bloque puede venir con su mazo y cartas ya cargados desde el servidor
+// (ver getCourseLearningData). Se renderizan directamente, sin fetch en cliente.
+export type LessonBlockWithDeck = LessonBlock & {
+  deck?: { id: string; title: string; cards: FlashcardCard[] } | null;
+};
 
 
 function asStringArray(v: unknown): string[] {
@@ -14,7 +20,7 @@ const NOTE_STYLES: Record<string, string> = {
   success: "border-gold/30 bg-gold/5",
 };
 
-export function LessonBlockRenderer({ block }: { block: LessonBlock }) {
+export function LessonBlockRenderer({ block }: { block: LessonBlockWithDeck }) {
   const data = (block.data ?? null) as Record<string, unknown> | null;
 
   switch (block.type) {
@@ -154,8 +160,8 @@ export function LessonBlockRenderer({ block }: { block: LessonBlock }) {
     }
 
     case "FLASHCARDS":
-      // Sin mazo vinculado no hay nada que practicar: cartel informativo.
-      if (!block.deckId) {
+      // Sin mazo/cartas no hay nada que practicar: cartel informativo.
+      if (!block.deck || block.deck.cards.length === 0) {
         return (
           <div className="flex items-center gap-3 rounded-lg border border-gold/25 bg-gold/5 p-4">
             <WalletCards className="size-5 shrink-0 text-gold" />
@@ -163,7 +169,7 @@ export function LessonBlockRenderer({ block }: { block: LessonBlock }) {
           </div>
         );
       }
-      return <FlashcardsViewer deckId={block.deckId} />;
+      return <FlashcardsViewer cards={block.deck.cards} title={block.deck.title} />;
 
     case "DIVIDER":
       return <hr className="border-border" />;

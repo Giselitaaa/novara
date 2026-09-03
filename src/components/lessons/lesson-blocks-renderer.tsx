@@ -1,9 +1,7 @@
-import type { LessonBlock } from "@prisma/client";
-
 import { ExercisePlayer } from "@/components/learning/exercise-player";
 import { Link } from "@/i18n/navigation";
 
-import { LessonBlockRenderer } from "./lesson-block-renderer";
+import { LessonBlockRenderer, type LessonBlockWithDeck } from "./lesson-block-renderer";
 
 export type ExerciseForPlayer = {
   id: string;
@@ -25,7 +23,7 @@ export function LessonBlocksRenderer({
   exercisesById,
   lessonId,
 }: {
-  blocks: LessonBlock[];
+  blocks: LessonBlockWithDeck[];
   exercisesById?: Map<string, ExerciseForPlayer>;
   lessonId?: string;
 }) {

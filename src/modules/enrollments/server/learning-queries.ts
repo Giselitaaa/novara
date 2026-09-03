@@ -34,6 +34,15 @@ export async function getCourseLearningData(courseSlug: string, userId: string) 
                 orderBy: {
                   order: "asc",
                 },
+                // Cargamos las cartas del mazo AQUÍ (servidor) para que las
+                // flashcards se rendericen al instante como props, sin depender
+                // de un fetch del cliente (que en algunos navegadores no
+                // llegaba a completarse y dejaba el visor en "Cargando…").
+                include: {
+                  deck: {
+                    include: { cards: { orderBy: { sortOrder: "asc" } } },
+                  },
+                },
               },
               exercise: true,
               exercises: {

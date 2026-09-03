@@ -157,7 +157,15 @@ export function SpeakingConversation({
     }
     let recorder: MediaRecorder;
     try {
-      recorder = new MediaRecorder(stream);
+      // Elegimos un formato que el navegador ADMITA de verdad. Chrome/Edge usan
+      // webm/opus; Safari solo admite audio/mp4. Sin esto, Safari grababa mp4
+      // pero se enviaba como .webm y la transcripción fallaba ("error al detener").
+      const candidates = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"];
+      const supported =
+        typeof MediaRecorder !== "undefined" && typeof MediaRecorder.isTypeSupported === "function"
+          ? candidates.find((t) => MediaRecorder.isTypeSupported(t))
+          : undefined;
+      recorder = supported ? new MediaRecorder(stream, { mimeType: supported }) : new MediaRecorder(stream);
     } catch {
       stream.getTracks().forEach((t) => t.stop());
       toast.error("Tu navegador no admite la grabación de audio. Prueba con Chrome o Edge actualizados.");
@@ -186,8 +194,18 @@ export function SpeakingConversation({
       setStatus("active");
       return;
     }
+    // La extensión del fichero debe coincidir con el formato REAL grabado
+    // (Safari = mp4, Chrome = webm); si no, el servicio de transcripción lo rechaza.
+    const type = blob.type || "audio/webm";
+    const ext = type.includes("mp4") || type.includes("mpeg") || type.includes("m4a")
+      ? "mp4"
+      : type.includes("ogg")
+        ? "ogg"
+        : type.includes("wav")
+          ? "wav"
+          : "webm";
     const form = new FormData();
-    form.append("audio", blob, "turn.webm");
+    form.append("audio", blob, `turn.${ext}`);
     form.append("language", language);
     let res: Response;
     try {
