@@ -10,8 +10,14 @@ import {
   mc, fb,
 } from "./_lib.mjs";
 
-// Bloques de Reading reutilizables por día (mismo formato Cambridge, distinto texto).
-const READING_P1 = (title, items) => reading(1, `Reading · Parte 1 — ${title}`, null, "Lee cada texto corto (señal, nota o mensaje) y elige qué significa (A/B/C).", items);
+// Reading Parte 1: los 6 textos cortos (señales/notas/mensajes) se muestran en
+// el RECUADRO DE TEXTO (numerados) y cada pregunta se refiere a uno de ellos —
+// así el alumno SIEMPRE tiene el texto delante para leer, como en Cambridge.
+const READING_P1 = (title, items) => {
+  const text = "Lee estos seis mensajes:\n\n" + items.map((q, i) => `${i + 1}.  ${q.data.prompt}`).join("\n\n");
+  const questions = items.map((q, i) => ({ ...q, data: { ...q.data, prompt: `Mensaje ${i + 1}: ¿qué significa?` } }));
+  return reading(1, `Reading · Parte 1 — ${title}`, text, "Lee los seis textos cortos del recuadro y elige qué significa cada uno (A/B/C).", questions);
+};
 
 const DAY1 = {
   title: "Día 1 — Present simple: habla de tu vida",

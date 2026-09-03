@@ -29,6 +29,24 @@ type Evaluation = {
 
 type Status = "idle" | "loading" | "recording" | "active" | "unavailable" | "evaluated";
 
+// Reconocimiento de voz del NAVEGADOR (Web Speech API). Es keyless: transcribe
+// sin depender de ninguna clave/servidor, así que evita el error 401 de un STT
+// en la nube. Safari/Chrome lo exponen (webkitSpeechRecognition). Tipos mínimos.
+type SRAlternative = { transcript: string };
+type SRResult = { isFinal: boolean } & Record<number, SRAlternative>;
+type SRResultEvent = { resultIndex: number; results: { length: number } & Record<number, SRResult> };
+type SpeechRecognitionLike = {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  maxAlternatives: number;
+  start: () => void;
+  stop: () => void;
+  onresult: ((e: SRResultEvent) => void) | null;
+  onerror: ((e: { error?: string }) => void) | null;
+  onend: (() => void) | null;
+};
+
 export function SpeakingConversation({
   language,
   level,
@@ -47,6 +65,7 @@ export function SpeakingConversation({
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   // Precarga las voces del navegador (getVoices puede tardar en poblarse).
   useEffect(() => {
@@ -131,7 +150,77 @@ export function SpeakingConversation({
     setStatus(ok ? "active" : "idle");
   }
 
+  /** Clase de reconocimiento del navegador (con prefijo webkit en Safari/Chrome). */
+  function getSpeechRecognition(): (new () => SpeechRecognitionLike) | null {
+    if (typeof window === "undefined") return null;
+    const w = window as unknown as {
+      SpeechRecognition?: new () => SpeechRecognitionLike;
+      webkitSpeechRecognition?: new () => SpeechRecognitionLike;
+    };
+    return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
+  }
+
+  function srLang(): string {
+    const l = language.toLowerCase();
+    if (/\bes|espa/.test(l)) return "es-ES";
+    if (/\bfr|franc/.test(l)) return "fr-FR";
+    return "en-GB"; // inglés británico (Cambridge)
+  }
+
+  /** Transcribe con el navegador (keyless). Devuelve false si no se pudo iniciar. */
+  function startBrowserRecognition(SR: new () => SpeechRecognitionLike): boolean {
+    let rec: SpeechRecognitionLike;
+    try {
+      rec = new SR();
+    } catch {
+      return false;
+    }
+    rec.lang = srLang();
+    rec.interimResults = false;
+    rec.continuous = true;
+    rec.maxAlternatives = 1;
+    let finalText = "";
+    let permissionError = false;
+    rec.onresult = (e) => {
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const r = e.results[i];
+        if (r && r.isFinal && r[0]) finalText += r[0].transcript + " ";
+      }
+    };
+    rec.onerror = (e) => {
+      if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+        permissionError = true;
+        toast.error("Has bloqueado el micrófono. Permítelo en la barra de direcciones y reintenta.");
+      }
+    };
+    rec.onend = () => {
+      recognitionRef.current = null;
+      if (finalText.trim()) {
+        void handleTranscript(finalText.trim());
+      } else if (!permissionError) {
+        toast.error("No te he entendido bien. Inténtalo de nuevo, hablando claro y un poco más largo.");
+        setStatus("active");
+      } else {
+        setStatus("active");
+      }
+    };
+    recognitionRef.current = rec;
+    try {
+      rec.start();
+    } catch {
+      recognitionRef.current = null;
+      return false;
+    }
+    setStatus("recording");
+    return true;
+  }
+
   async function startRecording() {
+    // 1) Reconocimiento del navegador (keyless, sin depender del STT en la nube).
+    const SR = getSpeechRecognition();
+    if (SR && startBrowserRecognition(SR)) return;
+
+    // 2) Respaldo: grabar y transcribir en el servidor.
     // getUserMedia solo existe en contextos SEGUROS: localhost o HTTPS. Si la
     // app se abre por la IP de red (http://192.168.x.x) el micrófono se bloquea.
     if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
@@ -184,8 +273,31 @@ export function SpeakingConversation({
   }
 
   function stopRecording() {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch {
+        /* onend hará el resto */
+      }
+      setStatus("loading");
+      return;
+    }
     recorderRef.current?.stop();
     setStatus("loading");
+  }
+
+  /** Con el texto ya transcrito (por navegador o servidor), avanza la conversación. */
+  async function handleTranscript(text: string) {
+    if (!text.trim()) {
+      toast.error("No te he entendido bien. Inténtalo de nuevo, hablando claro.");
+      setStatus("active");
+      return;
+    }
+    const history = [...turns, { role: "student" as const, text: text.trim() }];
+    setTurns(history);
+    const ok = await aiTurn(history);
+    if (ok) setStatus("active");
+    else setStatus((s) => (s === "unavailable" ? s : "active"));
   }
 
   async function handleAudio(blob: Blob) {
@@ -225,16 +337,7 @@ export function SpeakingConversation({
       return;
     }
     const { text } = (await res.json()) as { text: string };
-    if (!text.trim()) {
-      toast.error("No te he entendido bien. Inténtalo de nuevo, hablando claro.");
-      setStatus("active");
-      return;
-    }
-    const history = [...turns, { role: "student" as const, text }];
-    setTurns(history);
-    const ok = await aiTurn(history);
-    if (ok) setStatus("active");
-    else setStatus((s) => (s === "unavailable" ? s : "active"));
+    await handleTranscript(text);
   }
 
   async function finish() {

@@ -85,13 +85,15 @@ class OpenAIWhisperService implements SpeechToTextService {
  */
 class LocalWhisperService implements SpeechToTextService {
   readonly name = "whisper-local";
-  private readonly baseUrl = process.env.WHISPER_URL?.replace(/\/$/, "");
-  private readonly model = process.env.STT_MODEL || "whisper-1";
-  // Clave opcional: whisper.cpp / faster-whisper local NO la necesita, pero un
-  // endpoint OpenAI-compatible en la nube (p. ej. Groq `whisper-large-v3`, coste
-  // cero) EXIGE `Authorization: Bearer`. Sin ella devuelve 401 y el alumno veía
-  // "error al detener". Se reutiliza LOCAL_AI_API_KEY si no hay WHISPER_API_KEY.
-  private readonly apiKey = process.env.WHISPER_API_KEY || process.env.LOCAL_AI_API_KEY || "";
+  // La URL del STT cae, si no se define WHISPER_URL, a la MISMA base que el LLM
+  // (LOCAL_AI_BASE_URL, p. ej. Groq), que sabemos que funciona.
+  private readonly baseUrl = (process.env.WHISPER_URL || process.env.LOCAL_AI_BASE_URL)?.replace(/\/$/, "");
+  private readonly model = process.env.STT_MODEL || "whisper-large-v3";
+  // Clave: se PREFIERE la del LLM (LOCAL_AI_API_KEY), que está verificada y en
+  // uso por la conversación. Antes se prefería WHISPER_API_KEY y, si en el
+  // entorno tenía un valor viejo, Groq devolvía 401 ("Invalid API Key") aunque
+  // el LLM funcionara con la otra clave. whisper.cpp local ignora la cabecera.
+  private readonly apiKey = process.env.LOCAL_AI_API_KEY || process.env.WHISPER_API_KEY || "";
 
   isConfigured() {
     return Boolean(this.baseUrl);
