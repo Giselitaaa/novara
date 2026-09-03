@@ -87,6 +87,11 @@ class LocalWhisperService implements SpeechToTextService {
   readonly name = "whisper-local";
   private readonly baseUrl = process.env.WHISPER_URL?.replace(/\/$/, "");
   private readonly model = process.env.STT_MODEL || "whisper-1";
+  // Clave opcional: whisper.cpp / faster-whisper local NO la necesita, pero un
+  // endpoint OpenAI-compatible en la nube (p. ej. Groq `whisper-large-v3`, coste
+  // cero) EXIGE `Authorization: Bearer`. Sin ella devuelve 401 y el alumno veía
+  // "error al detener". Se reutiliza LOCAL_AI_API_KEY si no hay WHISPER_API_KEY.
+  private readonly apiKey = process.env.WHISPER_API_KEY || process.env.LOCAL_AI_API_KEY || "";
 
   isConfigured() {
     return Boolean(this.baseUrl);
@@ -109,10 +114,19 @@ class LocalWhisperService implements SpeechToTextService {
     form.append("file", blob, params.filename || "audio.webm");
     form.append("model", this.model);
     if (params.language) form.append("language", params.language);
+    // Groq (y OpenAI) requieren un formato de respuesta explícito; JSON trae `text`.
+    form.append("response_format", "json");
+
+    const headers: Record<string, string> = {};
+    if (this.apiKey) headers.Authorization = `Bearer ${this.apiKey}`;
 
     let response: Response;
     try {
-      response = await fetch(`${this.baseUrl}/audio/transcriptions`, { method: "POST", body: form });
+      response = await fetch(`${this.baseUrl}/audio/transcriptions`, {
+        method: "POST",
+        headers,
+        body: form,
+      });
     } catch (error) {
       throw new STTError(
         `No se pudo conectar con el servicio Whisper local en ${this.baseUrl}. ` +

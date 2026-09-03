@@ -1,6 +1,8 @@
 import type { LessonBlock } from "@prisma/client";
 import { Download, FileText, Lightbulb, WalletCards } from "lucide-react";
 
+import { FlashcardsViewer } from "@/components/learning/flashcards-viewer";
+
 
 function asStringArray(v: unknown): string[] {
   return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
@@ -152,12 +154,16 @@ export function LessonBlockRenderer({ block }: { block: LessonBlock }) {
     }
 
     case "FLASHCARDS":
-      return (
-        <div className="flex items-center gap-3 rounded-lg border border-gold/25 bg-gold/5 p-4">
-          <WalletCards className="size-5 shrink-0 text-gold" />
-          <p className="text-sm font-medium">Mazo de flashcards para practicar vocabulario.</p>
-        </div>
-      );
+      // Sin mazo vinculado no hay nada que practicar: cartel informativo.
+      if (!block.deckId) {
+        return (
+          <div className="flex items-center gap-3 rounded-lg border border-gold/25 bg-gold/5 p-4">
+            <WalletCards className="size-5 shrink-0 text-gold" />
+            <p className="text-sm font-medium">Este bloque de flashcards aún no tiene un mazo asignado.</p>
+          </div>
+        );
+      }
+      return <FlashcardsViewer deckId={block.deckId} />;
 
     case "DIVIDER":
       return <hr className="border-border" />;
