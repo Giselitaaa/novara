@@ -1,0 +1,10 @@
+/**
+ * Índice de semanas del A2 Key. Se añade una semana = una línea aquí.
+ * El orden del array es el orden del curso.
+ */
+import { WEEK1 } from "./week-01.mjs";
+
+export const WEEKS = [
+  WEEK1,
+  // WEEK2, WEEK3, … se irán añadiendo aquí.
+];
