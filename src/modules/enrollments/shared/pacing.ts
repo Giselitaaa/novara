@@ -45,6 +45,62 @@ export function moduleGate(
   return { locked: true, availableAt, daysUntil: Math.ceil(remaining / DAY_MS) };
 }
 
+/**
+ * Cuenta los DÍAS LECTIVOS (lunes a viernes) transcurridos DESPUÉS de la fecha
+ * de matrícula hasta `now`. El día de matrícula cuenta como día 0. Los fines de
+ * semana no suman: son días de descanso, como en una academia presencial.
+ */
+export function weekdaysSince(enrolledAt: Date, now: Date): number {
+  const start = new Date(enrolledAt);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(now);
+  end.setHours(0, 0, 0, 0);
+  if (end <= start) return 0;
+  let count = 0;
+  const d = new Date(start);
+  while (d < end) {
+    d.setDate(d.getDate() + 1);
+    const day = d.getDay(); // 0 = domingo, 6 = sábado
+    if (day !== 0 && day !== 6) count++;
+  }
+  return count;
+}
+
+/** Fecha (a las 00:00) del n-ésimo día lectivo a partir de hoy (n≥1). */
+function addWeekdays(from: Date, n: number): Date {
+  const d = new Date(from);
+  d.setHours(0, 0, 0, 0);
+  let added = 0;
+  while (added < n) {
+    d.setDate(d.getDate() + 1);
+    const day = d.getDay();
+    if (day !== 0 && day !== 6) added++;
+  }
+  return d;
+}
+
+/**
+ * RITMO DIARIO (#4): cada lección se libera de UNA en UNA, un día lectivo
+ * (Lun–Vie) tras otro desde la matrícula. La lección con índice secuencial
+ * `lessonIndex` (0 = primera lección de contenido, tras la guía) se abre cuando
+ * han pasado `lessonIndex` días lectivos. Así no se puede completar el nivel de
+ * golpe: es una clase de academia al día. El descanso del fin de semana no
+ * abre contenido nuevo, pero lo ya abierto sigue disponible.
+ */
+export function lessonScheduleGate(
+  enrolledAt: Date,
+  lessonIndex: number,
+  now: Date = new Date()
+): ModuleGate {
+  if (lessonIndex <= 0) return OPEN;
+  const elapsed = weekdaysSince(enrolledAt, now);
+  if (lessonIndex <= elapsed) return { locked: false, availableAt: null, daysUntil: 0 };
+  const remainingWeekdays = lessonIndex - elapsed;
+  const availableAt = addWeekdays(now, remainingWeekdays);
+  const daysUntil = Math.max(1, Math.ceil((availableAt.getTime() - now.getTime()) / DAY_MS));
+  return { locked: true, availableAt, daysUntil };
+}
+
 /** Texto corto para la UI del bloqueo por fecha. */
 export function formatUnlockLabel(gate: ModuleGate): string | null {
   if (!gate.locked || !gate.availableAt) return null;

@@ -1,7 +1,7 @@
 import "server-only";
 
 import { db } from "@/lib/db";
-import { moduleGate, type ModuleGate } from "@/modules/enrollments/shared/pacing";
+import { lessonScheduleGate, type ModuleGate } from "@/modules/enrollments/shared/pacing";
 
 /**
  * Estructura completa de aprendizaje de un curso para un alumno:
@@ -118,34 +118,54 @@ export async function getCourseLearningData(courseSlug: string, userId: string) 
   const applyPacing = !isAdmin && !isYoungLearners;
 
   const now = new Date();
-  const moduleGates = new Map<string, ModuleGate>();
-  course.modules.forEach((mod, index) => {
-    const gate = applyPacing
-      ? moduleGate(enrollment.enrolledAt, index, now)
-      : { locked: false, availableAt: null, daysUntil: 0 };
-    moduleGates.set(mod.id, gate);
-  });
 
-  // Un módulo está bloqueado si lo está por test O por fecha.
-  const lockedModuleIds = new Set<string>(testLockedModuleIds);
-  for (const [id, gate] of moduleGates) if (gate.locked) lockedModuleIds.add(id);
+  // #4 — BLOQUEO DIARIO SECUENCIAL: el contenido se libera de UNA lección en una
+  // (un día lectivo Lun–Vie tras otro desde la matrícula) y EN ORDEN: para abrir
+  // una lección hay que haber completado la anterior. Así cada día es una clase
+  // de academia y no se puede saltar ni terminar el nivel de golpe. La guía
+  // (isPreview) está siempre disponible. Se combina con el bloqueo por test de
+  // módulo ya existente. Admin y cursos infantiles (YLE) quedan exentos del ritmo.
+  let seqIndex = 0; // índice de lección de CONTENIDO (excluye la guía/preview)
+  let prevContentDone = true; // la primera lección no tiene anterior
 
   const flatLessons = course.modules.flatMap((m) => {
-    const gate = moduleGates.get(m.id);
-    const lockReason: "test" | "schedule" | null = gate?.locked
-      ? "schedule"
-      : testLockedModuleIds.has(m.id)
+    const moduleTestLocked = testLockedModuleIds.has(m.id);
+    return m.lessons.map((lesson) => {
+      let scheduleGate: ModuleGate = { locked: false, availableAt: null, daysUntil: 0 };
+      let sequentialLocked = false;
+
+      if (!lesson.isPreview) {
+        if (applyPacing) {
+          scheduleGate = lessonScheduleGate(enrollment.enrolledAt, seqIndex, now);
+          // Secuencial: bloqueada si la lección de contenido anterior no está completada.
+          if (seqIndex > 0 && !prevContentDone) sequentialLocked = true;
+        }
+        seqIndex++;
+        prevContentDone = progressByLessonId.get(lesson.id)?.status === "completado";
+      }
+
+      const isLocked = moduleTestLocked || scheduleGate.locked || sequentialLocked;
+      const lockReason: "test" | "schedule" | "sequence" | null = moduleTestLocked
         ? "test"
-        : null;
-    return m.lessons.map((lesson) => ({
-      ...lesson,
-      moduleId: m.id,
-      moduleTitle: m.title,
-      isLocked: lockedModuleIds.has(m.id),
-      lockReason,
-      availableAt: gate?.availableAt ?? null,
-    }));
+        : scheduleGate.locked
+          ? "schedule"
+          : sequentialLocked
+            ? "sequence"
+            : null;
+
+      return {
+        ...lesson,
+        moduleId: m.id,
+        moduleTitle: m.title,
+        isLocked,
+        lockReason,
+        availableAt: scheduleGate.availableAt,
+      };
+    });
   });
+
+  // Para compatibilidad: módulos bloqueados = solo los bloqueados por test.
+  const lockedModuleIds = new Set<string>(testLockedModuleIds);
 
   return {
     course,
@@ -153,7 +173,7 @@ export async function getCourseLearningData(courseSlug: string, userId: string) 
     lessons: flatLessons,
     progressByLessonId,
     lockedModuleIds,
-    moduleGates,
+    moduleGates: new Map<string, ModuleGate>(),
   };
 }
 

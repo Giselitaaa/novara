@@ -75,7 +75,9 @@ export default async function LessonPlayerPage({ params }: Props) {
         ? `Se desbloquea el ${new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "long" }).format(l.availableAt)}`
         : l.lockReason === "test"
           ? "Aprueba el test anterior"
-          : null,
+          : l.lockReason === "sequence"
+            ? "Termina la lección anterior"
+            : null,
   }));
 
   const progress = data.progressByLessonId.get(lessonId);
