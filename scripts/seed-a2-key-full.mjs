@@ -20,7 +20,7 @@ import { PrismaClient } from "@prisma/client";
 import { WEEKS } from "./a2-key/index.mjs";
 
 const db = new PrismaClient();
-const SLUG = "a2-key-piloto";
+const SLUG = "a2-key";
 const PIPER_URL = (process.env.PIPER_URL || "http://localhost:5001").replace(/\/$/, "");
 const VOICE = "en_GB-cori-high";
 
@@ -68,7 +68,7 @@ async function main() {
   const totalWeeks = WEEKS.length;
   const course = await db.course.create({
     data: {
-      slug: SLUG, title: "A2 Key — PILOTO (curso completo)", subtitle: `Programa diario para el A2 Key: ${totalWeeks} semana(s) publicadas. Cada día, las 4 destrezas con formato Cambridge.`,
+      slug: SLUG, title: "A2 Key (Cambridge English: Key / KET)", subtitle: `Programa diario de 12 semanas para el A2 Key. Cada día, las 4 destrezas con el formato real del examen.`,
       description: "Curso de preparación para Cambridge English: Key (A2 Key / KET). Cada día es una clase completa: gramática de profesor, vocabulario con flashcards y práctica de las CUATRO destrezas (Reading, Writing, Listening y Speaking) con el formato real del examen. Simulacros cada 2 semanas y simulacro final que estima tu nota (aprobado A2 = 120).",
       authorId: author.id, categoryId: category.id, levelId: level.id, languageId: language.id, statusId: status.id, accessTypeId: access.id, price: 0, publishedAt: now, updatedContentAt: now,
       seoTitle: "Preparación A2 Key (KET) — Programa diario completo — NOVARA", seoDescription: "Prepara el Cambridge A2 Key con clases diarias: gramática, vocabulario y las 4 destrezas en formato real.",
