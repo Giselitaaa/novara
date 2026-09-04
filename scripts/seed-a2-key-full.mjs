@@ -11,33 +11,13 @@
  * Nota: mientras se completa, se construye en 'a2-key-piloto' (revisión). Al
  * terminar las 12 semanas se cambiará el slug a 'a2-key' (curso real).
  */
-import { existsSync } from "node:fs";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
-
 import { PrismaClient } from "@prisma/client";
 
 import { WEEKS } from "./a2-key/index.mjs";
+import { generateListeningAudio } from "./lib/tts.mjs";
 
 const db = new PrismaClient();
 const SLUG = "a2-key";
-const PIPER_URL = (process.env.PIPER_URL || "http://localhost:5001").replace(/\/$/, "");
-const VOICE = "en_GB-cori-high";
-
-async function generateListeningAudio(text, filename) {
-  const rel = `/uploads/listening/${filename}.wav`;
-  const abs = path.join(process.cwd(), "public", "uploads", "listening", `${filename}.wav`);
-  if (existsSync(abs)) return rel; // idempotente: no regenerar si ya existe
-  try {
-    const res = await fetch(PIPER_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, voice: VOICE }) });
-    if (!res.ok) return null;
-    const buf = Buffer.from(await res.arrayBuffer());
-    if (!buf.length) return null;
-    await mkdir(path.dirname(abs), { recursive: true });
-    await writeFile(abs, buf);
-    return rel;
-  } catch { return null; }
-}
 
 async function main() {
   const [author, category, level, language, status, access, contentTexto] = await Promise.all([

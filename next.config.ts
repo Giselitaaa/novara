@@ -69,11 +69,12 @@ const nextConfig: NextConfig = {
 
     return [
       {
-        // Los audios de Listening (WAV de Piper) los sirve Vercel como
-        // "audio/wave", un tipo no estándar que, junto con nosniff, hace que
-        // Safari los rechace ("error" en el reproductor). Forzamos "audio/wav".
-        source: "/uploads/listening/:path*.wav",
-        headers: [{ key: "Content-Type", value: "audio/wav" }],
+        // Los audios de Listening son MP3 (voz británica de Piper, convertidos
+        // con ffmpeg para que pesen ~7× menos). Se sirven como audio/mpeg
+        // (estándar) para que todos los navegadores, incluido Safari, los
+        // reproduzcan con el header nosniff activo.
+        source: "/uploads/listening/:path*.mp3",
+        headers: [{ key: "Content-Type", value: "audio/mpeg" }],
       },
       {
         source: "/(.*)",
