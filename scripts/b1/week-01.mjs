@@ -173,9 +173,150 @@ Con un tiempo pasado concreto (yesterday, in 2019) → PAST SIMPLE, no present p
   ],
 };
 
+// ───────────────────────── DÍA 2 ─────────────────────────
+const DAY2 = {
+  title: "Día 2 — Present perfect vs past simple · Present perfect continuous",
+  description: "Contraste present perfect / past simple y present perfect continuous. Vocabulario de trabajo y estudios. Las 4 destrezas con formato B1; Listening P2.",
+  pedagogy: {
+    objective: "Distinguir present perfect y past simple, y usar el present perfect continuous.",
+    summary: "Present perfect vs past simple; present perfect continuous; trabajo/estudios; Reading P1–P6, Writing, Listening P2, Speaking P1–P4.",
+    commonMistakes: ["present perfect con tiempo pasado.", "usar simple donde va continuous (duración de actividad).", "'How long are you working here?'"],
+    reviewPrompts: ["¿'I've worked' o 'I worked' con 'in 2020'?", "¿Cuándo present perfect continuous?"],
+  },
+  items: [
+    TEXT("🔁 Repaso: for/since, just/already/yet. Hoy afinas cuándo usar present perfect y cuándo past simple, y aprendes el present perfect continuous (para la duración de una actividad)."),
+    GRAMMAR("Present perfect vs past simple", `PRESENT PERFECT: conecta con el presente — experiencias sin cuándo, resultados, acciones que continúan (for/since).
+· I've worked here for years (sigo aquí). Have you ever been to Rome?
+PAST SIMPLE: acción TERMINADA con tiempo pasado concreto (yesterday, last year, in 2020, ago, when I was…).
+· I worked in Rome in 2020. When did you arrive?
+Pista: si dices o preguntas CUÁNDO exacto → past simple.`),
+    GRAMMAR("Present perfect continuous", `have/has + been + verbo-ing. Para una ACTIVIDAD que empezó en el pasado y sigue (o acaba de terminar), enfatizando la DURACIÓN:
+· I've been studying English for three years. (y sigo)
+· She's tired because she's been running.
+Con How long…?: How long have you been learning English?
+Diferencia: present perfect (resultado: I've written three emails) vs continuous (actividad/duración: I've been writing emails all morning).`),
+    WARN("Errores típicos del hispanohablante", "· ❌ I've seen him yesterday → ✅ I saw him yesterday.\n· ❌ How long are you living here? → ✅ How long have you been living here?\n· ❌ I'm studying English for years → ✅ I've been studying English for years.\n· ❌ When have you arrived? → ✅ When did you arrive?"),
+    grammarEx("Gramática — Perfect vs simple y continuous", "Completa o elige.", [
+      mc("Choose:", ["I've finished it yesterday.", "I finished it yesterday.", "I finish it yesterday."], 1, "yesterday → past simple."),
+      fb("How long ___ you ___ (study) English?", ["have", "been studying"], "duración → present perfect continuous."),
+      fb("She's tired because she ___ (run).", ["has been running", "'s been running"], "actividad reciente → continuous."),
+      fb("I ___ (work) here since 2019.", ["have worked", "'ve worked", "have been working", "'ve been working"], "for/since → perfect(o continuous)."),
+      mc("Choose:", ["I've written three emails this morning.", "I've been written three emails.", "I written three emails."], 0, "resultado contable → present perfect."),
+      fb("We ___ (go) to Paris in 2021.", ["went"], "in 2021 → past simple."),
+      fb("They ___ (wait) for an hour and they're still waiting.", ["have been waiting", "'ve been waiting"], "duración que sigue → continuous."),
+    ]),
+    GRAMMAR("Vocabulario del día — Trabajo y estudios", "Léxico de trabajo y estudios (B1)."),
+    deck("B1 S1D2 — Trabajo y estudios", [
+      ["apply for", "solicitar (empleo)", "I've applied for three jobs.", "phrasal verb", "əˈplaɪ fə"],
+      ["deadline", "fecha límite", "The deadline is on Friday.", "sustantivo", "ˈdedlaɪn"],
+      ["experience", "experiencia", "She has a lot of experience.", "sustantivo", "ɪkˈspɪəriəns"],
+      ["skill", "habilidad / destreza", "Communication is a key skill.", "sustantivo", "skɪl"],
+      ["degree", "carrera / título", "He has a degree in law.", "sustantivo", "dɪˈɡriː"],
+      ["part-time", "a tiempo parcial", "I have a part-time job.", "adjetivo", "ˌpɑːt ˈtaɪm"],
+      ["colleague", "compañero/a de trabajo", "My colleagues are helpful.", "sustantivo", "ˈkɒliːɡ"],
+      ["get on with", "avanzar con / llevarse bien", "I need to get on with my work.", "phrasal verb", "ɡet ˈɒn wɪð"],
+      ["hand in", "entregar", "Hand in your project by Friday.", "phrasal verb", "hænd ˈɪn"],
+      ["qualification", "titulación / cualificación", "You need a qualification for this.", "sustantivo", "ˌkwɒlɪfɪˈkeɪʃn"],
+    ]),
+    vocabEx("Vocabulario — Trabajo y estudios", "Elige la opción correcta.", [
+      mc("To ask for a job officially is to ___ it.", ["apply for", "hand in", "get on"], 0, "apply for."),
+      mc("The last day to submit work is the ___.", ["deadline", "degree", "skill"], 0, "deadline."),
+      mc("To submit your work is to ___ it.", ["hand in", "apply for", "get on"], 0, "hand in."),
+      mc("A university qualification is a ___.", ["degree", "skill", "deadline"], 0, "degree."),
+      mc("A job of a few hours a day is ___.", ["part-time", "full-time", "deadline"], 0, "part-time."),
+      mc("An ability you have is a ___.", ["skill", "degree", "colleague"], 0, "skill."),
+    ]),
+
+    ...readingParts({
+      p1: { title: "En el trabajo y los estudios", items: [
+        mc("Email: 'Please hand in your reports by 5 pm Friday.'", ["Submit reports by Friday 5 pm.", "No reports.", "Reports due Monday."], 0, "'hand in… by 5 pm Friday'."),
+        mc("Job ad: 'Experience preferred but not essential.'", ["Experience helps but isn't required.", "Experience required.", "No experience allowed."], 0, "'preferred but not essential'."),
+        mc("Notice: 'Library closes early during exam week.'", ["Earlier closing in exam week.", "Open later.", "Closed all week."], 0, "'closes early during exam week'."),
+        mc("Text: 'I've applied for the manager job. Wish me luck!'", ["Applied for a job.", "Got the job.", "No job."], 0, "'I've applied for the manager job'."),
+        mc("Sign: 'Staff meeting moved to Thursday.'", ["The meeting is now Thursday.", "No meeting.", "Cancelled."], 0, "'moved to Thursday'."),
+      ] },
+      p2text: "FOUR PART-TIME JOBS FOR STUDENTS\n\nA) Café Assistant — weekends only; friendly and quick; good for meeting people.\nB) Online Tutor — teach school subjects from home; flexible hours; need good knowledge.\nC) Shop Assistant — evenings; must be organised and polite with customers.\nD) Delivery Rider — active outdoor job; choose your own hours; a bike is needed.",
+      p2q: { title: "Emparejar personas y trabajos", items: [
+        mc("Nadia is only free at weekends and likes people.", ["A", "B", "C", "D"], 0, "Café: weekends, people."),
+        mc("Omar wants to work from home teaching maths.", ["A", "B", "C", "D"], 1, "Online Tutor."),
+        mc("Lucía is free in the evenings and is very organised.", ["A", "B", "C", "D"], 2, "Shop Assistant: evenings."),
+        mc("Marco loves being outdoors and has a bike.", ["A", "B", "C", "D"], 3, "Delivery Rider."),
+        mc("Someone who wants flexible hours and knows school subjects.", ["A", "B", "C", "D"], 1, "B: flexible, knowledge."),
+      ] },
+      p3text: "MY FIRST YEAR AT UNIVERSITY\n\nI've just finished my first year at university, and it has been the most challenging — and rewarding — year of my life. When I arrived last September, I felt nervous and a bit lonely. I didn't know anyone, and the workload was much heavier than at school.\n\nAt first, I struggled to manage my time. I missed a couple of deadlines because I left everything until the last minute. But I've learned a lot since then. Now I plan my week carefully, and I always hand in my work on time. I've also joined a study group, which has helped me understand difficult subjects.\n\nThe best part, though, has been the people. I've made friends from all over the world, and my flatmates have become like a second family. I've been working part-time in the university café too, which has improved my confidence and given me some extra money. Looking back, I'm proud of how much I've grown. I can't wait for next year.",
+      p3q: { title: "Mi primer año en la universidad (texto largo)", items: [
+        mc("How did the writer feel when they arrived?", ["Confident.", "Nervous and lonely.", "Bored."], 1, "'nervous and a bit lonely'."),
+        mc("What problem did the writer have at first?", ["No money.", "Managing time / missing deadlines.", "No friends."], 1, "'struggled to manage my time… missed… deadlines'."),
+        mc("What does the writer do now?", ["Leaves work late.", "Plans carefully and hands in work on time.", "Skips classes."], 1, "'plan my week… hand in my work on time'."),
+        mc("What has helped with difficult subjects?", ["A tutor.", "A study group.", "The café."], 1, "'joined a study group'."),
+        mc("How does the writer feel looking back?", ["Regretful.", "Proud.", "Angry."], 1, "'I'm proud of how much I've grown'."),
+      ] },
+      p4text: "STARTING A NEW JOB\n\nLast month I started a new job at a marketing company. (1)___ On my first day, I was so nervous that I arrived half an hour early. Everyone was very welcoming, though, and my new colleagues introduced themselves straight away. (2)___\n\nThe first week was a lot to take in. There were so many new names, systems and tasks to learn. (3)___ My manager told me not to worry and to ask questions whenever I needed to. That advice really helped me relax.\n\nNow, a month later, I feel much more confident. (4)___ I've already finished my first big project, and my boss was pleased with it. (5)___ I'm really glad I applied for this job.",
+      p4options: [
+        "They even took me out for lunch to make me feel part of the team.", // A -> gap 2
+        "I had applied for it after months of searching.",                   // B -> gap 1
+        "At times, I felt completely overwhelmed.",                          // C -> gap 3
+        "I know where everything is and who to ask for help.",               // D -> gap 4
+        "I decided to leave the company immediately.",                       // E (extra)
+        "It has been a great start, and I'm learning something new every day.", // F -> gap 5
+        "I have never used a computer before.",                              // G (extra)
+        "The office was closed for the whole month.",                        // H (extra)
+      ],
+      p4q: { title: "Empezar un trabajo nuevo (gapped text)", items: [
+        mc("Hueco 1", ["A", "B", "C", "D", "E", "F", "G", "H"], 1, "B: había solicitado el puesto."),
+        mc("Hueco 2", ["A", "B", "C", "D", "E", "F", "G", "H"], 0, "A: le invitaron a comer (bienvenida)."),
+        mc("Hueco 3", ["A", "B", "C", "D", "E", "F", "G", "H"], 2, "C: se sintió abrumado."),
+        mc("Hueco 4", ["A", "B", "C", "D", "E", "F", "G", "H"], 3, "D: ya sabe dónde está todo."),
+        mc("Hueco 5", ["A", "B", "C", "D", "E", "F", "G", "H"], 5, "F: buen comienzo, aprende cada día."),
+      ] },
+      p5text: "Finding a good job is not easy. First, you should write a clear CV that lists your (1)___ and experience. Then, when you see a job you like, you (2)___ for it online. If they invite you to an (3)___, arrive early and be polite. Show that you have the right (4)___ for the job. After the interview, it's normal to (5)___ nervous while you wait for an answer. Don't give up — the right job will come with (6)___.",
+      p5q: { title: "Huecos con opciones (vocabulario)", items: [
+        mc("Hueco 1", ["skills", "deadlines", "colleagues", "degrees"], 0, "'your skills and experience'."),
+        mc("Hueco 2", ["apply", "hand", "get", "take"], 0, "'apply for it'."),
+        mc("Hueco 3", ["interview", "exam", "deadline", "office"], 0, "'invite you to an interview'."),
+        mc("Hueco 4", ["qualifications", "deadlines", "salaries", "hours"], 0, "'the right qualifications'."),
+        mc("Hueco 5", ["feel", "make", "do", "have"], 0, "'feel nervous'."),
+        mc("Hueco 6", ["patience", "money", "luck only", "experience"], 0, "'with patience'."),
+      ] },
+      p6text: "Hi Jo,\nGreat news — I've just got a new job! I've been looking (1)___ months, so I'm really happy. I applied (2)___ it online and had an interview last week. I've (3)___ started, and my colleagues are lovely. The only problem is the (4)___ — I have to hand in a big report by Friday! I've (5)___ been working really hard this week. How (6)___ things with you?\nSpeak soon,\nSam",
+      p6q: { title: "Open cloze (una palabra)", items: [
+        fb("Hueco 1", ["for"], "'looking for months'."),
+        fb("Hueco 2", ["for"], "'applied for it'."),
+        fb("Hueco 3", ["just", "already"], "'I've just/already started'."),
+        fb("Hueco 4", ["deadline"], "'the deadline'."),
+        fb("Hueco 5", ["been"], "'I've been working'."),
+        fb("Hueco 6", ["are"], "'How are things?'"),
+      ] },
+    }),
+
+    WRITING_HEAD,
+    writing(1, "Writing · Parte 1 — Un email (~100 palabras)", "Tu amigo/a inglés/a te pregunta por tus estudios o tu trabajo. Responde a su email (~100 palabras):\n· cuéntale qué estudias o en qué trabajas,\n· dile algo que te resulte difícil y cómo lo gestionas,\n· pregúntale por sus planes.", 80, 130),
+    writing(2, "Writing · Parte 2 — Un artículo o un relato (~100 palabras)", "Elige UNA opción (~100 palabras):\n· ARTÍCULO: 'The best way to study for exams' para la web del colegio, con consejos y razones.\n· RELATO: empieza con: 'It was the day of the interview, and Tom was very nervous.'", 80, 130),
+
+    LISTENING_HEAD,
+    listening(2, "Listening · Parte 2 — Seis diálogos (idea general)", "Escucha seis diálogos cortos (se oyen dos veces) y elige la respuesta correcta.", "This is Part Two. You will hear six short dialogues. Choose the correct answer for each. One. Woman: Have you handed in your project? Man: Not yet, but I'll finish it tonight. Two. Woman: How's the new job? Man: Great, my colleagues are really friendly. Three. Man: Why are you so tired? Woman: I've been studying all night for my exam. Four. Woman: Did you get the job? Man: Yes! I start on Monday. Five. Man: What do you find hardest about university? Woman: Managing my time, definitely. Six. Woman: Have you ever worked part-time? Man: Yes, in a café last summer.", [
+      mc("1. Has the man handed in his project?", ["Yes.", "Not yet.", "He won't do it."], 1, "'Not yet, but I'll finish it tonight'."),
+      mc("2. What does the man say about his new job?", ["Boring.", "The colleagues are friendly.", "Too hard."], 1, "'my colleagues are really friendly'."),
+      mc("3. Why is the woman tired?", ["She's ill.", "She's been studying all night.", "She worked late."], 1, "'studying all night'."),
+      mc("4. Did the man get the job?", ["No.", "Yes, starts Monday.", "Interview pending."], 1, "'Yes! I start on Monday'."),
+      mc("5. What does the woman find hardest?", ["Exams.", "Managing time.", "Making friends."], 1, "'Managing my time'."),
+      mc("6. Where did the man work part-time?", ["A shop.", "A café.", "An office."], 1, "'in a café last summer'."),
+    ]),
+
+    ...speakingParts("tus estudios/trabajo, lo que se te da bien y tus planes", { p1: "qué estudias o en qué trabajas, qué se te da bien y tus planes de futuro", p2: "personas trabajando o estudiando (una oficina, una biblioteca)", p3: "qué trabajo a tiempo parcial elegir para un estudiante", p4: "el trabajo, los estudios y equilibrar las responsabilidades" }),
+
+    SUMMARY("Resumen del Día 2", [
+      "Present perfect (conexión con el presente) vs past simple (tiempo pasado concreto).",
+      "Present perfect continuous: duración de una actividad (How long have you been…?).",
+      "Practicadas las 6 partes de Reading, Writing, Listening P2 y Speaking P1–P4.",
+    ]),
+    INFO("Tarea para el Día 3", "Escribe 2 frases con present perfect continuous (How long…?). Repasa las flashcards. Mañana: narración en pasado (past simple + past continuous + past perfect)."),
+  ],
+};
+
 export const WEEK1 = {
   n: 1,
   theme: "Estilo de vida y experiencias",
   description: "Presentes, present perfect y su contraste con el pasado. Cada día, las 4 destrezas con el formato real del B1.",
-  days: [DAY1],
+  days: [DAY1, DAY2],
 };
