@@ -12,6 +12,8 @@ import { WEEK7 } from "./week-07.mjs";
 import { WEEK8 } from "./week-08.mjs";
 import { WEEK9 } from "./week-09.mjs";
 import { WEEK10 } from "./week-10.mjs";
+import { WEEK11 } from "./week-11.mjs";
+import { WEEK12 } from "./week-12.mjs";
 
 export const WEEKS = [
   WEEK1,
@@ -24,5 +26,6 @@ export const WEEKS = [
   WEEK8,
   WEEK9,
   WEEK10,
-  // WEEK11, WEEK12 … se irán añadiendo aquí.
+  WEEK11,
+  WEEK12,
 ];
