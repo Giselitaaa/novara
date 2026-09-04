@@ -314,9 +314,145 @@ Diferencia: present perfect (resultado: I've written three emails) vs continuous
   ],
 };
 
+// ───────────────────────── DÍA 3 ─────────────────────────
+const DAY3 = {
+  title: "Día 3 — Narrar en pasado: past simple, continuous y past perfect",
+  description: "Tiempos del pasado para contar historias (past simple/continuous/past perfect). Vocabulario de viajes. Las 4 destrezas con formato B1; Listening P3.",
+  pedagogy: {
+    objective: "Narrar una historia combinando past simple, past continuous y past perfect.",
+    summary: "Narrative tenses; viajes; Reading P1–P6, Writing, Listening P3, Speaking P1–P4.",
+    commonMistakes: ["no usar past perfect para lo anterior.", "when/while con el tiempo equivocado.", "past perfect = 'había' + participio."],
+    reviewPrompts: ["¿Qué tiempo para la acción anterior a otra pasada?", "when + ¿qué tiempo? / while + ¿qué tiempo?"],
+  },
+  items: [
+    TEXT("🔁 Repaso: perfect vs simple. Hoy aprendes a NARRAR: combinar past simple (acciones), past continuous (fondo) y past perfect (lo anterior). Clave para el relato del Writing."),
+    GRAMMAR("Los tiempos de la narración", `PAST SIMPLE: acciones terminadas y en secuencia (I arrived, I opened the door, I saw…).
+PAST CONTINUOUS: acción de fondo en desarrollo (was/were + -ing): It was raining when I left.
+· when + past simple (acción corta); while + past continuous (acción larga).
+PAST PERFECT: had + participio — algo que ocurrió ANTES de otro momento pasado:
+· When I arrived, the film had already started. (primero empezó, luego llegué)
+Úsalos juntos para contar bien una historia: pon el fondo (continuous), lo previo (past perfect) y la secuencia (simple).`),
+    WARN("Errores típicos del hispanohablante", "· ❌ When I arrived, the film already started → ✅ …had already started.\n· ❌ While I was cook, the phone rang → ✅ While I was cooking…\n· ❌ I have arrived late yesterday → ✅ I arrived late yesterday.\n· past perfect = 'había' + participio (had eaten = había comido)."),
+    grammarEx("Gramática — Narrar en pasado", "Completa con el tiempo correcto.", [
+      fb("When we arrived, the train ___ (already/leave).", ["had already left"], "anterior → past perfect."),
+      fb("While she ___ (read), the lights went out.", ["was reading"], "fondo → past continuous."),
+      fb("I ___ (open) the door and ___ (see) a letter.", ["opened", "saw"], "secuencia → past simple."),
+      fb("He was tired because he ___ (not/sleep) well.", ["hadn't slept", "had not slept"], "causa anterior → past perfect."),
+      mc("Choose:", ["When I arrived, they finished dinner.", "When I arrived, they had finished dinner.", "When I arrived, they were finish dinner."], 1, "anterior → had finished."),
+      fb("It ___ (rain) when we left the house.", ["was raining"], "fondo → past continuous."),
+      fb("She realised she ___ (forget) her keys.", ["had forgotten"], "anterior → past perfect."),
+    ]),
+    GRAMMAR("Vocabulario del día — Viajes", "Léxico de viajes (B1)."),
+    deck("B1 S1D3 — Viajes", [
+      ["journey", "trayecto / viaje", "The journey took ten hours.", "sustantivo", "ˈdʒɜːni"],
+      ["abroad", "al extranjero", "I've never travelled abroad.", "adverbio", "əˈbrɔːd"],
+      ["accommodation", "alojamiento", "The accommodation was excellent.", "sustantivo", "əˌkɒməˈdeɪʃn"],
+      ["book in advance", "reservar con antelación", "We booked the hotel in advance.", "colocación", "bʊk ɪn ədˈvɑːns"],
+      ["get lost", "perderse", "We got lost in the old town.", "phrasal verb", "ɡet ˈlɒst"],
+      ["sightseeing", "hacer turismo", "We spent the day sightseeing.", "sustantivo", "ˈsaɪtsiːɪŋ"],
+      ["delayed", "retrasado", "Our flight was delayed.", "adjetivo", "dɪˈleɪd"],
+      ["luggage", "equipaje", "I lost my luggage at the airport.", "sustantivo", "ˈlʌɡɪdʒ"],
+      ["set off", "ponerse en camino", "We set off early in the morning.", "phrasal verb", "set ˈɒf"],
+      ["unforgettable", "inolvidable", "It was an unforgettable trip.", "adjetivo", "ˌʌnfəˈɡetəbl"],
+    ]),
+    vocabEx("Vocabulario — Viajes", "Elige la opción correcta.", [
+      mc("To reserve early is to book ___.", ["in advance", "abroad", "lost"], 0, "in advance."),
+      mc("To lose your way is to ___.", ["get lost", "set off", "book"], 0, "get lost."),
+      mc("Where you stay on a trip is the ___.", ["accommodation", "journey", "luggage"], 0, "accommodation."),
+      mc("To start a journey is to ___.", ["set off", "get lost", "book"], 0, "set off."),
+      mc("When a flight is late, it's ___.", ["delayed", "abroad", "lost"], 0, "delayed."),
+      mc("A trip you'll never forget is ___.", ["unforgettable", "delayed", "abroad"], 0, "unforgettable."),
+    ]),
+
+    ...readingParts({
+      p1: { title: "Viajes y transporte", items: [
+        mc("Airport screen: 'Flight BA210 delayed by 2 hours.'", ["The flight is two hours late.", "On time.", "Cancelled."], 0, "'delayed by 2 hours'."),
+        mc("Hotel note: 'Breakfast included; check-out by 11 am.'", ["Free breakfast; leave by 11.", "No breakfast.", "Check-out at 1."], 0, "'included; check-out by 11 am'."),
+        mc("Sign: 'Please keep your luggage with you at all times.'", ["Watch your bags.", "Leave your bags.", "No luggage."], 0, "'keep your luggage with you'."),
+        mc("Text: 'We've booked the hotel in advance, so relax!'", ["The hotel is already booked.", "No hotel.", "Book it now."], 0, "'booked… in advance'."),
+        mc("Notice: 'Free walking tours start at 10 from the square.'", ["Free tours at 10.", "No tours.", "Tours cost money."], 0, "'Free walking tours start at 10'."),
+      ] },
+      p2text: "FOUR HOLIDAY DESTINATIONS\n\nA) Rome — history, museums and amazing food; great for culture lovers who don't mind crowds.\nB) The Alps — hiking in summer, skiing in winter; perfect for active people who love nature.\nC) A Greek Island — quiet beaches and clear sea; ideal for relaxing and doing nothing.\nD) London — theatres, shopping and nightlife; exciting for young people who love cities.",
+      p2q: { title: "Emparejar personas y destinos", items: [
+        mc("Marta loves ancient history and great food.", ["A", "B", "C", "D"], 0, "Rome."),
+        mc("Leo is very active and loves the mountains.", ["A", "B", "C", "D"], 1, "The Alps."),
+        mc("Ana just wants to relax on a quiet beach.", ["A", "B", "C", "D"], 2, "Greek Island."),
+        mc("Sam is young and loves theatres and nightlife.", ["A", "B", "C", "D"], 3, "London."),
+        mc("Someone who wants nature and outdoor sport.", ["A", "B", "C", "D"], 1, "B."),
+      ] },
+      p3text: "THE TRIP THAT WENT WRONG\n\nLast summer, my sister and I went on a trip to Italy. We had planned it for months and had booked everything in advance, so we thought nothing could go wrong. We were mistaken!\n\nOur problems started at the airport. When we arrived, we discovered that our flight had been delayed by four hours. We waited and waited, tired and bored. Finally, we set off, but when we landed in Rome, my sister realised that the airline had lost her luggage. She had packed all her nice clothes for the trip, and now she had nothing!\n\nDespite everything, the holiday turned out wonderfully. While we were waiting for news about the luggage, we explored the city on foot. We got lost several times, but that's how we found the most beautiful little streets and cafés. My sister bought some new clothes, which she loved even more than her old ones. In the end, it was an unforgettable trip — not because everything was perfect, but because we learned to enjoy the surprises.",
+      p3q: { title: "El viaje que salió mal (texto largo)", items: [
+        mc("How had they prepared for the trip?", ["Badly.", "They'd planned and booked in advance.", "At the last minute."], 1, "'planned it for months and had booked everything in advance'."),
+        mc("What happened at the airport?", ["They missed the flight.", "The flight was delayed four hours.", "Nothing."], 1, "'flight had been delayed by four hours'."),
+        mc("What did the airline do?", ["Upgraded them.", "Lost the sister's luggage.", "Cancelled the flight."], 1, "'the airline had lost her luggage'."),
+        mc("What did they do while waiting for the luggage?", ["Stayed at the hotel.", "Explored the city on foot.", "Went home."], 1, "'we explored the city on foot'."),
+        mc("Why was it an unforgettable trip?", ["Everything was perfect.", "They learned to enjoy the surprises.", "It was cheap."], 1, "'we learned to enjoy the surprises'."),
+      ] },
+      p4text: "A NIGHT UNDER THE STARS\n\nLast year, I went camping in the mountains with two friends. (1)___ We had chosen a quiet spot next to a small lake, far from any town. After we had put up our tent, we made a fire and cooked dinner. (2)___\n\nAs the sun went down, the sky slowly filled with thousands of stars. (3)___ We lay on our backs and watched them for hours, talking quietly. I had never seen anything so beautiful in my life.\n\nSuddenly, we heard a noise in the bushes. (4)___ We were terrified! But when we shone our torch, we saw that it was only a small deer. We laughed with relief. (5)___ It was one of the best nights I have ever had.",
+      p4options: [
+        "It was the first time I had ever slept outdoors.",          // A -> gap 1
+        "The food tasted amazing after our long walk.",             // B -> gap 2
+        "There were no city lights to hide them.",                  // C -> gap 3
+        "We all jumped up, our hearts beating fast.",               // D -> gap 4
+        "We had forgotten to bring any food at all.",               // E (extra)
+        "After that, we sat by the fire until we felt sleepy.",     // F -> gap 5
+        "The hotel room was very comfortable.",                     // G (extra)
+        "It rained heavily for the whole week.",                    // H (extra)
+      ],
+      p4q: { title: "Una noche bajo las estrellas (gapped text)", items: [
+        mc("Hueco 1", ["A", "B", "C", "D", "E", "F", "G", "H"], 0, "A: primera vez durmiendo fuera."),
+        mc("Hueco 2", ["A", "B", "C", "D", "E", "F", "G", "H"], 1, "B: la comida sabía genial."),
+        mc("Hueco 3", ["A", "B", "C", "D", "E", "F", "G", "H"], 2, "C: sin luces de ciudad."),
+        mc("Hueco 4", ["A", "B", "C", "D", "E", "F", "G", "H"], 3, "D: se levantaron asustados."),
+        mc("Hueco 5", ["A", "B", "C", "D", "E", "F", "G", "H"], 5, "F: se sentaron junto al fuego."),
+      ] },
+      p5text: "Travelling is one of the best ways to learn about the world. Before you go, it's a good idea to (1)___ your accommodation in advance. When you arrive, don't be afraid to (2)___ the city on foot — sometimes getting (3)___ leads to the best discoveries. Try the local food and go (4)___ to see the famous places. Even if your flight is (5)___ or you lose your (6)___, try to stay positive: the surprises often become the best stories.",
+      p5q: { title: "Huecos con opciones (vocabulario)", items: [
+        mc("Hueco 1", ["book", "get", "set", "take"], 0, "'book your accommodation'."),
+        mc("Hueco 2", ["explore", "book", "delay", "pack"], 0, "'explore the city'."),
+        mc("Hueco 3", ["lost", "delayed", "abroad", "unforgettable"], 0, "'getting lost'."),
+        mc("Hueco 4", ["sightseeing", "shopping", "camping", "swimming"], 0, "'go sightseeing… famous places'."),
+        mc("Hueco 5", ["delayed", "lost", "booked", "abroad"], 0, "'flight is delayed'."),
+        mc("Hueco 6", ["luggage", "journey", "accommodation", "tent"], 0, "'lose your luggage'."),
+      ] },
+      p6text: "Hi Kim,\nI'm back from Italy! The trip didn't start well: our flight (1)___ delayed by four hours, and the airline lost my sister's luggage. She (2)___ packed all her best clothes! (3)___ everything, we had a wonderful time. (4)___ we were waiting for news, we explored Rome on foot. We got lost, (5)___ that's how we found the best cafés! It was (6)___ unforgettable trip.\nLove,\nSam",
+      p6q: { title: "Open cloze (una palabra)", items: [
+        fb("Hueco 1", ["was"], "'was delayed'."),
+        fb("Hueco 2", ["had"], "'She had packed' (anterior → past perfect)."),
+        fb("Hueco 3", ["Despite"], "'Despite everything'."),
+        fb("Hueco 4", ["While"], "'While we were waiting'."),
+        fb("Hueco 5", ["but"], "contraste → but."),
+        fb("Hueco 6", ["an"], "'an unforgettable trip'."),
+      ] },
+    }),
+
+    WRITING_HEAD,
+    writing(1, "Writing · Parte 1 — Un email (~100 palabras)", "Tu amigo/a inglés/a te pregunta por un viaje reciente. Responde a su email (~100 palabras):\n· cuéntale adónde fuiste y con quién,\n· describe algo que salió mal o una sorpresa,\n· pregúntale por sus vacaciones.", 80, 130),
+    writing(2, "Writing · Parte 2 — Un artículo o un relato (~100 palabras)", "Elige UNA opción (~100 palabras):\n· ARTÍCULO: 'Tips for travelling on a budget' con 2–3 consejos y razones.\n· RELATO: empieza con: 'When we arrived at the airport, we knew something was wrong.'", 80, 130),
+
+    LISTENING_HEAD,
+    listening(3, "Listening · Parte 3 — Rellenar huecos", "Escucha la información sobre una excursión y completa las notas con UNA palabra o número en cada hueco (se oye dos veces).", "This is Part Three. You will hear a tour guide giving information about a day trip. Good morning, everyone. Welcome to our day trip to the mountains. The coach will leave at eight o'clock sharp, so please don't be late. The journey takes about two hours. We'll stop for lunch in a village called Greenford. Remember to bring comfortable shoes and a raincoat, because the weather can change quickly. The trip costs thirty-five pounds, which includes lunch. We'll be back in the city by six o'clock in the evening.", [
+      fb("The coach leaves at ___ o'clock.", ["eight", "8"], "'leave at eight o'clock'."),
+      fb("The journey takes about ___ hours.", ["two", "2"], "'about two hours'."),
+      fb("Lunch stop in a village called ___.", ["Greenford"], "'a village called Greenford'."),
+      fb("Bring comfortable shoes and a ___.", ["raincoat"], "'a raincoat'."),
+      fb("The trip costs ___ pounds.", ["thirty-five", "35"], "'thirty-five pounds'."),
+    ]),
+
+    ...speakingParts("un viaje que hiciste, adónde te gusta ir y por qué", { p1: "un viaje reciente, adónde te gusta viajar y cómo prefieres hacerlo", p2: "personas de vacaciones (una playa, una ciudad, la montaña)", p3: "qué destino elegir para un viaje de fin de curso con la clase", p4: "los viajes, sus ventajas y aprender de otras culturas" }),
+
+    SUMMARY("Resumen del Día 3", [
+      "Narrar: past simple (secuencia), past continuous (fondo), past perfect (lo anterior).",
+      "when + past simple; while + past continuous.",
+      "Practicadas las 6 partes de Reading, Writing, Listening P3 y Speaking P1–P4.",
+    ]),
+    INFO("Tarea para el Día 4", "Escribe una mini-historia (5 frases) usando los tres tiempos del pasado. Repasa las flashcards. Mañana: used to / would (hábitos del pasado)."),
+  ],
+};
+
 export const WEEK1 = {
   n: 1,
   theme: "Estilo de vida y experiencias",
-  description: "Presentes, present perfect y su contraste con el pasado. Cada día, las 4 destrezas con el formato real del B1.",
-  days: [DAY1, DAY2],
+  description: "Presentes, present perfect y su contraste con el pasado; narración. Cada día, las 4 destrezas con el formato real del B1.",
+  days: [DAY1, DAY2, DAY3],
 };
