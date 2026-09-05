@@ -8,7 +8,21 @@
 import { buildCourse } from "./lib/build-course.mjs";
 import { WEEKS } from "./b1/index.mjs";
 
-await buildCourse({
+// Reintenta el seed completo si Neon corta a mitad (buildCourse es idempotente).
+async function run(fn, tries = 4) {
+  for (let i = 0; i < tries; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      const transient = /reach database|Can't reach|ECONNRESET|Closed|timeout|terminating|Connection|pool/i.test((e && e.message) || "");
+      if (!transient || i === tries - 1) throw e;
+      console.warn(`⏳ Seed cortado por la BD (intento ${i + 1}/${tries}); reintento en 10s…`);
+      await new Promise((r) => setTimeout(r, 10000));
+    }
+  }
+}
+
+await run(() => buildCourse({
   slug: "b1-nuevo",
   levelKey: "intermedio",
   title: "B1 Preliminary (Cambridge English: Preliminary / PET)",
@@ -34,4 +48,4 @@ await buildCourse({
   audioPrefix: "b1f",
   deckPrefix: "B1",
   finalMinutes: 90,
-});
+}));

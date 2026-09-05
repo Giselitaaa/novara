@@ -14,6 +14,28 @@ import { generateListeningAudio } from "./tts.mjs";
 
 const db = new PrismaClient();
 
+/**
+ * Neon (serverless, capa gratuita) puede tardar en "despertar" o cortar la
+ * conexión bajo carga. Reintenta una operación varias veces antes de rendirse,
+ * para que un corte transitorio no tire todo el seed.
+ */
+async function withRetry(fn, { tries = 8, wait = 6000, label = "op" } = {}) {
+  let lastErr;
+  for (let i = 0; i < tries; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      lastErr = e;
+      const msg = (e && e.message) || "";
+      const transient = /reach database|Can't reach|ECONNRESET|Closed|timeout|terminating|Connection|pool/i.test(msg);
+      if (!transient) throw e;
+      console.warn(`⏳ ${label}: BD no accesible (intento ${i + 1}/${tries}), reintento en ${wait / 1000}s…`);
+      await new Promise((r) => setTimeout(r, wait));
+    }
+  }
+  throw lastErr;
+}
+
 export async function buildCourse({
   slug,
   levelKey,
@@ -31,15 +53,23 @@ export async function buildCourse({
   deckPrefix = "Curso",
   finalMinutes = 90,
 }) {
-  const [author, category, level, language, status, access, contentTexto] = await Promise.all([
-    db.author.findFirst({ where: { isPlatformAuthor: true } }),
-    db.category.findFirst({ where: { slug: "idiomas" } }),
-    db.courseLevel.findUnique({ where: { key: levelKey } }),
-    db.language.findFirst({ where: { code: "es" } }),
-    db.courseStatus.findUnique({ where: { key: "publicado" } }),
-    db.accessType.findUnique({ where: { key: "gratis" } }),
-    db.contentType.findUnique({ where: { key: "texto" } }),
-  ]);
+  // Espera a que Neon esté accesible antes de empezar (evita fallar al arrancar
+  // si la BD serverless está "dormida" o con un corte transitorio).
+  await withRetry(() => db.course.count(), { label: "conexión BD", tries: 12, wait: 6000 });
+
+  const [author, category, level, language, status, access, contentTexto] = await withRetry(
+    () =>
+      Promise.all([
+        db.author.findFirst({ where: { isPlatformAuthor: true } }),
+        db.category.findFirst({ where: { slug: "idiomas" } }),
+        db.courseLevel.findUnique({ where: { key: levelKey } }),
+        db.language.findFirst({ where: { code: "es" } }),
+        db.courseStatus.findUnique({ where: { key: "publicado" } }),
+        db.accessType.findUnique({ where: { key: "gratis" } }),
+        db.contentType.findUnique({ where: { key: "texto" } }),
+      ]),
+    { label: "catálogos" }
+  );
   const missing = Object.entries({ author, category, level, language, status, access, contentTexto }).filter(([, v]) => !v).map(([k]) => k);
   if (missing.length) throw new Error("Faltan catálogos: " + missing.join(", "));
   const adminUser = (await db.user.findFirst({ where: { roles: { some: { role: { name: "administrador" } } } }, select: { id: true } })) ?? (await db.user.findFirst({ select: { id: true } }));
