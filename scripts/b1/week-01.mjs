@@ -450,9 +450,273 @@ PAST PERFECT: had + participio — algo que ocurrió ANTES de otro momento pasad
   ],
 };
 
+// ───────────────────────── DÍA 4 ─────────────────────────
+const DAY4 = {
+  title: "Día 4 — used to / would (hábitos del pasado) · Describir personas",
+  description: "used to y would para hábitos y estados del pasado. Vocabulario de personalidad y descripción. Las 4 destrezas con formato B1; Listening P4.",
+  pedagogy: {
+    objective: "Hablar de hábitos y estados pasados con used to y would, y describir a la gente.",
+    summary: "used to / would; describir personas; Reading P1–P6, Writing, Listening P4, Speaking P1–P4.",
+    commonMistakes: ["'would' con verbos de estado.", "'I use to' en afirmativa.", "'didn't used to'."],
+    reviewPrompts: ["¿'would' o 'used to' con 'have/be/know'?", "Negativa de 'used to'."],
+  },
+  items: [
+    TEXT("🔁 Repaso: narrar en pasado. Hoy 'used to' y 'would' para hábitos del pasado, y vocabulario para describir a las personas (físico y personalidad)."),
+    GRAMMAR("used to / would (hábitos del pasado)", `USED TO + base: hábitos y ESTADOS del pasado que ya no son verdad:
+· I used to play the piano. · We used to live in a village. · There used to be a cinema here.
+· Negativa: didn't use to (sin -d). Pregunta: Did you use to…?
+
+WOULD + base: hábitos REPETIDOS del pasado (acciones, al narrar recuerdos):
+· Every summer, we would go to the beach and build sandcastles.
+⚠️ 'would' NO se usa con verbos de ESTADO (be, have, know, like): con estados usa 'used to'.
+· ✅ I used to have long hair (NO 'I would have long hair').`),
+    WARN("Errores típicos del hispanohablante", "· ❌ I would have a dog → ✅ I used to have a dog (estado).\n· ❌ I use to play (pasado) → ✅ I used to play.\n· ❌ I didn't used to → ✅ I didn't use to.\n· ✅ acciones repetidas: We would visit our grandparents every Sunday."),
+    grammarEx("Gramática — used to / would", "Completa o elige.", [
+      fb("When I was young, I ___ (used to / play) outside all day.", ["used to play"], "hábito → used to."),
+      fb("Every summer, we ___ (would / go) to the seaside.", ["would go"], "acción repetida → would."),
+      mc("Choose (state verb):", ["I would have long hair.", "I used to have long hair.", "I would having long hair."], 1, "estado → used to."),
+      mc("Negative:", ["I didn't used to like tea.", "I didn't use to like tea.", "I usen't to like tea."], 1, "didn't use to."),
+      fb("There ___ (used to / be) a shop on this corner.", ["used to be"], "estado → used to be."),
+      fb("On Sundays my dad ___ (would / cook) a big lunch.", ["would cook"], "acción repetida → would."),
+      mc("Question:", ["Did you use to play sport?", "Did you used to play sport?", "Do you used to play sport?"], 0, "Did you use to…?"),
+    ]),
+    GRAMMAR("Vocabulario del día — Describir personas", "Físico y personalidad (B1)."),
+    deck("B1 S1D4 — Describir personas", [
+      ["outgoing", "extrovertido/a", "She's very outgoing and friendly.", "adjetivo", "ˌaʊtˈɡəʊɪŋ"],
+      ["shy", "tímido/a", "He was shy as a child.", "adjetivo", "ʃaɪ"],
+      ["hard-working", "trabajador/a", "My sister is hard-working.", "adjetivo", "hɑːd ˈwɜːkɪŋ"],
+      ["generous", "generoso/a", "He's generous with his time.", "adjetivo", "ˈdʒenərəs"],
+      ["reliable", "de fiar / fiable", "She's a reliable friend.", "adjetivo", "rɪˈlaɪəbl"],
+      ["stubborn", "cabezota", "My grandfather was stubborn.", "adjetivo", "ˈstʌbən"],
+      ["curly", "rizado", "I used to have curly hair.", "adjetivo", "ˈkɜːli"],
+      ["good sense of humour", "buen sentido del humor", "She has a great sense of humour.", "colocación", "sens əv ˈhjuːmə"],
+      ["get on well with", "llevarse bien con", "I get on well with my cousins.", "phrasal verb", "ɡet ɒn ˈwel wɪð"],
+      ["take after", "parecerse a (familiar)", "I take after my mother.", "phrasal verb", "teɪk ˈɑːftə"],
+    ]),
+    vocabEx("Vocabulario — Describir personas", "Elige la opción correcta.", [
+      mc("Someone who talks easily to new people is ___.", ["outgoing", "shy", "stubborn"], 0, "outgoing."),
+      mc("Someone you can always trust is ___.", ["reliable", "shy", "stubborn"], 0, "reliable."),
+      mc("Someone who won't change their mind is ___.", ["stubborn", "generous", "reliable"], 0, "stubborn."),
+      mc("To resemble a family member is to ___ them.", ["take after", "get on with", "look for"], 0, "take after."),
+      mc("Someone who gives a lot to others is ___.", ["generous", "shy", "stubborn"], 0, "generous."),
+      mc("To have a good relationship with someone is to ___ them.", ["get on well with", "take after", "look after"], 0, "get on well with."),
+    ]),
+
+    ...readingParts({
+      p1: { title: "Personas y recuerdos", items: [
+        mc("Lonely-hearts ad: 'Outgoing, reliable man seeks friends for hiking.'", ["A sociable, trustworthy man wants hiking friends.", "He's selling something.", "He's lost."], 0, "'Outgoing, reliable man seeks friends'."),
+        mc("Note: 'The new boss is strict but very fair.'", ["The boss is tough but just.", "The boss is lazy.", "No boss."], 0, "'strict but very fair'."),
+        mc("Text: 'You really take after your dad — same smile!'", ["You look like your dad.", "You annoy your dad.", "No dad."], 0, "'take after your dad'."),
+        mc("Card: 'Thanks for being such a generous friend.'", ["Thanking a generous friend.", "A complaint.", "Goodbye."], 0, "'such a generous friend'."),
+        mc("Message: 'Grandma used to tell the best stories, didn't she?'", ["Remembering Grandma's stories.", "Grandma tells stories now.", "No stories."], 0, "'used to tell the best stories'."),
+      ] },
+      p2text: "FOUR PEOPLE DESCRIBE A ROLE MODEL\n\nA) 'My grandmother was kind and generous; she would always help our neighbours.'\nB) 'My old teacher was strict but fair, and she made me love reading.'\nC) 'My football coach was hard-working and taught me never to give up.'\nD) 'My best friend is outgoing and funny; she makes everyone feel welcome.'",
+      p2q: { title: "Emparejar personas y descripciones", items: [
+        mc("Who admires someone kind who helped neighbours?", ["A", "B", "C", "D"], 0, "A: grandmother, generous."),
+        mc("Who admires a teacher who inspired a love of reading?", ["A", "B", "C", "D"], 1, "B: teacher, reading."),
+        mc("Who learned never to give up?", ["A", "B", "C", "D"], 2, "C: coach, never give up."),
+        mc("Who admires a funny, welcoming friend?", ["A", "B", "C", "D"], 3, "D: outgoing, funny."),
+        mc("Who describes a hard-working person?", ["A", "B", "C", "D"], 2, "C."),
+      ] },
+      p3text: "THE PERSON WHO CHANGED MY LIFE\n\nWhen I was a teenager, I was extremely shy. I found it hard to talk to people, and I would spend most of my free time alone in my room. That all changed when I met Mr Álvarez, my drama teacher.\n\nMr Álvarez was one of the most patient and generous people I have ever known. He noticed that I was quiet, but instead of leaving me alone, he gently encouraged me. He used to give me small roles in the school plays, just one or two lines at first. He would always say, 'Don't worry about being perfect; just enjoy it.'\n\nSlowly, I began to change. Acting helped me forget my fears, and I discovered that I actually loved being on stage. By the end of the year, I had a main role in the school play. I'm still not the most outgoing person, but I'm no longer the frightened boy I used to be. I take after Mr Álvarez in one way: now I try to encourage shy students too. One kind, patient person really can change a life.",
+      p3q: { title: "La persona que cambió mi vida (texto largo)", items: [
+        mc("What was the writer like as a teenager?", ["Outgoing.", "Extremely shy.", "Stubborn."], 1, "'extremely shy'."),
+        mc("Who was Mr Álvarez?", ["A football coach.", "A drama teacher.", "A neighbour."], 1, "'my drama teacher'."),
+        mc("What did Mr Álvarez do?", ["Ignored the writer.", "Gently encouraged them with small roles.", "Gave them a main role at once."], 1, "'gently encouraged me… small roles'."),
+        mc("What did the writer discover?", ["They hated acting.", "They loved being on stage.", "They wanted to teach maths."], 1, "'I actually loved being on stage'."),
+        mc("How does the writer take after Mr Álvarez?", ["They act in films.", "They encourage shy students.", "They are strict."], 1, "'I try to encourage shy students too'."),
+      ] },
+      p4text: "MY CHILDHOOD SUMMERS\n\nSome of my happiest memories are of the summers I spent at my grandparents' house in the countryside. (1)___ Every July, my parents would drive us there, and my brother and I would count the hours until we arrived.\n\nMy grandmother was an amazing cook. (2)___ In the mornings, we would help her collect eggs and water the vegetables. She used to say that hard work made the food taste better, and she was right.\n\nIn the afternoons, we were free to explore. (3)___ We would climb trees, swim in the river, and build dens in the woods. There were no phones or computers, so we had to use our imagination. (4)___\n\nThose summers taught me to love nature and simple things. (5)___ Whenever I smell fresh bread, I'm a child again in my grandmother's kitchen.",
+      p4options: [
+        "We used to spend six whole weeks there every year.",       // A -> gap 1
+        "She would bake fresh bread every single morning.",         // B -> gap 2
+        "The whole day was one big adventure.",                     // C -> gap 3
+        "We were never bored for a single minute.",                 // D -> gap 4
+        "My grandparents lived in a big modern city.",              // E (extra)
+        "I still remember them clearly, even now.",                 // F -> gap 5
+        "We would watch television all day long.",                  // G (extra)
+        "The house had no garden at all.",                          // H (extra)
+      ],
+      p4q: { title: "Mis veranos de infancia (gapped text)", items: [
+        mc("Hueco 1", ["A", "B", "C", "D", "E", "F", "G", "H"], 0, "A: seis semanas cada año."),
+        mc("Hueco 2", ["A", "B", "C", "D", "E", "F", "G", "H"], 1, "B: horneaba pan (era gran cocinera)."),
+        mc("Hueco 3", ["A", "B", "C", "D", "E", "F", "G", "H"], 2, "C: el día era una aventura."),
+        mc("Hueco 4", ["A", "B", "C", "D", "E", "F", "G", "H"], 3, "D: nunca se aburrían."),
+        mc("Hueco 5", ["A", "B", "C", "D", "E", "F", "G", "H"], 5, "F: los recuerda aún hoy."),
+      ] },
+      p5text: "My best friend and I are quite different. I'm rather (1)___ and I find parties difficult, but she is very (2)___ and loves meeting new people. However, we have a lot in common too. We are both (3)___ and always help each other. She can be a little (4)___ and never changes her mind, but she is completely (5)___ — I know I can always trust her. People say I (6)___ after my mother, but I think I'm more like my friend!",
+      p5q: { title: "Huecos con opciones (vocabulario)", items: [
+        mc("Hueco 1", ["shy", "outgoing", "generous", "reliable"], 0, "'I find parties difficult' → shy."),
+        mc("Hueco 2", ["outgoing", "shy", "stubborn", "quiet"], 0, "'loves meeting new people' → outgoing."),
+        mc("Hueco 3", ["generous", "stubborn", "shy", "lazy"], 0, "'always help each other' → generous."),
+        mc("Hueco 4", ["stubborn", "reliable", "shy", "generous"], 0, "'never changes her mind' → stubborn."),
+        mc("Hueco 5", ["reliable", "shy", "stubborn", "outgoing"], 0, "'I can always trust her' → reliable."),
+        mc("Hueco 6", ["take", "get", "look", "come"], 0, "'take after my mother'."),
+      ] },
+      p6text: "Hi Alex,\nYou asked about my grandmother. She was the kindest person I've ever known. When I was little, we (1)___ to spend every summer at her house. She (2)___ bake fresh bread every morning — I can still smell it! She was very generous and (3)___ always help the neighbours. People say I take (4)___ her because I love cooking too. She could be a bit stubborn, (5)___ she was completely reliable. I miss her a lot. Do you (6)___ on well with your grandparents?\nLove,\nSam",
+      p6q: { title: "Open cloze (una palabra)", items: [
+        fb("Hueco 1", ["used"], "'we used to spend'."),
+        fb("Hueco 2", ["would"], "'She would bake' (acción repetida)."),
+        fb("Hueco 3", ["would"], "'would always help'."),
+        fb("Hueco 4", ["after"], "'take after her'."),
+        fb("Hueco 5", ["but"], "contraste → but."),
+        fb("Hueco 6", ["get"], "'get on well with'."),
+      ] },
+    }),
+
+    WRITING_HEAD,
+    writing(1, "Writing · Parte 1 — Un email (~100 palabras)", "Tu amigo/a inglés/a te pregunta por una persona importante en tu vida. Responde a su email (~100 palabras):\n· describe a esa persona (físico y carácter),\n· cuenta algo que solía hacer (used to / would),\n· pregúntale por alguien importante para él/ella.", 80, 130),
+    writing(2, "Writing · Parte 2 — Un artículo o un relato (~100 palabras)", "Elige UNA opción (~100 palabras):\n· ARTÍCULO: 'What makes a good friend?' con tus ideas y razones.\n· RELATO: empieza con: 'I will never forget the teacher who changed my life.'", 80, 130),
+
+    LISTENING_HEAD,
+    listening(4, "Listening · Parte 4 — Una entrevista (detalle)", "Escucha una entrevista con una escritora sobre su infancia y elige la respuesta correcta (se oye dos veces).", "This is Part Four. You will hear an interview with a writer, Elena, about her childhood. Interviewer: Elena, where did you grow up? Elena: In a small village by the sea. We didn't have much money, but I had a wonderful childhood. Interviewer: What did you use to do for fun? Elena: I would spend hours reading. My grandmother used to give me old books, and I loved them. Interviewer: Were you an outgoing child? Elena: No, quite the opposite — I was very shy. Books were my best friends. Interviewer: And when did you start writing? Elena: When I was about twelve. My teacher was very encouraging; she said I had talent. Interviewer: Do you take after anyone in your family? Elena: My grandmother, definitely. She was a great storyteller.", [
+      mc("Where did Elena grow up?", ["In a big city.", "In a village by the sea.", "Abroad."], 1, "'a small village by the sea'."),
+      mc("What did Elena use to do for fun?", ["Play sport.", "Read for hours.", "Paint."], 1, "'I would spend hours reading'."),
+      mc("What was Elena like as a child?", ["Outgoing.", "Very shy.", "Stubborn."], 1, "'I was very shy'."),
+      mc("When did she start writing?", ["At six.", "At about twelve.", "At twenty."], 1, "'When I was about twelve'."),
+      mc("Who does Elena take after?", ["Her mother.", "Her grandmother.", "Her teacher."], 1, "'My grandmother, definitely'."),
+    ]),
+
+    ...speakingParts("tu familia y las personas importantes para ti", { p1: "cómo eres tú, a quién te pareces en tu familia y cómo eras de pequeño/a", p2: "una familia o un grupo de amigos juntos", p3: "qué regalo hacerle a un amigo/a que se marcha a vivir fuera", p4: "la amistad, la familia y las cualidades importantes en las personas" }),
+
+    SUMMARY("Resumen del Día 4", [
+      "used to + base (hábitos y estados pasados); would + base (acciones repetidas, no estados).",
+      "Vocabulario para describir físico y personalidad.",
+      "Practicadas las 6 partes de Reading, Writing, Listening P4 y Speaking P1–P4.",
+    ]),
+    INFO("Tarea para el Día 5", "Escribe 4 frases sobre cómo eras de pequeño/a (used to / would). Repasa TODO el vocabulario de la semana. Mañana: repaso general y mini-simulacro."),
+  ],
+};
+
+// ───────────────────────── DÍA 5 ─────────────────────────
+const DAY5 = {
+  title: "Día 5 — Repaso de la semana + mini-simulacro",
+  description: "Consolidación de presentes, present perfect, narración y used to/would. Las 4 destrezas con formato B1; Listening P1. Al final, el mini-simulacro de la Semana 1.",
+  pedagogy: {
+    objective: "Consolidar la gramática de la semana y medir el progreso.",
+    summary: "Repaso integrado; Reading P1–P6; Writing; Listening; Speaking; mini-simulacro.",
+    reviewPrompts: ["¿Qué punto te costó más?", "Repásalo antes de la Semana 2."],
+  },
+  items: [
+    TEXT("🎯 Repaso de la Semana 1 del B1. Consolidas todo y practicas las 4 destrezas. Al final tienes el mini-simulacro (módulo aparte)."),
+    GRAMMAR("Repaso de la Semana 1", `1) Presentes: simple (rutinas/estado) vs continuous (ahora/temporal).
+2) Present perfect (for/since, just/already/yet) vs past simple; present perfect continuous (duración).
+3) Narrar: past simple + past continuous + past perfect (when/while).
+4) used to (hábitos/estados) y would (acciones repetidas del pasado).`),
+    grammarEx("Repaso mixto de gramática — Semana 1", "Completa o elige (todo lo de la semana).", [
+      fb("I ___ (live) here since 2019.", ["have lived", "'ve lived", "have been living", "'ve been living"], "since → present perfect."),
+      mc("Choose:", ["I've seen it yesterday.", "I saw it yesterday.", "I seen it yesterday."], 1, "yesterday → past simple."),
+      fb("When we arrived, the film ___ (already/start).", ["had already started"], "anterior → past perfect."),
+      fb("When I was young, I ___ (used to / have) long hair.", ["used to have"], "estado → used to."),
+      fb("How long ___ you ___ (learn) English?", ["have", "been learning"], "duración → present perfect continuous."),
+      fb("While she ___ (cook), the phone rang.", ["was cooking"], "fondo → past continuous."),
+      fb("Every summer we ___ (would / go) to the beach.", ["would go"], "acción repetida → would."),
+      mc("Choose:", ["I've just arrive.", "I've just arrived.", "I just arrive."], 1, "just + participio."),
+    ]),
+    GRAMMAR("Repaso de vocabulario — Semana 1", "Repasa los mazos (estilo de vida, trabajo/estudios, viajes, personas)."),
+    vocabEx("Repaso de vocabulario — Semana 1", "Elige la opción correcta.", [
+      mc("To start a new hobby:", ["take up", "cut down", "commute"], 0, "take up."),
+      mc("To submit your work:", ["hand in", "apply for", "get on"], 0, "hand in."),
+      mc("To lose your way:", ["get lost", "set off", "book"], 0, "get lost."),
+      mc("Someone you can trust:", ["reliable", "shy", "stubborn"], 0, "reliable."),
+      mc("To reserve early:", ["book in advance", "get lost", "set off"], 0, "book in advance."),
+      mc("The last day to submit work:", ["deadline", "degree", "skill"], 0, "deadline."),
+      mc("Someone sociable:", ["outgoing", "shy", "stubborn"], 0, "outgoing."),
+      mc("To resemble a relative:", ["take after", "get on with", "look after"], 0, "take after."),
+    ]),
+
+    ...readingParts({
+      p1: { title: "Repaso — avisos variados", items: [
+        mc("Sign: 'Job fair Saturday — bring your CV.'", ["Bring your CV to the fair.", "No fair.", "Cancelled."], 0, "'bring your CV'."),
+        mc("Text: 'I've been studying all week, I need a break!'", ["Tired from studying a lot.", "Hasn't studied.", "On holiday."], 0, "'been studying all week'."),
+        mc("Notice: 'Flight delayed — new departure 16:30.'", ["Departs at 16:30 now.", "On time.", "Cancelled."], 0, "'new departure 16:30'."),
+        mc("Card: 'You're the most reliable friend I have. Thank you.'", ["Praising a reliable friend.", "A complaint.", "Goodbye forever."], 0, "'most reliable friend'."),
+        mc("Note: 'There used to be a park here before they built the mall.'", ["A park existed here before.", "A park is here now.", "No mall."], 0, "'used to be a park'."),
+      ] },
+      p2text: "FOUR WEEKEND COURSES\n\nA) Creative Writing — write your own stories with a published author. For imaginative people.\nB) Public Speaking — build confidence and learn to speak in front of others. Great for shy people.\nC) Photography Walk — learn to take great photos around the city. Bring a camera.\nD) Cooking Abroad — learn dishes from different countries. For food lovers.",
+      p2q: { title: "Emparejar personas y cursos", items: [
+        mc("A shy person who wants more confidence speaking.", ["A", "B", "C", "D"], 1, "Public Speaking."),
+        mc("An imaginative person who loves stories.", ["A", "B", "C", "D"], 0, "Creative Writing."),
+        mc("Someone who loves food from other countries.", ["A", "B", "C", "D"], 3, "Cooking Abroad."),
+        mc("A person who enjoys taking photos.", ["A", "B", "C", "D"], 2, "Photography Walk."),
+        mc("Someone who wants to write with a real author.", ["A", "B", "C", "D"], 0, "A."),
+      ] },
+      p3text: "HOW MY TOWN HAS CHANGED\n\nI've lived in the same town all my life, and it has changed enormously. When I was a child, it was a small, quiet place. There used to be a big green field near my house, where my friends and I would play football every afternoon. Sadly, a few years ago they built a shopping centre there.\n\nIn some ways, the changes have been good. We now have a modern library, a cinema and better public transport. When I was young, we didn't use to have any of that; if you wanted to see a film, you had to travel to the city. Today, young people have far more to do.\n\nHowever, I sometimes miss the old town. It used to be quieter and friendlier, and everyone knew each other. Now there are more people and more traffic. I've been thinking about this a lot lately. Change brings both good and bad, but one thing is certain: the town where I grew up will always live in my memory.",
+      p3q: { title: "Cómo ha cambiado mi pueblo (texto largo)", items: [
+        mc("What used to be near the writer's house?", ["A cinema.", "A big green field.", "A library."], 1, "'a big green field… where… we would play football'."),
+        mc("What did they build there?", ["A school.", "A shopping centre.", "A park."], 1, "'they built a shopping centre'."),
+        mc("What good changes does the writer mention?", ["Fewer people.", "A library, cinema and better transport.", "Less traffic."], 1, "'a modern library, a cinema and better public transport'."),
+        mc("What does the writer miss?", ["The traffic.", "The quieter, friendlier town.", "The shopping centre."], 1, "'quieter and friendlier'."),
+        mc("What is the writer's overall view?", ["Change is all bad.", "Change brings good and bad.", "Nothing changed."], 1, "'Change brings both good and bad'."),
+      ] },
+      p4text: "MEETING AN OLD FRIEND\n\nLast week, something wonderful happened. (1)___ I was walking through the city centre when I heard someone call my name. I turned around, and there was Marco, my best friend from primary school!\n\nWe hadn't seen each other for fifteen years. (2)___ We used to be inseparable as children, but his family had moved abroad when we were twelve. We went to a café to catch up. (3)___ He told me he had become a doctor and had two children now.\n\nIt was strange but lovely. (4)___ In some ways he had changed a lot, but his warm smile was exactly the same. We talked for three hours and promised to stay in touch. (5)___ Sometimes life gives you the best surprises when you least expect them.",
+      p4options: [
+        "I was doing my shopping like any normal Saturday.",         // A -> gap 1
+        "We had so much to talk about after all those years.",       // B -> gap 2
+        "Over coffee, he told me everything about his life.",        // C -> gap 3
+        "It felt as if no time had passed at all.",                  // D -> gap 4
+        "I had never met him before in my life.",                    // E (extra)
+        "This time, I'm sure we won't lose contact again.",          // F -> gap 5
+        "He looked exactly like a stranger.",                        // G (extra)
+        "We had spoken every single day for years.",                 // H (extra)
+      ],
+      p4q: { title: "Reencuentro con un viejo amigo (gapped text)", items: [
+        mc("Hueco 1", ["A", "B", "C", "D", "E", "F", "G", "H"], 0, "A: era un sábado normal."),
+        mc("Hueco 2", ["A", "B", "C", "D", "E", "F", "G", "H"], 1, "B: mucho de que hablar."),
+        mc("Hueco 3", ["A", "B", "C", "D", "E", "F", "G", "H"], 2, "C: le contó su vida con un café."),
+        mc("Hueco 4", ["A", "B", "C", "D", "E", "F", "G", "H"], 3, "D: como si no hubiera pasado el tiempo."),
+        mc("Hueco 5", ["A", "B", "C", "D", "E", "F", "G", "H"], 5, "F: no perder el contacto otra vez."),
+      ] },
+      p5text: "My town has changed a lot. When I was a child, there (1)___ to be a field where we (2)___ play every day. Now there's a shopping centre. We have a new library and cinema, so young people have more to (3)___. But I sometimes (4)___ the old, quieter town. Last week I met an old friend I (5)___ seen for years. It was a lovely (6)___.",
+      p5q: { title: "Huecos con opciones (vocabulario/gramática)", items: [
+        mc("Hueco 1", ["used", "use", "would", "did"], 0, "'there used to be'."),
+        mc("Hueco 2", ["would", "used", "will", "are"], 0, "'we would play' (acción repetida)."),
+        mc("Hueco 3", ["do", "make", "have", "take"], 0, "'more to do'."),
+        mc("Hueco 4", ["miss", "lose", "leave", "forget"], 0, "'I miss the old town'."),
+        mc("Hueco 5", ["hadn't", "haven't", "didn't", "wasn't"], 0, "'I hadn't seen for years'."),
+        mc("Hueco 6", ["surprise", "problem", "deadline", "journey"], 0, "'a lovely surprise'."),
+      ] },
+      p6text: "Hi Robin,\nYou'll never guess what happened! Last week I met my old friend Marco. We (1)___ seen each other for fifteen years — his family (2)___ moved abroad when we were twelve. When we were kids, we (3)___ to play together every day. We went for a coffee to catch (4)___. He's a doctor now! In some ways he (5)___ changed a lot, but his smile was the same. We promised to stay (6)___ touch. Life is full of surprises!\nLove,\nSam",
+      p6q: { title: "Open cloze (una palabra)", items: [
+        fb("Hueco 1", ["hadn't", "hadn't"], "'We hadn't seen each other' → hadn't."),
+        fb("Hueco 2", ["had"], "'his family had moved' (anterior)."),
+        fb("Hueco 3", ["used"], "'we used to play'."),
+        fb("Hueco 4", ["up"], "'catch up'."),
+        fb("Hueco 5", ["had", "'d"], "'he had changed'."),
+        fb("Hueco 6", ["in"], "'stay in touch'."),
+      ] },
+    }),
+
+    WRITING_HEAD,
+    writing(1, "Writing · Parte 1 — Un email (~100 palabras)", "Tu amigo/a inglés/a te pregunta cómo ha cambiado tu ciudad o tu vida. Responde a su email (~100 palabras):\n· describe cómo era antes (used to / would),\n· di qué ha cambiado y si es para mejor,\n· pregúntale por su ciudad.", 80, 130),
+    writing(2, "Writing · Parte 2 — Un artículo o un relato (~100 palabras)", "Elige UNA opción (~100 palabras):\n· ARTÍCULO: 'Is life better today than in the past?' con tu opinión y razones.\n· RELATO: empieza con: 'I couldn't believe my eyes when I saw who was standing there.'", 80, 130),
+
+    LISTENING_HEAD,
+    listening(1, "Listening · Parte 1 — Siete audios cortos", "Escucha los audios cortos (se oyen dos veces) y elige la respuesta correcta.", "This is Part One. You will hear people in seven situations. One. Woman: What was your town like before? Man: There used to be a cinema, but now it's a shop. Two. Man: How long have you known Sara? Woman: We've been friends since primary school. Three. Woman: Why are you so happy? Man: I met an old friend I hadn't seen for years. Four. Man: What was your grandmother like? Woman: Very generous — she'd help anyone. Five. Woman: Did you use to play a sport? Man: Yes, I would play tennis every weekend. Six. Man: What are you like? Woman: A bit shy, but reliable. Seven. Woman: Who do you take after? Man: My father — same sense of humour.", [
+      mc("1. What used to be in the man's town?", ["A shop.", "A cinema.", "A park."], 1, "'There used to be a cinema'."),
+      mc("2. How long have they been friends?", ["Since primary school.", "For one year.", "Since university."], 0, "'since primary school'."),
+      mc("3. Why is the man happy?", ["A new job.", "He met an old friend.", "A holiday."], 1, "'met an old friend I hadn't seen for years'."),
+      mc("4. What was the grandmother like?", ["Strict.", "Generous.", "Shy."], 1, "'Very generous'."),
+      mc("5. What did the man use to play?", ["Football.", "Tennis.", "Basketball."], 1, "'I would play tennis'."),
+      mc("6. How does the woman describe herself?", ["Outgoing.", "Shy but reliable.", "Stubborn."], 1, "'A bit shy, but reliable'."),
+      mc("7. Who does the man take after?", ["His mother.", "His father.", "His grandmother."], 1, "'My father'."),
+    ]),
+
+    ...speakingParts("recuerdos, cómo eras y cómo ha cambiado tu vida", { p1: "cómo eras de niño/a, cómo ha cambiado tu ciudad y a quién te pareces", p2: "un lugar de antes y de ahora, o una familia de varias generaciones", p3: "qué recuerdo o foto poner en un álbum de la clase", p4: "los recuerdos, los cambios y si la vida era mejor antes o ahora" }),
+
+    SUMMARY("Resumen de la Semana 1 (B1)", [
+      "Dominas los presentes, el present perfect (y continuous), la narración en pasado y used to/would.",
+      "Has practicado las 6 partes de Reading, Writing P1–P2, Listening y Speaking P1–P4 cada día.",
+      "Ahora, el mini-simulacro de la semana.",
+      "La semana que viene: el futuro (formas de futuro) y las predicciones.",
+    ]),
+    INFO("Mini-simulacro de la Semana 1", "En el módulo siguiente tienes el simulacro cronometrado con las prácticas auto-corregibles de la semana (Reading y Listening). Aprueba con un 60%. Si no llegas, repasa antes de la Semana 2."),
+  ],
+};
+
 export const WEEK1 = {
   n: 1,
   theme: "Estilo de vida y experiencias",
-  description: "Presentes, present perfect y su contraste con el pasado; narración. Cada día, las 4 destrezas con el formato real del B1.",
-  days: [DAY1, DAY2, DAY3],
+  description: "Presentes, present perfect (y continuous), narración en pasado y used to/would. Cada día, las 4 destrezas con el formato real del B1.",
+  days: [DAY1, DAY2, DAY3, DAY4, DAY5],
 };
