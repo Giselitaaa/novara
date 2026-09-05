@@ -121,9 +121,15 @@ export async function buildCourse({
           const ex = item.exercise;
           let config = ex.config ?? undefined;
           if (ex.category === "listening" && ex.audioScript) {
-            const audio = await generateListeningAudio(ex.audioScript, `${audioPrefix}-w${week.n}-d${dayIndex}-p${ex.part ?? audioSeq++}`);
+            const fname = `${audioPrefix}-w${week.n}-d${dayIndex}-p${ex.part ?? audioSeq++}`;
+            // Reintenta si Piper falla puntualmente (evita Listening sin audio).
+            let audio = null;
+            for (let t = 0; t < 3 && !audio; t++) {
+              audio = await generateListeningAudio(ex.audioScript, fname);
+              if (!audio && t < 2) { console.warn(`⏳ Audio ${fname} falló (intento ${t + 1}/3), reintento en 4s…`); await new Promise((r) => setTimeout(r, 4000)); }
+            }
             if (audio) { config = { ...(config ?? {}), audioUrl: audio }; console.warn(`🔊 ${audio}`); }
-            else console.warn("⚠️  Piper/ffmpeg no disponible: Listening sin audio.");
+            else console.warn(`⚠️  Piper/ffmpeg no disponible tras 3 intentos: ${fname} sin audio.`);
           }
           const e = await db.exercise.create({ data: { lessonId: lesson.id, category: ex.category, title: ex.title, instructions: ex.instructions ?? null, sortOrder: 0, config, questions: { create: (ex.questions ?? []).map((q, i) => ({ order: i, kind: q.kind, data: q.data })) } } });
           await db.lessonBlock.create({ data: { lessonId: lesson.id, type: "EXERCISE", order: order++, data: { exerciseId: e.id } } });
