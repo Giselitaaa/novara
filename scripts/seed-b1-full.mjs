@@ -23,7 +23,7 @@ async function run(fn, tries = 4) {
 }
 
 await run(() => buildCourse({
-  slug: "b1-nuevo",
+  slug: "b1-preliminary",
   levelKey: "intermedio",
   title: "B1 Preliminary (Cambridge English: Preliminary / PET)",
   subtitle: "Programa diario de 12 semanas para el B1 Preliminary. Cada día, las 4 destrezas con el formato real del examen.",
