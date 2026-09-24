@@ -1,8 +1,7 @@
 /**
  * B2 First (FCE) — curso completo (12 semanas) con el estándar diario: cada día
  * practica las 4 destrezas con el formato REAL del B2. Reutiliza el constructor
- * y el helper de audio compartidos. Se siembra en el slug 'b2-nuevo' (piloto);
- * al completarse se cambia por 'b2-first'.
+ * y el helper de audio compartidos. Curso COMPLETO y en el slug oficial 'b2-first'.
  *   node scripts/seed-b2-full.mjs
  */
 import { buildCourse } from "./lib/build-course.mjs";
@@ -23,7 +22,7 @@ async function run(fn, tries = 4) {
 }
 
 await run(() => buildCourse({
-  slug: "b2-nuevo",
+  slug: "b2-first",
   levelKey: "intermedio",
   title: "B2 First (Cambridge English: First / FCE)",
   subtitle: "Programa diario de 12 semanas para el B2 First. Cada día, las 4 destrezas con el formato real del examen.",
