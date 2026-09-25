@@ -52,6 +52,9 @@ export async function buildCourse({
   audioPrefix = "lvl",
   deckPrefix = "Curso",
   finalMinutes = 90,
+  passingScore = 60,
+  examNote = "Reúne las partes auto-corregibles (Reading y Listening) de esta semana, cronometradas. Aprueba con un 60%. Writing y Speaking se evalúan aparte.",
+  finalExamNote = "Simulacro completo con las partes auto-corregibles (Reading y Listening) de todo el curso, cronometrado. Aprueba con un 60%. Writing y Speaking se evalúan aparte.",
 }) {
   // Espera a que Neon esté accesible antes de empezar (evita fallar al arrancar
   // si la BD serverless está "dormida" o con un corte transitorio).
@@ -147,10 +150,10 @@ export async function buildCourse({
 
     // Mini-simulacro semanal.
     if (weekCollected.length) {
-      const exam = await db.exam.create({ data: { courseId: course.id, title: `🎯 Mini-simulacro — Semana ${week.n}`, passingScore: 60, timeLimitMinutes: 45, sections: { create: weekCollected.map((r, i) => ({ exerciseId: r.id, weight: r.weight, order: i })) } } });
+      const exam = await db.exam.create({ data: { courseId: course.id, title: `🎯 Mini-simulacro — Semana ${week.n}`, passingScore, timeLimitMinutes: 45, sections: { create: weekCollected.map((r, i) => ({ exerciseId: r.id, weight: r.weight, order: i })) } } });
       const mm = await createModule(`🎯 Mini-simulacro — Semana ${week.n}`, "Práctica cronometrada de la semana.", moduleOrder++);
       await db.lesson.create({ data: { moduleId: mm.id, title: exam.title, description: "Reúne las prácticas auto-corregibles de la semana.", sortOrder: 0, contentTypeId: contentTexto.id, isPreview: false, blocks: { create: [
-        { type: "NOTES", order: 0, title: "Cómo funciona", content: "Reúne las partes auto-corregibles (Reading y Listening) de esta semana, cronometradas. Aprueba con un 60%. Writing y Speaking se evalúan aparte.", data: { variant: "info" } },
+        { type: "NOTES", order: 0, title: "Cómo funciona", content: examNote, data: { variant: "info" } },
         { type: "EXAM", order: 1, data: { examId: exam.id } },
       ] } } });
       weekCollected = [];
@@ -158,10 +161,10 @@ export async function buildCourse({
 
     // Simulacro FINAL en la última semana.
     if (week.n === weeks.length && allCollected.length && weeks.length >= 8) {
-      const exam = await db.exam.create({ data: { courseId: course.id, title: "🎯 Simulacro FINAL", passingScore: 60, timeLimitMinutes: finalMinutes, sections: { create: allCollected.map((r, i) => ({ exerciseId: r.id, weight: r.weight, order: i })) } } });
+      const exam = await db.exam.create({ data: { courseId: course.id, title: "🎯 Simulacro FINAL", passingScore, timeLimitMinutes: finalMinutes, sections: { create: allCollected.map((r, i) => ({ exerciseId: r.id, weight: r.weight, order: i })) } } });
       const mm = await createModule("🎯 Simulacro final", "Simulacro completo que estima tu nota.", moduleOrder++);
       await db.lesson.create({ data: { moduleId: mm.id, title: exam.title, description: "Reúne, cronometradas, todas las prácticas auto-corregibles del curso.", sortOrder: 0, contentTypeId: contentTexto.id, isPreview: false, blocks: { create: [
-        { type: "NOTES", order: 0, title: "Cómo funciona", content: "Simulacro completo con las partes auto-corregibles (Reading y Listening) de todo el curso, cronometrado. Aprueba con un 60%. Writing y Speaking se evalúan aparte.", data: { variant: "info" } },
+        { type: "NOTES", order: 0, title: "Cómo funciona", content: finalExamNote, data: { variant: "info" } },
         { type: "EXAM", order: 1, data: { examId: exam.id } },
       ] } } });
     }
