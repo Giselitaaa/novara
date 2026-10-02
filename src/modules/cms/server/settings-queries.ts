@@ -30,13 +30,35 @@ export const SETTINGS_KEYS = [
 
 export type SettingsMap = Record<(typeof SETTINGS_KEYS)[number], string>;
 
-export async function getAllSettings(): Promise<SettingsMap> {
-  const rows = await db.globalSetting.findMany({
-    where: { key: { in: [...SETTINGS_KEYS] } },
-  });
-  const map = Object.fromEntries(rows.map((r) => [r.key, r.value as string]));
+const EMPTY_SETTINGS = Object.fromEntries(
+  SETTINGS_KEYS.map((key) => [key, ""])
+) as SettingsMap;
 
-  return Object.fromEntries(
-    SETTINGS_KEYS.map((key) => [key, map[key] ?? ""])
-  ) as SettingsMap;
+/**
+ * Se ejecuta en el layout raíz, en el camino de CADA request (incluido
+ * el health check de despliegue). Si la base de datos no responde, no
+ * puede colgar la página indefinidamente: tras 8s devuelve valores por
+ * defecto en vez de dejar la petición esperando para siempre.
+ */
+export async function getAllSettings(): Promise<SettingsMap> {
+  try {
+    const rows = await Promise.race([
+      db.globalSetting.findMany({ where: { key: { in: [...SETTINGS_KEYS] } } }),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("getAllSettings: timeout tras 8s")), 8000)
+      ),
+    ]);
+    const map = Object.fromEntries(rows.map((r) => [r.key, r.value as string]));
+
+    return Object.fromEntries(
+      SETTINGS_KEYS.map((key) => [key, map[key] ?? ""])
+    ) as SettingsMap;
+  } catch (error) {
+    console.error(
+      "[getAllSettings] fallo al leer ajustes, usando valores por defecto:",
+      error
+    );
+
+    return EMPTY_SETTINGS;
+  }
 }
