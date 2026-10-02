@@ -11,6 +11,13 @@ import type { NextAuthConfig } from "next-auth";
  * la sesión).
  */
 export const authConfig = {
+  // Detrás de un proxy que termina TLS (Render/Cloudflare), Auth.js ve
+  // la petición interna como http:// salvo que confíe en los headers
+  // X-Forwarded-*. Sin esto, la URL que calcula internamente no
+  // coincide con la pública (https), lo que puede encadenar reescrituras
+  // sobre sí misma en el middleware hasta que el proxy las detecta como
+  // bucle y corta la petición (508 Loop Detected).
+  trustHost: true,
   pages: {
     signIn: "/auth/iniciar-sesion",
     error: "/auth/error",
