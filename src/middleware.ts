@@ -1,16 +1,16 @@
-import { NextResponse } from "next/server";
-import NextAuth from "next-auth";
+import { NextResponse, type NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 import createIntlMiddleware from "next-intl/middleware";
 
 import { routing } from "@/i18n/routing";
-import { authConfig } from "@/lib/auth.config";
 
-// Instancia ligera de Auth.js exclusiva del middleware — construida
-// solo con la config edge-safe (ver `lib/auth.config.ts`), nunca con
-// `lib/auth.ts` completo, para que bcrypt/Prisma no entren en el
-// bundle del Edge Runtime.
-const { auth } = NextAuth(authConfig);
-
+/**
+ * `getToken` en vez del wrapper `auth(...)` de NextAuth: el wrapper
+ * genera cookies CSRF nuevas en cada invocación y, combinado con la
+ * reescritura interna de next-intl, encadenaba reinvocaciones del
+ * middleware hasta que el proxy de Render las detectaba como un
+ * bucle (508 Loop Detected) — la web nunca llegaba a cargar.
+ */
 const intlMiddleware = createIntlMiddleware(routing);
 
 const PROTECTED_PREFIXES = [
@@ -34,22 +34,30 @@ function stripLocale(pathname: string) {
   return pathname;
 }
 
-export default auth((req) => {
+export default async function middleware(req: NextRequest) {
   const pathname = stripLocale(req.nextUrl.pathname) || "/";
   const isProtected = PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 
-  if (isProtected && !req.auth) {
-    const locale = req.nextUrl.pathname.split("/")[1];
-    const localePrefix = (routing.locales as readonly string[]).includes(locale ?? "")
-      ? `/${locale}`
-      : "";
-    const signInUrl = new URL(`${localePrefix}/auth/iniciar-sesion`, req.nextUrl.origin);
-    signInUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
-    return NextResponse.redirect(signInUrl);
+  if (isProtected) {
+    const token = await getToken({ req, secret: process.env.AUTH_SECRET });
+
+    if (!token) {
+      const locale = req.nextUrl.pathname.split("/")[1];
+      const localePrefix = (routing.locales as readonly string[]).includes(locale ?? "")
+        ? `/${locale}`
+        : "";
+      const signInUrl = new URL(
+        `${localePrefix}/auth/iniciar-sesion`,
+        req.nextUrl.origin
+      );
+      signInUrl.searchParams.set("callbackUrl", req.nextUrl.pathname);
+
+      return NextResponse.redirect(signInUrl);
+    }
   }
 
   return intlMiddleware(req);
-});
+}
 
 export const config = {
   matcher: ["/((?!api|_next/static|_next/image|.*\\..*).*)"],
