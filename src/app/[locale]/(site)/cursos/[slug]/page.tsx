@@ -11,8 +11,8 @@ import { CourseReviewForm } from "@/components/catalog/course-review-form";
 import { CourseSidebar } from "@/components/catalog/course-sidebar";
 import { Container } from "@/components/layout/container";
 import { CourseCard } from "@/components/marketing/course-card";
+import { auth } from "@/lib/auth";
 import { JsonLd } from "@/lib/json-ld";
-import { requireSession } from "@/lib/require-session";
 import { buildCourseSchema } from "@/lib/seo";
 import { logProductEvent } from "@/modules/analytics/server/events";
 import {
@@ -66,7 +66,10 @@ export const revalidate = 300;
 
 export default async function CourseDetailPage({ params }: Props) {
   const { slug } = await params;
-  const session = await requireSession();
+  // Público: la ficha del curso no exige sesión (catálogo de marketing).
+  // Solo se usa la sesión si existe, para estado de inscripción/favorito/
+  // vista previa de admin — nunca para bloquear el acceso anónimo.
+  const session = await auth();
   const isAdmin = session?.user?.roles?.includes("administrador") ?? false;
 
   const course = await getCourseBySlug(slug, { allowUnpublished: isAdmin });
