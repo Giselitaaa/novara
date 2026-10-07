@@ -6,9 +6,10 @@ import {
   CheckCircle2,
   Clock,
   CreditCard,
+  Paperclip,
   Smartphone,
 } from "lucide-react";
-import { useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -79,7 +80,84 @@ export function CheckoutFlow({
     });
   }
 
-  function handleUploadProof(formData: FormData) {
+  const ALLOWED_PROOF_TYPES = [
+    "application/pdf",
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+  ];
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [useUrlFallback, setUseUrlFallback] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function handleSelectFile(file: File | null) {
+    if (!file) {
+      setProofFile(null);
+      return;
+    }
+    if (!ALLOWED_PROOF_TYPES.includes(file.type)) {
+      toast.error("Formato no admitido. Usa PDF, JPG, PNG o WEBP.");
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      toast.error("El archivo supera el tamaño máximo (8 MB).");
+      return;
+    }
+    setProofFile(file);
+  }
+
+  function handleUploadProof() {
+    if (!existingPayment || !proofFile) return;
+    const file = proofFile;
+    startTransition(async () => {
+      try {
+        const presignRes = await fetch("/api/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contentType: file.type,
+            size: file.size,
+            folder: "payment-proofs",
+          }),
+        });
+        const presignData = await presignRes.json();
+        if (!presignRes.ok) {
+          if (presignData.error === "not_configured") {
+            setUseUrlFallback(true);
+            toast.error(
+              "La subida de archivos no está disponible; pega la URL manualmente."
+            );
+            return;
+          }
+          toast.error(presignData.message ?? "No se pudo preparar la subida.");
+          return;
+        }
+
+        const putRes = await fetch(presignData.uploadUrl, {
+          method: "PUT",
+          headers: { "Content-Type": file.type },
+          body: file,
+        });
+        if (!putRes.ok) {
+          toast.error("No se pudo subir el archivo.");
+          return;
+        }
+
+        const result = await uploadPaymentProof(
+          existingPayment.id,
+          presignData.publicUrl
+        );
+        toast.success(result.message);
+        setProofFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        router.refresh();
+      } catch {
+        toast.error("No se pudo subir el justificante.");
+      }
+    });
+  }
+
+  function handleUploadProofUrl(formData: FormData) {
     if (!existingPayment) return;
     const proofFileUrl = String(formData.get("proofFileUrl") ?? "").trim();
     if (!proofFileUrl) {
@@ -191,23 +269,56 @@ export function CheckoutFlow({
           )}
         </Card>
 
-        <form action={handleUploadProof} className="flex flex-col gap-3">
-          <Label htmlFor="proofFileUrl">
-            URL del justificante (captura o PDF ya subido)
-          </Label>
-          <div className="flex gap-2">
-            <input
-              id="proofFileUrl"
-              name="proofFileUrl"
-              placeholder="https://…"
-              required
-              className="h-11 flex-1 rounded-md border border-input bg-background px-3.5 text-sm"
-            />
-            <Button type="submit" variant="gold" disabled={isPending}>
-              Enviar justificante
-            </Button>
+        {useUrlFallback ? (
+          <form action={handleUploadProofUrl} className="flex flex-col gap-3">
+            <Label htmlFor="proofFileUrl">
+              URL del justificante (captura o PDF ya subido)
+            </Label>
+            <div className="flex gap-2">
+              <input
+                id="proofFileUrl"
+                name="proofFileUrl"
+                placeholder="https://…"
+                required
+                className="h-11 flex-1 rounded-md border border-input bg-background px-3.5 text-sm"
+              />
+              <Button type="submit" variant="gold" disabled={isPending}>
+                Enviar justificante
+              </Button>
+            </div>
+          </form>
+        ) : (
+          <div className="flex flex-col gap-3">
+            <Label htmlFor="proofFile">
+              Justificante (PDF, JPG, PNG o WEBP — máx. 8 MB)
+            </Label>
+            <div className="flex gap-2">
+              <input
+                ref={fileInputRef}
+                id="proofFile"
+                type="file"
+                accept="application/pdf,image/jpeg,image/png,image/webp"
+                onChange={(e) => handleSelectFile(e.target.files?.[0] ?? null)}
+                className="h-11 flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
+              />
+              <Button
+                type="button"
+                variant="gold"
+                disabled={isPending || !proofFile}
+                onClick={handleUploadProof}
+              >
+                <Paperclip className="size-4" />
+                {isPending ? "Subiendo…" : "Enviar justificante"}
+              </Button>
+            </div>
+            {proofFile && (
+              <p className="text-xs text-muted-foreground">
+                Seleccionado: {proofFile.name} (
+                {(proofFile.size / 1024 / 1024).toFixed(1)} MB)
+              </p>
+            )}
           </div>
-        </form>
+        )}
       </div>
     );
   }

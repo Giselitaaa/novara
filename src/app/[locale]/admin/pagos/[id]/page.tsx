@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import { PaymentReviewActions } from "@/components/admin/payments/payment-review-actions";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Link } from "@/i18n/navigation";
 import { formatPrice } from "@/lib/format";
 import { getPaymentDetail } from "@/modules/payments/server/queries";
 
@@ -57,13 +56,19 @@ export default async function PaymentDetailPage({ params }: Props) {
         <Card>
           <CardContent className="pt-6">
             <p className="mb-2 text-sm text-muted-foreground">Justificante</p>
-            <Link
+            {/* Enlace nativo, no el `Link` con prefijo de idioma: un
+                justificante subido localmente es una ruta estática
+                (`/uploads/...`), no una ruta de la app, y el prefijo de
+                locale la rompería (404). Las URL externas pegadas a mano
+                siguen funcionando igual. */}
+            <a
               href={payment.proofFileUrl}
               target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-2 text-sm font-medium text-gold-foreground underline dark:text-gold"
             >
               <FileText className="size-4" /> Ver justificante
-            </Link>
+            </a>
           </CardContent>
         </Card>
       )}
