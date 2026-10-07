@@ -621,6 +621,10 @@ model Exam {
   passingScore       Decimal        @map("passing_score") @db.Decimal(5, 2)
   timeLimitMinutes   Int?           @map("time_limit_minutes")
   maxAttempts        Int?           @map("max_attempts")
+  // Distingue el examen FINAL de nivel de los mini-simulacros semanales.
+  // Solo aprobar el examen marcado `isFinal` (del mismo curso) habilita el
+  // certificado — ver `issueCertificateIfEligible`.
+  isFinal            Boolean        @default(false) @map("is_final")
   // Composición por bloques de ejercicio (Fase 6): si `randomizeSections`,
   // el orden de las secciones se baraja por intento.
   randomizeSections  Boolean        @default(false) @map("randomize_sections")

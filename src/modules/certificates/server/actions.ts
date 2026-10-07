@@ -14,8 +14,16 @@ function generateCertificateCode() {
 /**
  * Comprueba si un alumno cumple los requisitos para certificarse en
  * un curso, y si es así, emite el certificado (idempotente — nunca
- * duplica). Regla: si el curso tiene examen, hace falta un intento
- * aprobado; si no tiene examen, basta con el 100% de progreso.
+ * duplica). Regla: si el curso tiene un examen marcado como FINAL
+ * (`isFinal`), hace falta un intento aprobado de ESE examen en
+ * concreto — aprobar un mini-simulacro semanal no basta. Si el curso
+ * tiene exámenes pero ninguno está marcado como final (dato sin
+ * configurar), no se emite certificado por examen hasta que se marque
+ * uno — nunca se asume. Si el curso no tiene ningún examen, basta con
+ * el 100% de progreso.
+ *
+ * Además de `percentComplete`, se exige 100% de lecciones de verdad
+ * (recuento real), para que manipular el resumen cacheado no baste.
  *
  * Se llama tras completar una lección o aprobar un examen — nunca
  * hace falta invocarla manualmente.
@@ -26,17 +34,24 @@ export async function issueCertificateIfEligible(userId: string, courseId: strin
 
   const course = await db.course.findUnique({
     where: { id: courseId },
-    include: { exams: true },
+    include: { exams: { where: { isFinal: true } } },
   });
   if (!course) return null;
 
+  const hasAnyExam = (await db.exam.count({ where: { courseId } })) > 0;
+
   let eligible = false;
 
-  if (course.exams.length > 0) {
-    const passedAttempt = await db.examAttempt.findFirst({
-      where: { userId, exam: { courseId }, passed: true },
-    });
-    eligible = !!passedAttempt;
+  if (hasAnyExam) {
+    const finalExam = course.exams[0];
+    if (finalExam) {
+      const passedAttempt = await db.examAttempt.findFirst({
+        where: { userId, examId: finalExam.id, passed: true },
+      });
+      eligible = !!passedAttempt;
+    } else {
+      eligible = false;
+    }
   } else {
     const summary = await db.courseProgressSummary.findUnique({
       where: { userId_courseId: { userId, courseId } },
