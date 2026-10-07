@@ -112,6 +112,11 @@ export async function markLessonComplete(lessonId: string, courseSlug: string) {
   if (!lesson) throw new Error("Lección no encontrada.");
   const courseId = lesson.module.courseId;
 
+  const enrollment = await db.enrollment.findUnique({
+    where: { userId_courseId: { userId, courseId } },
+  });
+  if (!enrollment) throw new Error("No estás inscrito en este curso.");
+
   const alreadyCompleted = await db.lessonProgress.findUnique({
     where: { userId_lessonId: { userId, lessonId } },
   });
