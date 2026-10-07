@@ -10,6 +10,7 @@ import { db } from "@/lib/db";
 import { emailShell, sendTransactionalEmail } from "@/lib/mail";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { requireSession } from "@/lib/require-session";
+import { getAppOrigin } from "@/lib/url";
 import { linkReferralOnRegister } from "@/modules/affiliates/server/actions";
 import {
   changePasswordSchema,
@@ -105,7 +106,7 @@ export async function registerUser(
   });
 
   const token = await issueToken(user.id, "email_verification");
-  const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/verificar-email?token=${token}`;
+  const verifyUrl = `${await getAppOrigin()}/auth/verificar-email?token=${token}`;
 
   await sendTransactionalEmail({
     userId: user.id,
@@ -151,7 +152,7 @@ export async function requestPasswordReset(
   // emails están registrados en la plataforma.
   if (user) {
     const token = await issueToken(user.id, "password_reset");
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/restablecer-contrasena?token=${token}`;
+    const resetUrl = `${await getAppOrigin()}/auth/restablecer-contrasena?token=${token}`;
     await sendTransactionalEmail({
       userId: user.id,
       to: user.email,

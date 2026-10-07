@@ -6,6 +6,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { requireSession } from "@/lib/require-session";
+import { getAppOrigin } from "@/lib/url";
 import { logAdminAction } from "@/modules/admin/server/audit";
 import { requireAdmin } from "@/modules/admin/server/guard";
 
@@ -157,7 +158,7 @@ export async function replyToSupportTicket(ticketId: string, body: string) {
         title: "Tenemos noticias de tu solicitud",
         bodyHtml: parsed.data.body.replace(/\n/g, "<br/>"),
         ctaLabel: "Ver mi solicitud",
-        ctaUrl: `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/soporte`,
+        ctaUrl: `${await getAppOrigin()}/soporte`,
       }),
     });
   } catch {
@@ -184,12 +185,18 @@ export async function replyToMyTicket(ticketId: string, body: string) {
 
   const parsed = replySchema.safeParse({ ticketId, body });
   if (!parsed.success) {
-    return { status: "error" as const, message: parsed.error.issues[0]?.message ?? "Escribe una respuesta." };
+    return {
+      status: "error" as const,
+      message: parsed.error.issues[0]?.message ?? "Escribe una respuesta.",
+    };
   }
 
   const rl = checkRateLimit(`support-reply:${session.user.id}`, 30, 60 * 60);
   if (!rl.allowed) {
-    return { status: "error" as const, message: "Demasiados mensajes seguidos. Espera un poco." };
+    return {
+      status: "error" as const,
+      message: "Demasiados mensajes seguidos. Espera un poco.",
+    };
   }
 
   const ticket = await db.supportTicket.findUnique({
@@ -198,7 +205,10 @@ export async function replyToMyTicket(ticketId: string, body: string) {
   });
   if (!ticket) return { status: "error" as const, message: "La solicitud ya no existe." };
   if (ticket.userId !== session.user.id) {
-    return { status: "error" as const, message: "No puedes responder a una solicitud que no es tuya." };
+    return {
+      status: "error" as const,
+      message: "No puedes responder a una solicitud que no es tuya.",
+    };
   }
 
   const openStatus = await db.status.findUnique({ where: { key: "abierto" } });
@@ -212,7 +222,12 @@ export async function replyToMyTicket(ticketId: string, body: string) {
       data: { ticketId: ticket.id, senderId: session.user.id, body: parsed.data.body },
     }),
     ...(openStatus
-      ? [db.supportTicket.update({ where: { id: ticket.id }, data: { statusId: openStatus.id } })]
+      ? [
+          db.supportTicket.update({
+            where: { id: ticket.id },
+            data: { statusId: openStatus.id },
+          }),
+        ]
       : []),
     ...admins.map((a) =>
       db.notification.create({

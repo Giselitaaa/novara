@@ -13,7 +13,9 @@ export const siteConfig = {
     es: "Academia online premium donde cada curso cumple un estándar alto y el progreso se mide de verdad.",
     en: "A premium online academy where every course meets a high standard and progress is tracked for real.",
   },
-  url: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+  // Nunca debe caer a localhost: si falta la variable en producción, usa
+  // el dominio real conocido de NOVARA en vez de romper enlaces/SEO.
+  url: process.env.NEXT_PUBLIC_APP_URL ?? "https://novara-5915.onrender.com",
   links: {
     // Se completan cuando existan los perfiles reales.
     instagram: "",

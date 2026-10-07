@@ -3,6 +3,7 @@ import "server-only";
 import { siteConfig } from "@/config/site";
 import { db } from "@/lib/db";
 import { emailShell, sendTransactionalEmail } from "@/lib/mail";
+import { getAppOrigin } from "@/lib/url";
 
 /**
  * Barrido de retención: avisa por email a los alumnos que llevan ~7 o
@@ -26,6 +27,7 @@ export async function runRetentionSweep() {
 
   let sent = 0;
   const results: Record<string, number> = {};
+  const appUrl = await getAppOrigin();
 
   for (const w of windows) {
     const users = await db.user.findMany({
@@ -42,7 +44,6 @@ export async function runRetentionSweep() {
 
     for (const user of users) {
       const firstName = user.profile?.firstName ?? "";
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "";
       await sendTransactionalEmail({
         userId: user.id,
         to: user.email,

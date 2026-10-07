@@ -2,6 +2,7 @@ import "server-only";
 
 import { db } from "@/lib/db";
 import { emailShell, sendTransactionalEmail } from "@/lib/mail";
+import { getAppOrigin } from "@/lib/url";
 import { confirmReferralCommission } from "@/modules/affiliates/server/actions";
 
 /**
@@ -93,7 +94,7 @@ export async function grantAccessForPayment(
       title: "Pago aprobado",
       bodyHtml: `Ya tienes acceso completo a <strong>${payment.course?.title}</strong>. ¡A por ello!`,
       ctaLabel: "Empezar el curso",
-      ctaUrl: `${process.env.NEXT_PUBLIC_APP_URL}/cursos/${payment.course?.slug}`,
+      ctaUrl: `${await getAppOrigin()}/cursos/${payment.course?.slug}`,
     }),
   });
 

@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { emailShell, sendTransactionalEmail } from "@/lib/mail";
 import { requireSession } from "@/lib/require-session";
+import { getAppOrigin } from "@/lib/url";
 import { logAdminAction } from "@/modules/admin/server/audit";
 import { requireAdmin } from "@/modules/admin/server/guard";
 
@@ -188,7 +189,9 @@ export async function approvePayment(paymentId: string) {
   revalidatePath(`/admin/pagos/${paymentId}`);
   return {
     status: "success" as const,
-    message: granted ? "Pago aprobado y acceso concedido." : "El pago ya estaba aprobado.",
+    message: granted
+      ? "Pago aprobado y acceso concedido."
+      : "El pago ya estaba aprobado.",
   };
 }
 
@@ -252,7 +255,7 @@ export async function rejectPayment(paymentId: string, reason: string) {
       title: "Tu pago no se ha podido validar",
       bodyHtml: `Motivo: ${reason}. Puedes subir un nuevo justificante desde tu perfil.`,
       ctaLabel: "Subir nuevo justificante",
-      ctaUrl: `${process.env.NEXT_PUBLIC_APP_URL}/cursos/${payment.course?.slug}/comprar`,
+      ctaUrl: `${await getAppOrigin()}/cursos/${payment.course?.slug}/comprar`,
     }),
   });
 

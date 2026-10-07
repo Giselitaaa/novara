@@ -6,6 +6,7 @@ import QRCode from "qrcode";
 
 import { db } from "@/lib/db";
 import { emailShell, sendTransactionalEmail } from "@/lib/mail";
+import { getAppOrigin } from "@/lib/url";
 
 function generateCertificateCode() {
   return `NOV-${randomBytes(5).toString("hex").toUpperCase()}`;
@@ -70,8 +71,9 @@ export async function issueCertificateIfEligible(userId: string, courseId: strin
       })
     ).id;
 
+  const appOrigin = await getAppOrigin();
   const uniqueCode = generateCertificateCode();
-  const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verificar/${uniqueCode}`;
+  const verificationUrl = `${appOrigin}/verificar/${uniqueCode}`;
   const qrUrl = await QRCode.toDataURL(verificationUrl, { margin: 1, width: 240 });
 
   const certificate = await db.certificate.create({
@@ -103,7 +105,7 @@ export async function issueCertificateIfEligible(userId: string, courseId: strin
         title: "Certificado emitido",
         bodyHtml: `Has completado <strong>${course.title}</strong>. Tu certificado, con código <strong>${uniqueCode}</strong>, ya está disponible.`,
         ctaLabel: "Ver mi certificado",
-        ctaUrl: `${process.env.NEXT_PUBLIC_APP_URL}/perfil?tab=certificados`,
+        ctaUrl: `${appOrigin}/perfil?tab=certificados`,
       }),
     });
   }

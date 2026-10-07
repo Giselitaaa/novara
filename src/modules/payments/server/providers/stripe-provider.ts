@@ -3,6 +3,7 @@ import "server-only";
 import Stripe from "stripe";
 
 import { db } from "@/lib/db";
+import { getAppOrigin } from "@/lib/url";
 
 import { grantAccessForPayment } from "../grant-access";
 
@@ -76,7 +77,7 @@ export class StripePaymentProvider implements PaymentProvider {
       },
     });
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3001";
+    const appUrl = await getAppOrigin();
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
@@ -119,7 +120,10 @@ export class StripePaymentProvider implements PaymentProvider {
       throw new PaymentProviderError("Falta STRIPE_WEBHOOK_SECRET.", "not_configured");
     }
     if (!params.signature) {
-      throw new PaymentProviderError("Petición de webhook sin firma.", "invalid_signature");
+      throw new PaymentProviderError(
+        "Petición de webhook sin firma.",
+        "invalid_signature"
+      );
     }
 
     let event: Stripe.Event;
