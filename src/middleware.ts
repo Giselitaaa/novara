@@ -39,7 +39,17 @@ export default async function middleware(req: NextRequest) {
   const isProtected = PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 
   if (isProtected) {
-    const token = await getToken({ req, secret: process.env.AUTH_SECRET });
+    // `secureCookie` explícito: detrás del proxy de Render, `getToken` no
+    // siempre detecta por sí solo que la petición pública es HTTPS, y
+    // busca la cookie de sesión SIN el prefijo `__Secure-` — la que el
+    // navegador realmente tiene (porque sí llegó por HTTPS) nunca
+    // coincide, así que trataba a cualquier alumna logueada como
+    // anónima en /perfil, /mi-aprendizaje, /notificaciones y /examenes.
+    const token = await getToken({
+      req,
+      secret: process.env.AUTH_SECRET,
+      secureCookie: process.env.NODE_ENV === "production",
+    });
 
     if (!token) {
       const locale = req.nextUrl.pathname.split("/")[1];
