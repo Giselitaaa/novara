@@ -278,7 +278,7 @@ export default async function LessonPlayerPage({ params }: Props) {
                 </div>
               </div>
               <Button asChild variant="gold" size="sm">
-                <Link href={`/examenes/${moduleTest.id}`}>Hacer el test</Link>
+                <Link href={`/examenes/${moduleTest.id}/secciones`}>Hacer el test</Link>
               </Button>
             </div>
           )}

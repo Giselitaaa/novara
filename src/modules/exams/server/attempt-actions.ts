@@ -2,9 +2,15 @@
 
 import { db } from "@/lib/db";
 import { requireSession } from "@/lib/require-session";
+import { issueCertificateIfEligible } from "@/modules/certificates/server/actions";
 import { computeWeightedExamScore, isPassing } from "@/modules/exams/shared/scoring";
 import { gradeExercise } from "@/modules/exercises/shared/grade";
 import type { Question, Response } from "@/modules/exercises/shared/question-types";
+import {
+  awardXP,
+  checkAndAwardAchievements,
+  touchStreak,
+} from "@/modules/gamification/server/actions";
 
 export type ComposedExamResult = {
   finalScore: number;
@@ -71,15 +77,29 @@ export async function submitComposedExam(
 
   // Persistir el intento (reutiliza el modelo ExamAttempt existente).
   if (session?.user?.id) {
+    const userId = session.user.id;
     await db.examAttempt.create({
       data: {
         examId,
-        userId: session.user.id,
+        userId,
         score: finalScore,
         passed,
         submittedAt: new Date(),
       },
     });
+
+    // Mismo efecto que el motor simple (gradeAndSubmitAttempt) al aprobar:
+    // XP, racha, certificado (si corresponde) y logros. Antes solo ocurría
+    // en el motor sin uso real — los 104 exámenes reales no disparaban nada
+    // de esto al aprobarse.
+    if (passed) {
+      await awardXP(userId, "examen_aprobado", "Exam", examId);
+      await touchStreak(userId);
+      if (exam.courseId) {
+        await issueCertificateIfEligible(userId, exam.courseId);
+      }
+      await checkAndAwardAchievements(userId);
+    }
   }
 
   return {
