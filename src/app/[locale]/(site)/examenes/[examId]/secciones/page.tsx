@@ -5,6 +5,7 @@ import { Container } from "@/components/layout/container";
 import { ComposedExamPlayer } from "@/components/learning/composed-exam-player";
 import { requireSession } from "@/lib/require-session";
 import { getComposedExamForStudent } from "@/modules/exams/server/composition-queries";
+import { getUserAttemptCount } from "@/modules/exams/server/student-queries";
 
 export const metadata: Metadata = { title: "Examen" };
 
@@ -13,14 +14,27 @@ type Props = { params: Promise<{ examId: string }> };
 export default async function ComposedExamPage({ params }: Props) {
   const { examId } = await params;
   const session = await requireSession();
-  if (!session?.user?.id) redirect(`/auth/iniciar-sesion?callbackUrl=/examenes/${examId}/secciones`);
+  if (!session?.user?.id)
+    redirect(`/auth/iniciar-sesion?callbackUrl=/examenes/${examId}/secciones`);
 
   const exam = await getComposedExamForStudent(examId);
   if (!exam) notFound();
 
+  const attemptsUsed = await getUserAttemptCount(examId, session.user.id);
+  const attemptsExhausted =
+    Boolean(exam.maxAttempts) && attemptsUsed >= exam.maxAttempts!;
+
   return (
     <Container className="py-10 sm:py-14">
-      {exam.sections.length === 0 ? (
+      {attemptsExhausted ? (
+        <div className="rounded-lg border border-dashed border-border p-8 text-center">
+          <h1 className="font-display text-xl tracking-tighter">{exam.title}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Has agotado el número máximo de intentos permitidos ({exam.maxAttempts}) para
+            este examen.
+          </p>
+        </div>
+      ) : exam.sections.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border p-8 text-center">
           <h1 className="font-display text-xl tracking-tighter">{exam.title}</h1>
           <p className="mt-2 text-sm text-muted-foreground">

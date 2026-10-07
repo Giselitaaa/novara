@@ -36,6 +36,17 @@ export async function submitComposedExam(
   });
   if (!exam) throw new Error("Examen no encontrado.");
 
+  if (session?.user?.id && exam.maxAttempts) {
+    const attemptsUsed = await db.examAttempt.count({
+      where: { examId, userId: session.user.id },
+    });
+    if (attemptsUsed >= exam.maxAttempts) {
+      throw new Error(
+        "Has agotado el número máximo de intentos permitidos para este examen."
+      );
+    }
+  }
+
   const bySection = new Map(sectionResponses.map((s) => [s.sectionId, s.responses]));
 
   let needsManualReview = false;
