@@ -7,7 +7,10 @@ import { requireSession } from "@/lib/require-session";
 import { getComposedExamForStudent } from "@/modules/exams/server/composition-queries";
 import { getUserAttemptCount } from "@/modules/exams/server/student-queries";
 
-export const metadata: Metadata = { title: "Examen" };
+export const metadata: Metadata = {
+  title: "Examen",
+  robots: { index: false, follow: false },
+};
 
 type Props = { params: Promise<{ examId: string }> };
 

@@ -10,7 +10,10 @@ import { db } from "@/lib/db";
 import { requireSession } from "@/lib/require-session";
 import { getFinalProjectSubmission } from "@/modules/courses/server/student-actions";
 
-export const metadata: Metadata = { title: "Proyecto final" };
+export const metadata: Metadata = {
+  title: "Proyecto final",
+  robots: { index: false, follow: false },
+};
 
 type Props = { params: Promise<{ slug: string }> };
 

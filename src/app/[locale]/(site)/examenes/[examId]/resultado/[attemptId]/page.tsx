@@ -11,7 +11,10 @@ import { requireSession } from "@/lib/require-session";
 import { getAttemptResult } from "@/modules/exams/server/student-queries";
 import { getFinalExamOutcome } from "@/modules/readiness/server/final-outcome-queries";
 
-export const metadata: Metadata = { title: "Resultado del examen" };
+export const metadata: Metadata = {
+  title: "Resultado del examen",
+  robots: { index: false, follow: false },
+};
 
 type Props = { params: Promise<{ examId: string; attemptId: string }> };
 

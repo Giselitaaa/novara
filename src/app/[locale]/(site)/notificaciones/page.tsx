@@ -10,7 +10,10 @@ import { requireSession } from "@/lib/require-session";
 import { markAllNotificationsAsRead } from "@/modules/notifications/server/actions";
 import { listNotifications } from "@/modules/notifications/server/queries";
 
-export const metadata: Metadata = { title: "Notificaciones" };
+export const metadata: Metadata = {
+  title: "Notificaciones",
+  robots: { index: false, follow: false },
+};
 
 const TYPE_ICONS: Record<string, LucideIcon> = {
   pago: Receipt,

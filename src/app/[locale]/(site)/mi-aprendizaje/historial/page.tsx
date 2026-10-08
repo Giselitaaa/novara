@@ -9,7 +9,10 @@ import { Pagination } from "@/components/ui/pagination";
 import { requireSession } from "@/lib/require-session";
 import { getLearningHistory } from "@/modules/users/server/history-queries";
 
-export const metadata: Metadata = { title: "Historial de aprendizaje" };
+export const metadata: Metadata = {
+  title: "Historial de aprendizaje",
+  robots: { index: false, follow: false },
+};
 
 const ICON_BY_KIND = {
   lesson: BookOpen,

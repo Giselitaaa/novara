@@ -38,7 +38,10 @@ import { getNextObjectives } from "@/modules/users/server/objectives-queries";
 import { getProfileByUserId, getStudentOverview } from "@/modules/users/server/queries";
 import { getWeeklySummary } from "@/modules/users/server/weekly-summary-queries";
 
-export const metadata: Metadata = { title: "Mi aprendizaje" };
+export const metadata: Metadata = {
+  title: "Mi aprendizaje",
+  robots: { index: false, follow: false },
+};
 
 export default async function StudentDashboardPage() {
   const session = await requireSession();

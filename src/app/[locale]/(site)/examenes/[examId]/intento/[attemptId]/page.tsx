@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { redirect } from "next/navigation";
 
@@ -6,6 +7,11 @@ import { Container } from "@/components/layout/container";
 import { db } from "@/lib/db";
 import { requireSession } from "@/lib/require-session";
 import { getExamForTaking } from "@/modules/exams/server/student-queries";
+
+export const metadata: Metadata = {
+  title: "Examen en curso",
+  robots: { index: false, follow: false },
+};
 
 type Props = { params: Promise<{ examId: string; attemptId: string }> };
 

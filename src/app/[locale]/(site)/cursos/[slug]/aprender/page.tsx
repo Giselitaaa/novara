@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { redirect } from "next/navigation";
 
 import { requireSession } from "@/lib/require-session";
 import { getCourseLearningData } from "@/modules/enrollments/server/learning-queries";
+
+export const metadata: Metadata = {
+  title: "Continuar curso",
+  robots: { index: false, follow: false },
+};
 
 type Props = { params: Promise<{ slug: string }> };
 

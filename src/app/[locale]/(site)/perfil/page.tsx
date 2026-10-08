@@ -20,7 +20,10 @@ import {
 import { listMyPurchases } from "@/modules/payments/server/queries";
 import { getLearningDashboard, getProfileByUserId } from "@/modules/users/server/queries";
 
-export const metadata: Metadata = { title: "Mi perfil" };
+export const metadata: Metadata = {
+  title: "Mi perfil",
+  robots: { index: false, follow: false },
+};
 
 /**
  * Ruta protegida por el middleware (`PROTECTED_PREFIXES`), pero se
