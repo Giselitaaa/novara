@@ -239,9 +239,61 @@ export function CheckoutFlow({
     );
   }
 
-  // Estado 2: pedido pendiente — mostrar instrucciones + subir justificante.
+  // Estado 2: pedido pendiente — mostrar instrucciones + subir justificante
+  // (Bizum/transferencia), o permitir reintentar (tarjeta abandonada).
   if (existingPayment.status.key === "pendiente") {
     const isBizum = existingPayment.paymentMethod.key === "bizum";
+    const isTarjeta = existingPayment.paymentMethod.key === "tarjeta";
+
+    if (isTarjeta) {
+      return (
+        <div className="flex flex-col gap-4">
+          <Card className="flex flex-col items-center gap-3 p-8 text-center">
+            <CreditCard className="size-8 text-gold" />
+            <h3 className="font-display text-lg tracking-tighter">
+              Tu pago con tarjeta no se completó
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Se canceló o no llegaste a terminarlo — no se te ha cobrado nada.
+            </p>
+            <Button
+              variant="gold"
+              className="mt-2"
+              disabled={isPending}
+              onClick={handleCardCheckout}
+            >
+              {isPending ? "Abriendo…" : "Reintentar con tarjeta"}
+            </Button>
+          </Card>
+
+          <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground">
+            <span className="h-px flex-1 bg-border" />o paga con otro método
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 py-6"
+              disabled={isPending}
+              onClick={() => handleRequest("bizum")}
+            >
+              <Smartphone className="size-6" />
+              Bizum
+            </Button>
+            <Button
+              variant="outline"
+              className="h-auto flex-col gap-2 py-6"
+              disabled={isPending}
+              onClick={() => handleRequest("transferencia_bancaria")}
+            >
+              <Building2 className="size-6" />
+              Transferencia bancaria
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="flex flex-col gap-6">
         <Card className="p-5">
