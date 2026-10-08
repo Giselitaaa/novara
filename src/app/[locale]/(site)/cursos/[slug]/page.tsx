@@ -13,7 +13,7 @@ import { Container } from "@/components/layout/container";
 import { CourseCard } from "@/components/marketing/course-card";
 import { auth } from "@/lib/auth";
 import { JsonLd } from "@/lib/json-ld";
-import { buildCourseSchema } from "@/lib/seo";
+import { buildCourseSchema, buildPageMetadata, DEFAULT_OG_IMAGE } from "@/lib/seo";
 import { logProductEvent } from "@/modules/analytics/server/events";
 import {
   getCourseBySlug,
@@ -26,31 +26,34 @@ import {
 } from "@/modules/courses/server/review-queries";
 import { isCourseFavorited } from "@/modules/courses/server/student-actions";
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = { params: Promise<{ locale: string; slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const course = await getCourseBySlug(slug);
-  if (!course) return {};
+  const { locale, slug } = await params;
+  // Misma comprobación de admin que el cuerpo de la página (vista previa de
+  // cursos sin publicar): si no se replica aquí, un admin viendo la vista
+  // previa de un curso sin publicar recibiría un 404 real, porque esta
+  // función resuelve ANTES del límite de streaming que crea `loading.tsx` —
+  // ver nota en la llamada a notFound() de abajo.
+  const session = await auth();
+  const isAdmin = session?.user?.roles?.includes("administrador") ?? false;
+  const course = await getCourseBySlug(slug, { allowUnpublished: isAdmin });
+  // notFound() se llama AQUÍ (en generateMetadata), no solo en el cuerpo de
+  // la página: `loading.tsx` envuelve la página en un límite <Suspense> que
+  // ya ha enviado la cabecera HTTP 200 para cuando el cuerpo resuelve y
+  // llama a notFound() — el código de estado queda fijado en 200 aunque el
+  // contenido final muestre "Esta página no existe". generateMetadata se
+  // resuelve ANTES de ese streaming, así que aquí notFound() sí produce un
+  // 404 real.
+  if (!course) notFound();
 
-  return {
+  return buildPageMetadata({
+    locale,
+    path: `/cursos/${course.slug}`,
     title: course.title,
     description: course.subtitle || course.description.slice(0, 155),
-    alternates: { canonical: `/cursos/${course.slug}` },
-    openGraph: {
-      type: "website",
-      title: course.title,
-      description: course.subtitle || undefined,
-      url: `/cursos/${course.slug}`,
-      images: course.bannerImageUrl ? [course.bannerImageUrl] : undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: course.title,
-      description: course.subtitle || undefined,
-      images: course.bannerImageUrl ? [course.bannerImageUrl] : undefined,
-    },
-  };
+    image: course.bannerImageUrl ?? DEFAULT_OG_IMAGE,
+  });
 }
 
 /**
@@ -65,7 +68,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export const revalidate = 300;
 
 export default async function CourseDetailPage({ params }: Props) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   // Público: la ficha del curso no exige sesión (catálogo de marketing).
   // Solo se usa la sesión si existe, para estado de inscripción/favorito/
   // vista previa de admin — nunca para bloquear el acceso anónimo.
@@ -106,7 +109,7 @@ export default async function CourseDetailPage({ params }: Props) {
         </div>
       )}
       <CourseHero course={course} />
-      <JsonLd data={buildCourseSchema(course)} />
+      <JsonLd data={buildCourseSchema(locale, course)} />
 
       <Container className="grid grid-cols-1 gap-12 py-10 sm:py-14 lg:grid-cols-[1fr_360px]">
         <div className="flex flex-col gap-12">

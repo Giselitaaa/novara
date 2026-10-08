@@ -15,6 +15,7 @@ import { LessonBlocksRenderer } from "@/components/lessons/lesson-blocks-rendere
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Link, redirect } from "@/i18n/navigation";
+import { db } from "@/lib/db";
 import { formatSeconds } from "@/lib/format";
 import { requireSession } from "@/lib/require-session";
 import {
@@ -23,9 +24,24 @@ import {
 } from "@/modules/enrollments/server/learning-queries";
 import { getLatestSubmission } from "@/modules/exercises/server/actions";
 
-export const metadata: Metadata = { title: "Aprendiendo" };
-
 type Props = { params: Promise<{ slug: string; lessonId: string }> };
+
+// Existencia comprobada aquí (no solo en el cuerpo de la página): el
+// `loading.tsx` de `cursos/[slug]/` ya fija el 200 antes de que el cuerpo
+// resuelva y llame a notFound(). generateMetadata se resuelve antes de ese
+// streaming, así que aquí notFound() sí produce un 404 real. Comprobación
+// ligera e independiente de la sesión — misma relación lección↔curso que
+// usa `getCourseLearningData`, sin filtrar por matrícula (eso lo decide el
+// cuerpo de la página).
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug, lessonId } = await params;
+  const lesson = await db.lesson.findFirst({
+    where: { id: lessonId, module: { course: { slug } } },
+    select: { id: true },
+  });
+  if (!lesson) notFound();
+  return { title: "Aprendiendo", robots: { index: false, follow: false } };
+}
 
 export default async function LessonPlayerPage({ params }: Props) {
   const { slug, lessonId } = await params;

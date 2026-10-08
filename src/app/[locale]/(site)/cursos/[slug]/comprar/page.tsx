@@ -9,9 +9,19 @@ import { requireSession } from "@/lib/require-session";
 import { getCourseBySlug } from "@/modules/courses/server/queries";
 import { getActivePaymentForUserCourse } from "@/modules/payments/server/queries";
 
-export const metadata: Metadata = { title: "Comprar curso" };
-
 type Props = { params: Promise<{ slug: string }> };
+
+// Existencia comprobada aquí (no solo en el cuerpo de la página): esta
+// página no tiene `loading.tsx` propio, pero hereda el límite <Suspense>
+// del `loading.tsx` de `cursos/[slug]/`, que ya fija el 200 antes de que
+// el cuerpo resuelva y llame a notFound(). generateMetadata se resuelve
+// antes de ese streaming, así que aquí notFound() sí produce un 404 real.
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const course = await getCourseBySlug(slug);
+  if (!course || course.accessType !== "premium") notFound();
+  return { title: "Comprar curso", robots: { index: false, follow: false } };
+}
 
 export default async function CheckoutPage({ params }: Props) {
   const { slug } = await params;

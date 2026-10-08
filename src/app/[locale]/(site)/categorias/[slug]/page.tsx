@@ -7,19 +7,22 @@ import { Container } from "@/components/layout/container";
 import { CategoryCard } from "@/components/marketing/category-card";
 import { CourseCard } from "@/components/marketing/course-card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { buildPageMetadata } from "@/lib/seo";
 import { getCategoryBySlug } from "@/modules/categories/server/queries";
 import { listCourses } from "@/modules/courses/server/queries";
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = { params: Promise<{ locale: string; slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const category = await getCategoryBySlug(slug);
-  if (!category) return {};
-  return {
+  if (!category) notFound();
+  return buildPageMetadata({
+    locale,
+    path: `/categorias/${slug}`,
     title: category.name,
     description: `Cursos de ${category.name} en NOVARA.`,
-  };
+  });
 }
 
 export const revalidate = 300;

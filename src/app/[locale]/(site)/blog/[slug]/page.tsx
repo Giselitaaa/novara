@@ -4,32 +4,35 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Container } from "@/components/layout/container";
 import { JsonLd } from "@/lib/json-ld";
-import { buildArticleSchema } from "@/lib/seo";
+import { buildArticleSchema, buildPageMetadata, DEFAULT_OG_IMAGE } from "@/lib/seo";
 import { getPublishedBlogPostBySlug } from "@/modules/cms/server/blog-queries";
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = { params: Promise<{ locale: string; slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const post = await getPublishedBlogPostBySlug(slug);
-  if (!post) return {};
-  return {
+  if (!post) notFound();
+  return buildPageMetadata({
+    locale,
+    path: `/blog/${post.slug}`,
     title: post.title,
     description: post.seoDescription ?? post.excerpt ?? undefined,
-  };
+    image: post.coverImageUrl ?? DEFAULT_OG_IMAGE,
+  });
 }
 
 export const revalidate = 300;
 
 export default async function BlogPostPage({ params }: Props) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
   const post = await getPublishedBlogPostBySlug(slug);
   if (!post) notFound();
 
   return (
     <Container className="max-w-2xl py-10 sm:py-14">
       <JsonLd
-        data={buildArticleSchema({
+        data={buildArticleSchema(locale, {
           title: post.title,
           excerpt: post.excerpt,
           slug: post.slug,
