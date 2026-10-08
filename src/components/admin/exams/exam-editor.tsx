@@ -5,8 +5,10 @@ import { useTransition } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useRouter } from "@/i18n/navigation";
 import {
   attachQuestionToExam,
@@ -27,12 +29,17 @@ export function ExamSettingsForm({
   passingScore,
   timeLimitMinutes,
   maxAttempts,
+  hasCourse,
+  isFinal,
 }: {
   examId: string;
   title: string;
   passingScore: number;
   timeLimitMinutes: number | null;
   maxAttempts: number | null;
+  /** Solo los exámenes de curso pueden marcarse como examen final. */
+  hasCourse: boolean;
+  isFinal: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
 
@@ -74,6 +81,28 @@ export function ExamSettingsForm({
           />
         </FormField>
       </div>
+
+      {hasCourse && (
+        <div className="flex items-start gap-2.5 rounded-md border border-border p-3.5">
+          <Checkbox
+            id="isFinal"
+            name="isFinal"
+            defaultChecked={isFinal}
+            className="mt-0.5"
+          />
+          <div>
+            <Label htmlFor="isFinal" className="font-normal">
+              Examen final del curso
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              Aprobarlo es lo que habilita el certificado (no un mini-simulacro semanal).
+              Solo puede haber uno por curso — marcar este desmarca automáticamente
+              cualquier otro examen final del mismo curso.
+            </p>
+          </div>
+        </div>
+      )}
+
       <Button type="submit" variant="gold" disabled={isPending} className="w-fit">
         {isPending ? "Guardando…" : "Guardar ajustes"}
       </Button>

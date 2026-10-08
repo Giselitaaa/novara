@@ -106,18 +106,37 @@ export async function createExam(formData: FormData) {
 export async function updateExamSettings(examId: string, formData: FormData) {
   await requireAdmin();
 
-  await db.exam.update({
+  const isFinal = formData.get("isFinal") === "on";
+  const exam = await db.exam.findUnique({
     where: { id: examId },
-    data: {
-      title: String(formData.get("title") ?? ""),
-      passingScore: Number(formData.get("passingScore") ?? 70),
-      timeLimitMinutes: formData.get("timeLimitMinutes")
-        ? Number(formData.get("timeLimitMinutes"))
-        : null,
-      maxAttempts: formData.get("maxAttempts")
-        ? Number(formData.get("maxAttempts"))
-        : null,
-    },
+    select: { courseId: true },
+  });
+
+  await db.$transaction(async (tx) => {
+    // Como máximo un examen final por curso: marcar este desmarca
+    // cualquier otro del mismo curso (si no, `issueCertificateIfEligible`
+    // tomaría el primero que encuentre de forma arbitraria).
+    if (isFinal && exam?.courseId) {
+      await tx.exam.updateMany({
+        where: { courseId: exam.courseId, NOT: { id: examId } },
+        data: { isFinal: false },
+      });
+    }
+
+    await tx.exam.update({
+      where: { id: examId },
+      data: {
+        title: String(formData.get("title") ?? ""),
+        passingScore: Number(formData.get("passingScore") ?? 70),
+        timeLimitMinutes: formData.get("timeLimitMinutes")
+          ? Number(formData.get("timeLimitMinutes"))
+          : null,
+        maxAttempts: formData.get("maxAttempts")
+          ? Number(formData.get("maxAttempts"))
+          : null,
+        ...(exam?.courseId ? { isFinal } : {}),
+      },
+    });
   });
 
   revalidatePath(`/admin/examenes/${examId}`);

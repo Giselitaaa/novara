@@ -24,7 +24,9 @@ export default async function ExamEditPage({ params }: Props) {
         <div>
           <h1 className="font-display text-2xl tracking-tighter">{exam.title}</h1>
           {exam.course && (
-            <p className="mt-1 text-sm text-muted-foreground">Curso: {exam.course.title}</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Curso: {exam.course.title}
+            </p>
           )}
         </div>
         <Link
@@ -52,6 +54,8 @@ export default async function ExamEditPage({ params }: Props) {
             passingScore={Number(exam.passingScore)}
             timeLimitMinutes={exam.timeLimitMinutes}
             maxAttempts={exam.maxAttempts}
+            hasCourse={Boolean(exam.courseId)}
+            isFinal={exam.isFinal}
           />
         </TabsContent>
       </Tabs>

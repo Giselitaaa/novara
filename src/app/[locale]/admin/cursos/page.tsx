@@ -82,6 +82,7 @@ export default async function AdminCoursesPage({ searchParams }: Props) {
           <option value="aprobado">Aprobado</option>
           <option value="publicado">Publicado</option>
           <option value="archivado">Archivado</option>
+          <option value="eliminado">Eliminados (para restaurar)</option>
         </select>
         <Button type="submit" variant="outline">
           Filtrar
@@ -130,7 +131,11 @@ export default async function AdminCoursesPage({ searchParams }: Props) {
                   {course._count.enrollments}
                 </TableCell>
                 <TableCell className="text-right">
-                  <CourseRowActions courseId={course.id} statusKey={course.status.key} />
+                  <CourseRowActions
+                    courseId={course.id}
+                    statusKey={course.status.key}
+                    isDeleted={Boolean(course.deletedAt)}
+                  />
                 </TableCell>
               </TableRow>
             ))}

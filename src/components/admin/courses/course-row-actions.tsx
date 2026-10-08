@@ -1,6 +1,15 @@
 "use client";
 
-import { Archive, CheckCircle2, Copy, Eye, EyeOff, Send, Trash2 } from "lucide-react";
+import {
+  Archive,
+  CheckCircle2,
+  Copy,
+  Eye,
+  EyeOff,
+  RotateCcw,
+  Send,
+  Trash2,
+} from "lucide-react";
 import { useTransition } from "react";
 import { toast } from "sonner";
 
@@ -16,14 +25,17 @@ import {
   changeCourseStatus,
   deleteCourse,
   duplicateCourse,
+  restoreCourse,
 } from "@/modules/courses/server/admin-actions";
 
 export function CourseRowActions({
   courseId,
   statusKey,
+  isDeleted = false,
 }: {
   courseId: string;
   statusKey: string;
+  isDeleted?: boolean;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -38,6 +50,22 @@ export function CourseRowActions({
         toast.error("No se pudo completar la acción.");
       }
     });
+  }
+
+  // Un curso eliminado (soft-delete) no es visible en el listado normal
+  // ni en el resto de acciones de estado — solo tiene sentido ofrecer
+  // restaurarlo.
+  if (isDeleted) {
+    return (
+      <Button
+        variant="outline"
+        size="sm"
+        disabled={isPending}
+        onClick={() => run(() => restoreCourse(courseId), "Curso restaurado.")}
+      >
+        <RotateCcw className="mr-2 size-4" /> Restaurar
+      </Button>
+    );
   }
 
   return (

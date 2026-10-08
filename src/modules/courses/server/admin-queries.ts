@@ -8,12 +8,19 @@ export async function listAllCoursesAdmin(params: {
   page: number;
 }) {
   const pageSize = 20;
+  // "eliminado" no es un CourseStatus real: es el filtro para encontrar
+  // los cursos con soft-delete (`deletedAt`), que de otro modo son
+  // invisibles incluso para el admin — sin esto, no había ninguna forma
+  // de localizarlos en la interfaz para restaurarlos.
+  const isDeletedFilter = params.statusKey === "eliminado";
   const where = {
-    deletedAt: null,
+    deletedAt: isDeletedFilter ? { not: null } : null,
     ...(params.search
       ? { title: { contains: params.search, mode: "insensitive" as const } }
       : {}),
-    ...(params.statusKey ? { status: { key: params.statusKey } } : {}),
+    ...(params.statusKey && !isDeletedFilter
+      ? { status: { key: params.statusKey } }
+      : {}),
   };
 
   const [courses, total] = await Promise.all([

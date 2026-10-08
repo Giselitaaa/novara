@@ -264,6 +264,22 @@ export async function deleteCourse(courseId: string) {
   return { status: "success" as const, message: "Curso eliminado." };
 }
 
+/**
+ * Deshace un soft-delete. No toca el `status` del curso (queda igual
+ * que antes de eliminarlo — si estaba "publicado", vuelve a estarlo
+ * directamente); el admin puede cambiarlo después con las acciones
+ * normales si no es lo que quiere.
+ */
+export async function restoreCourse(courseId: string) {
+  const session = await requireAdmin();
+
+  await db.course.update({ where: { id: courseId }, data: { deletedAt: null } });
+
+  await logAdminAction(session.user.id, "courses.restore", "Course", courseId);
+  revalidatePath("/admin/cursos");
+  return { status: "success" as const, message: "Curso restaurado." };
+}
+
 // ─── Objetivos y requisitos ─────────────────────────────────────────
 
 export async function addObjective(courseId: string, text: string) {
