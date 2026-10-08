@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
@@ -33,14 +34,31 @@ function SealMark({ className }: { className?: string }) {
   );
 }
 
+/**
+ * Logotipo real de NOVARA (no un sustituto inventado): marca + wordmark
+ * en una sola imagen, en dos variantes de color para que se lea bien
+ * tanto en fondo claro como oscuro. Se alternan por CSS (`dark:`), sin
+ * JS, para que no haya parpadeo al hidratar.
+ */
 function Logo({ className }: { className?: string }) {
   return (
-    <Link
-      href="/"
-      className={cn("group inline-flex items-center gap-2 text-foreground", className)}
-    >
-      <SealMark className="text-gold transition-transform duration-300 group-hover:rotate-[12deg]" />
-      <span className="font-display text-xl font-medium tracking-tighter">NOVARA</span>
+    <Link href="/" className={cn("inline-flex items-center", className)}>
+      <Image
+        src="/brand/logo-navy.png"
+        alt="NOVARA"
+        width={900}
+        height={290}
+        priority
+        className="h-7 w-auto dark:hidden"
+      />
+      <Image
+        src="/brand/logo-cream.png"
+        alt="NOVARA"
+        width={900}
+        height={290}
+        priority
+        className="hidden h-7 w-auto dark:block"
+      />
     </Link>
   );
 }

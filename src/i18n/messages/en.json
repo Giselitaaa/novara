@@ -6,7 +6,7 @@
     "retry": "Retry",
     "save": "Save",
     "cancel": "Cancel",
-    "free": "Free",
+    "free": "Included",
     "skipToContent": "Skip to content"
   },
   "nav": {
@@ -16,8 +16,8 @@
     "howItWorks": "How it works",
     "myLearning": "My learning",
     "profile": "My profile",
-    "signIn": "Sign in",
-    "signUp": "Sign up",
+    "signIn": "Access my account",
+    "signUp": "Create my account",
     "signOut": "Sign out",
     "openMenu": "Open menu",
     "closeMenu": "Close menu"
@@ -32,18 +32,16 @@
   },
   "home": {
     "hero": {
-      "eyebrow": "Verified online academy",
-      "headlineLine1": "Learn for real,",
-      "headlineEmphasis": "not halfway.",
-      "subheadline": "NOVARA runs on a single rule: if a course doesn't meet a high standard, it doesn't get published. Real progress, real exams, verifiable certificates.",
-      "primaryCta": "Explore courses",
-      "secondaryCta": "How it works",
-      "sealCaption": "Standard verified by NOVARA"
+      "eyebrow": "Cambridge English Official Exam Preparation",
+      "headline": "Your next level starts here",
+      "subheadline": "This isn't about learning English. It's about preparing to prove your level. At NOVARA you'll find structured preparation for official Cambridge English exams, with content designed to help you move forward with confidence and reach your exam day fully prepared.",
+      "primaryCta": "Get started",
+      "levelsAria": "Go straight to level {level}"
     },
     "brandStatement": {
       "eyebrow": "The difference",
-      "title": "We don't publish hundreds of courses. We publish the ones worth finishing.",
-      "body": "Most platforms measure success in catalog size. We measure it in courses completed. Every course goes through a review process before it's published, and your progress is tracked lesson by lesson, not just at sign-up."
+      "title": "Fewer courses. More purpose.",
+      "body": "We're not here to fill a catalogue. We're here to offer training that actually makes sense.\n\nAt NOVARA, every course answers a specific goal. We choose content carefully, build a clear learning structure, and give you progress you can track at every stage.\n\nBecause learning isn't about collecting courses. It's about moving forward and going further."
     },
     "categories": {
       "eyebrow": "Catalog",
@@ -63,45 +61,45 @@
     },
     "benefits": {
       "eyebrow": "Why NOVARA",
-      "title": "What actually changes the outcome",
+      "title": "A different way to prepare.",
       "items": {
         "quality": {
-          "title": "A demanding quality standard",
-          "body": "Every course goes through editorial review before publishing. No filler to pad the catalog."
+          "title": "Quality before quantity",
+          "body": "Every course goes through an editorial review before joining NOVARA. We choose content with a clear structure, purpose and defined objectives."
         },
         "progress": {
-          "title": "Progress tracked for real",
-          "body": "We save exactly where you left off, lesson by lesson, not just whether you're \"enrolled.\""
+          "title": "Your progress, always in hand",
+          "body": "Every step counts. Your progress is recorded lesson by lesson, so you can pick up your preparation exactly where you left it."
         },
         "certificates": {
-          "title": "Verifiable certificates",
-          "body": "Every certificate has a unique code and a QR code anyone can verify publicly."
+          "title": "Recognition for your effort",
+          "body": "Once you meet the assessment requirements, you'll earn a NOVARA certificate with a unique code and a publicly verifiable QR."
         },
         "payment": {
-          "title": "Flexible, human payment",
-          "body": "Bizum or bank transfer, with manual review. No payment gateway taking a cut of your trust."
+          "title": "A simple, secure payment experience",
+          "body": "Pay through Stripe, with a process designed to be comfortable, clear and secure."
         }
       }
     },
     "howItWorks": {
-      "eyebrow": "The process",
-      "title": "How NOVARA works",
+      "eyebrow": "How NOVARA works",
+      "title": "Your path to the next level.",
       "steps": {
         "choose": {
-          "title": "Choose your course",
-          "body": "Free or premium, filter by category and level until you find what you actually need."
+          "title": "Find your goal",
+          "body": "Explore our course selection and find the training that best fits your level, your needs and your goals."
         },
         "learn": {
-          "title": "Learn at your pace",
-          "body": "Video, text, audio, or hands-on exercises. Your progress saves automatically on every lesson."
+          "title": "Learn with a clear structure",
+          "body": "Access lessons in different formats: text, audio and practical exercises. Move at your own pace and pick up your training whenever you need to."
         },
         "assess": {
-          "title": "Prove what you learned",
-          "body": "A real exam with a real passing score, not a filler form to unlock the certificate."
+          "title": "Put your knowledge to the test",
+          "body": "Check what you've learned through assessments designed to measure your knowledge. Meet the set criteria and prove you're ready."
         },
         "certify": {
           "title": "Get your certificate",
-          "body": "Generated automatically, with a public verification code, the moment you pass."
+          "body": "Once you pass the assessment, you'll receive your NOVARA certificate with a unique code and a public verification system."
         }
       }
     },
@@ -112,35 +110,35 @@
     },
     "faq": {
       "eyebrow": "Frequently asked questions",
-      "title": "What you need to know",
+      "title": "Everything you need to know before you start.",
       "items": {
         "free": {
-          "question": "Are the free courses really free?",
-          "answer": "Yes. Part of the catalog is free with no fine print. Premium courses exist because they involve more depth, exercises, or higher-stakes certification — not because the free content is deliberately cut short."
+          "question": "What kind of training does NOVARA offer?",
+          "answer": "NOVARA offers structured digital training, with a particular focus on preparing for official Cambridge English exams. Our offering is designed to guide you from your current level to your academic goals."
         },
         "payment": {
-          "question": "How does payment by Bizum or bank transfer work?",
-          "answer": "You make the payment and upload proof. An administrator reviews it and manually approves access, usually quickly. We prefer this over relying on a third-party gateway that takes a cut of every payment."
+          "question": "How do I purchase a course?",
+          "answer": "Select the course you're interested in, review its details, and complete checkout through our secure Stripe payment platform."
         },
         "certificate": {
-          "question": "Does the certificate actually mean something?",
-          "answer": "Every certificate includes a unique code and a QR code linking to a public verification page, so anyone — a company, a client — can confirm it's authentic."
+          "question": "Are NOVARA certificates official?",
+          "answer": "NOVARA issues its own completion certificates for students who meet each course's requirements. These certificates confirm the training completed on our platform, but they do not replace an official Cambridge English qualification or a certification issued by Cambridge English itself."
         },
         "quality": {
-          "question": "How is course quality guaranteed?",
-          "answer": "Every course goes through a review pipeline (draft → in review → approved → published) before reaching the catalog. We don't publish by volume."
+          "question": "How does NOVARA guarantee course quality?",
+          "answer": "Courses go through an editorial review process before publication. We work with structured content, defined learning objectives and clear assessment criteria."
         },
         "mobile": {
-          "question": "Will there be a mobile app?",
-          "answer": "It's on the roadmap. The platform is built from day one so that step won't require rebuilding anything."
+          "question": "Can I access NOVARA from my phone?",
+          "answer": "Yes. NOVARA is designed to offer an accessible learning experience across devices, including computers, tablets and phones."
         }
       }
     },
     "cta": {
-      "title": "Your next finished course starts here",
-      "subtitle": "No filler, no pointless endless catalog. Just courses worth finishing.",
-      "primaryCta": "Create free account",
-      "secondaryCta": "Explore catalog"
+      "title": "Your next level won't reach itself.",
+      "subtitle": "Start with a decision. Continue with preparation, consistency and clear goals. At NOVARA you have the space to turn your academic goals into real progress.",
+      "primaryCta": "Start your journey",
+      "secondaryCta": "Discover our courses"
     }
   },
   "footer": {
@@ -184,7 +182,7 @@
         },
         {
           "heading": "3. Free and premium courses",
-          "body": "Part of the catalog is free of charge. Premium courses require payment of the amount shown on each course, via Bizum or bank transfer, with manual review and approval by the NOVARA team before access is granted."
+          "body": "Premium courses require payment of the amount shown for each course, processed securely through Stripe."
         },
         {
           "heading": "4. Payments and refunds",

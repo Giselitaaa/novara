@@ -1,5 +1,3 @@
-import { Fraunces, IBM_Plex_Mono, Plus_Jakarta_Sans } from "next/font/google";
-
 /**
  * Sistema tipográfico de NOVARA — tres roles, cada uno con un trabajo:
  *
@@ -12,25 +10,13 @@ import { Fraunces, IBM_Plex_Mono, Plus_Jakarta_Sans } from "next/font/google";
  *   o verificable — códigos de certificado, timestamps, puntuaciones de
  *   examen, las etiquetas-ledger de las secciones. Refuerza el rigor
  *   del producto sin decorar.
+ *
+ * Se usan pilas locales deliberadamente: el build y la primera carga no
+ * dependen de que el entorno pueda alcanzar Google Fonts. Si el producto
+ * incorpora archivos WOFF2 con licencia, pueden sustituirse aquí sin tocar
+ * los consumidores de estas tres variables.
  */
-export const fontDisplay = Fraunces({
-  subsets: ["latin"],
-  variable: "--font-display",
-  weight: "variable",
-  style: ["normal", "italic"],
-  display: "swap",
-});
-
-export const fontSans = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
-
-export const fontMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  weight: ["400", "500"],
-  display: "swap",
-});
+const local = { variable: "" };
+export const fontDisplay = local;
+export const fontSans = local;
+export const fontMono = local;

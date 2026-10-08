@@ -2,10 +2,10 @@
 
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 import { Container } from "@/components/layout/container";
-import { SealMark } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 
@@ -20,21 +20,34 @@ export function CTA() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="relative overflow-hidden rounded-xl border border-border bg-primary px-8 py-16 text-center text-primary-foreground sm:px-16 sm:py-20"
+          className="relative overflow-hidden rounded-xl border border-border px-8 py-16 text-center text-primary-foreground sm:px-16 sm:py-20"
         >
-          <div
+          {/* Fotografía de marca como fondo, confinada a este bloque
+              (no a toda la sección) — con una capa oscura encima para
+              que el texto siga siendo legible sobre cualquier parte
+              de la imagen. */}
+          <Image
+            src="/hero/cta-scene.jpg"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover"
             aria-hidden
-            className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-gold/20 blur-3xl"
           />
-          <SealMark className="mx-auto mb-6 size-8 text-gold" />
-          <h2 className="mx-auto max-w-xl text-balance font-display text-3xl tracking-tighter sm:text-4xl">
+          <div aria-hidden className="absolute inset-0 bg-[#0d0a08]/55" />
+          <h2 className="relative z-10 mx-auto max-w-xl text-balance font-display text-3xl tracking-tighter text-[#f3ece1] sm:text-4xl">
             {t("title")}
           </h2>
-          <p className="mx-auto mt-4 max-w-md text-balance text-primary-foreground/70">
+          <p className="relative z-10 mx-auto mt-4 max-w-md text-balance text-[#f3ece1]/75">
             {t("subtitle")}
           </p>
-          <div className="mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button asChild variant="gold" size="lg">
+          <div className="relative z-10 mt-9 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Button
+              asChild
+              variant="gold"
+              size="lg"
+              className="rounded-full bg-[#c9a357] text-[#1a1410] hover:bg-[#d4b46a]"
+            >
               <Link href="/auth/crear-cuenta">
                 {t("primaryCta")}
                 <ArrowRight className="size-4" />
@@ -44,7 +57,7 @@ export function CTA() {
               asChild
               variant="outline"
               size="lg"
-              className="border-primary-foreground/25 text-primary-foreground hover:bg-primary-foreground/10"
+              className="rounded-full border-[#f3ece1]/25 text-[#f3ece1] hover:bg-[#f3ece1]/10"
             >
               <Link href="/cursos">{t("secondaryCta")}</Link>
             </Button>

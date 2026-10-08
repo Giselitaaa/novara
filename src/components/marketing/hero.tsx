@@ -1,11 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 
 import { Container } from "@/components/layout/container";
-import { SealMark } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 
@@ -23,78 +22,110 @@ const item = {
   },
 };
 
+/**
+ * Niveles con acceso directo desde la portada: solo los 5 cursos
+ * "grandes" de adultos (Cambridge Key/Preliminary/First/Advanced/
+ * Proficiency) — Pre-A1/Movers/Flyers son para niños y no tienen
+ * sitio natural en una selección rápida de nivel para adultos.
+ */
+const LEVELS = [
+  { label: "A2", slug: "a2-key" },
+  { label: "B1", slug: "b1-preliminary" },
+  { label: "B2", slug: "b2-first" },
+  { label: "C1", slug: "c1-advanced" },
+  { label: "C2", slug: "c2-proficiency" },
+] as const;
+
 export function Hero() {
   const t = useTranslations("home.hero");
 
   return (
-    <section className="relative overflow-hidden">
-      {/* Atmósfera de fondo: dos manchas de color suaves, índigo y oro,
-          coherentes con la paleta — nunca un gradiente decorativo
-          genérico desconectado de los tokens de marca. */}
+    <section className="relative overflow-hidden bg-[#0d0a08] text-[#f3ece1]">
+      {/* Fotografía única (encargada para la marca), no un montaje de
+          recortes sueltos. Confinada a la mitad derecha para que nunca
+          compita con el texto. Oculta en móvil: en una pantalla
+          estrecha no cabe con legibilidad junto al texto. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 opacity-60 dark:opacity-40"
+        className="absolute inset-y-0 right-0 hidden w-1/2 items-center lg:flex"
       >
-        <div className="absolute -top-32 left-1/2 h-[36rem] w-[36rem] -translate-x-1/2 rounded-full bg-secondary/10 blur-3xl" />
-        <div className="absolute right-0 top-40 h-80 w-80 rounded-full bg-gold/10 blur-3xl" />
+        <div className="relative aspect-[1641/959] w-full">
+          <Image
+            src="/hero/scene-full.jpg"
+            alt=""
+            fill
+            sizes="50vw"
+            className="object-contain"
+            priority
+          />
+        </div>
+        {/* Fundido hacia el fondo de la sección en el borde izquierdo de
+            la foto, para que la unión con el texto sea un degradado, no
+            un corte duro. */}
+        <div className="absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-[#0d0a08] to-transparent" />
       </div>
 
-      <Container className="flex flex-col items-center pb-24 pt-20 text-center sm:pb-32 sm:pt-28">
+      {/* Mismo fundido en la base, en toda la sección: mantiene el pie
+          de la foto (y el texto/los botones) siempre legibles. */}
+      <div
+        aria-hidden
+        className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#0d0a08] to-transparent"
+      />
+
+      <Container className="relative grid min-h-[85vh] items-center py-24">
         <motion.div
           variants={container}
           initial="hidden"
           animate="show"
-          className="flex flex-col items-center"
+          className="flex max-w-xl flex-col"
         >
-          <motion.div
+          <motion.p
             variants={item}
-            className="mb-8 flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 shadow-soft"
+            className="font-mono text-xs uppercase tracking-widest text-[#f3ece1]/60"
           >
-            <SealMark className="size-3.5 text-gold" />
-            <span className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-              {t("eyebrow")}
-            </span>
-          </motion.div>
+            {t("eyebrow")}
+          </motion.p>
 
           <motion.h1
             variants={item}
-            className="max-w-3xl text-balance font-display text-5xl leading-[1.05] tracking-tightest sm:text-6xl md:text-7xl"
+            className="mt-5 text-balance font-display text-5xl leading-[1.05] tracking-tightest sm:text-6xl md:text-7xl"
           >
-            {t("headlineLine1")}
-            <br />
-            <span className="italic text-gold-foreground dark:text-gold">
-              {t("headlineEmphasis")}
-            </span>
+            {t("headline")}
           </motion.h1>
 
           <motion.p
             variants={item}
-            className="mt-7 max-w-xl text-balance text-lg text-muted-foreground"
+            className="mt-7 max-w-md text-balance text-lg text-[#f3ece1]/70"
           >
             {t("subheadline")}
           </motion.p>
 
-          <motion.div
-            variants={item}
-            className="mt-10 flex flex-col items-center gap-4 sm:flex-row"
-          >
-            <Button asChild variant="gold" size="lg">
-              <Link href="/cursos">
-                {t("primaryCta")}
-                <ArrowRight className="size-4" />
-              </Link>
-            </Button>
-            <Button asChild variant="ghost" size="lg">
-              <Link href="/#como-funciona">{t("secondaryCta")}</Link>
+          <motion.div variants={item} className="mt-10">
+            <Button
+              asChild
+              variant="gold"
+              size="lg"
+              className="rounded-full bg-[#c9a357] px-8 text-[#1a1410] shadow-[0_0_40px_-10px] shadow-[#c9a357]/60 hover:bg-[#d4b46a]"
+            >
+              <Link href="/cursos">{t("primaryCta")}</Link>
             </Button>
           </motion.div>
 
-          <motion.p
+          <motion.div
             variants={item}
-            className="mt-14 font-mono text-xs uppercase tracking-widest text-muted-foreground"
+            className="mt-8 flex flex-wrap items-center gap-2.5"
           >
-            {t("sealCaption")}
-          </motion.p>
+            {LEVELS.map(({ label, slug }) => (
+              <Link
+                key={slug}
+                href={`/cursos/${slug}`}
+                aria-label={t("levelsAria", { level: label })}
+                className="rounded-full border border-[#f3ece1]/25 px-4 py-1.5 text-sm text-[#f3ece1]/85 transition-colors hover:border-[#c9a357] hover:text-[#c9a357]"
+              >
+                {label}
+              </Link>
+            ))}
+          </motion.div>
         </motion.div>
       </Container>
     </section>

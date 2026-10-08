@@ -22,9 +22,13 @@ export function BrandStatement() {
           <h2 className="text-balance font-display text-3xl leading-tight tracking-tighter sm:text-4xl">
             {t("title")}
           </h2>
-          <p className="mx-auto mt-6 max-w-xl text-balance text-base text-muted-foreground sm:text-lg">
-            {t("body")}
-          </p>
+          <div className="mx-auto mt-6 max-w-xl space-y-4 text-balance text-base text-muted-foreground sm:text-lg">
+            {t("body")
+              .split("\n\n")
+              .map((paragraph, i) => (
+                <p key={i}>{paragraph}</p>
+              ))}
+          </div>
         </motion.div>
       </Container>
     </section>
