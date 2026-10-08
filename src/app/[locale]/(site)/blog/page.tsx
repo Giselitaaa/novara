@@ -5,9 +5,20 @@ import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Container } from "@/components/layout/container";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Link } from "@/i18n/navigation";
+import { buildPageMetadata } from "@/lib/seo";
 import { getPublishedBlogPosts } from "@/modules/cms/server/blog-queries";
 
-export const metadata: Metadata = { title: "Blog" };
+type Props = { params: Promise<{ locale: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({
+    locale,
+    path: "/blog",
+    title: "Blog",
+    description: "Explora los artículos del blog de NOVARA.",
+  });
+}
 
 export const revalidate = 300;
 

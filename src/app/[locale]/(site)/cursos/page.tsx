@@ -7,17 +7,27 @@ import { Container } from "@/components/layout/container";
 import { CourseCard } from "@/components/marketing/course-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Pagination } from "@/components/ui/pagination";
+import { buildPageMetadata } from "@/lib/seo";
 import { listCourses, listCourseLevels } from "@/modules/courses/server/queries";
 import { parseCourseFilters } from "@/modules/courses/shared/filters";
 
-export const metadata: Metadata = {
-  title: "Cursos",
-  description: "Explora el catálogo completo de cursos de NOVARA.",
-};
-
 type Props = {
+  params: Promise<{ locale: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  // Canonical fijo a la URL sin filtros: evita que cada combinación de
+  // filtros/orden se indexe como una página distinta (contenido
+  // duplicado del mismo catálogo).
+  return buildPageMetadata({
+    locale,
+    path: "/cursos",
+    title: "Cursos",
+    description: "Explora el catálogo completo de cursos de NOVARA.",
+  });
+}
 
 export default async function CoursesPage({ searchParams }: Props) {
   const rawParams = await searchParams;

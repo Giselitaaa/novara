@@ -4,31 +4,32 @@ import type { Metadata } from "next";
 import { CertificateDesign } from "@/components/certificates/certificate-design";
 import { ShareCertificate } from "@/components/certificates/share-certificate";
 import { Container } from "@/components/layout/container";
+import { buildPageMetadata } from "@/lib/seo";
 import {
   getCertificateByCode,
   getCertificateSummary,
 } from "@/modules/certificates/server/queries";
 
-type Props = { params: Promise<{ code: string }> };
+type Props = { params: Promise<{ locale: string; code: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { code } = await params;
+  const { locale, code } = await params;
   const summary = await getCertificateSummary(code.toUpperCase());
-  if (!summary) return { title: "Certificado no encontrado" };
+  if (!summary) {
+    return {
+      title: "Certificado no encontrado",
+      robots: { index: false, follow: false },
+    };
+  }
 
   const title = `Certificado de ${summary.studentName} — ${summary.courseTitle}`;
   const description = `Certificado de finalización emitido por NOVARA. Código de verificación ${summary.uniqueCode}.`;
-  return {
+  return buildPageMetadata({
+    locale,
+    path: `/verificar/${summary.uniqueCode}`,
     title,
     description,
-    openGraph: {
-      title,
-      description,
-      type: "article",
-      url: `/verificar/${summary.uniqueCode}`,
-    },
-    twitter: { card: "summary_large_image", title, description },
-  };
+  });
 }
 
 export default async function VerifyCertificatePage({ params }: Props) {

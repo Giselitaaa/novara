@@ -28,6 +28,12 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const isEs = locale === "es";
+  // El campo "URL del favicon" del panel admin (Configuración) se lee
+  // aquí: si el admin lo rellena, se usa de verdad. Si no, cae al
+  // sello de marca (`SealMark`, el mismo que error.tsx/not-found.tsx)
+  // como favicon por defecto — nunca un icono genérico.
+  const settings = await getAllSettings();
+  const faviconUrl = settings.site_favicon_url || "/favicon.svg";
 
   return {
     metadataBase: new URL(siteConfig.url),
@@ -36,6 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       template: `%s — ${siteConfig.name}`,
     },
     description: isEs ? siteConfig.description.es : siteConfig.description.en,
+    icons: { icon: faviconUrl },
   };
 }
 

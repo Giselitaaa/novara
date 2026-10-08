@@ -10,6 +10,7 @@ import { Hero } from "@/components/marketing/hero";
 import { HowItWorks } from "@/components/marketing/how-it-works";
 import { Testimonials } from "@/components/marketing/testimonials";
 import { siteConfig } from "@/config/site";
+import { absoluteUrl, DEFAULT_OG_IMAGE } from "@/lib/seo";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -20,20 +21,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const isEs = locale === "es";
   const title = isEs ? siteConfig.tagline.es : siteConfig.tagline.en;
   const description = isEs ? siteConfig.description.es : siteConfig.description.en;
+  const url = absoluteUrl(locale, "/");
 
   return {
     title,
     description,
+    alternates: { canonical: url },
     openGraph: {
       title: `${siteConfig.name} — ${title}`,
       description,
+      url,
+      siteName: siteConfig.name,
       type: "website",
       locale,
+      images: [{ url: DEFAULT_OG_IMAGE }],
     },
     twitter: {
       card: "summary_large_image",
       title: `${siteConfig.name} — ${title}`,
       description,
+      images: [DEFAULT_OG_IMAGE],
     },
   };
 }

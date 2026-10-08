@@ -5,12 +5,20 @@ import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Container } from "@/components/layout/container";
 import { CategoryCard } from "@/components/marketing/category-card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { buildPageMetadata } from "@/lib/seo";
 import { listRootCategoriesWithCounts } from "@/modules/categories/server/queries";
 
-export const metadata: Metadata = {
-  title: "Categorías",
-  description: "Explora el catálogo de NOVARA por categoría.",
-};
+type Props = { params: Promise<{ locale: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  return buildPageMetadata({
+    locale,
+    path: "/categorias",
+    title: "Categorías",
+    description: "Explora el catálogo de NOVARA por categoría.",
+  });
+}
 
 export const revalidate = 300;
 

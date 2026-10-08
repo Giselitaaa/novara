@@ -11,12 +11,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { auth } from "@/lib/auth";
+import { buildPageMetadata } from "@/lib/seo";
 import { getAllSettings } from "@/modules/cms/server/settings-queries";
 import { listMySupportTickets } from "@/modules/support/server/queries";
 
-export async function generateMetadata(): Promise<Metadata> {
+type Props = { params: Promise<{ locale: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
   const t = await getTranslations("support");
-  return { title: t("metaTitle") };
+  return buildPageMetadata({
+    locale,
+    path: "/soporte",
+    title: t("metaTitle"),
+    description: t("subtitle"),
+  });
 }
 
 export default async function SupportPage() {

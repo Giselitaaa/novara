@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { db } from "@/lib/db";
 
 export const SETTINGS_KEYS = [
@@ -36,26 +38,32 @@ const EMPTY_SETTINGS = Object.fromEntries(
  * el health check de despliegue). Si la base de datos no responde, no
  * puede colgar la página indefinidamente: tras 8s devuelve valores por
  * defecto en vez de dejar la petición esperando para siempre.
+ *
+ * `cache()`: también la llama `generateMetadata` del layout raíz (para
+ * el favicon configurable) — sin memoizar, cada request pagaría dos
+ * consultas idénticas en vez de una.
  */
-export async function getAllSettings(): Promise<SettingsMap> {
-  try {
-    const rows = await Promise.race([
-      db.globalSetting.findMany({ where: { key: { in: [...SETTINGS_KEYS] } } }),
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("getAllSettings: timeout tras 8s")), 8000)
-      ),
-    ]);
-    const map = Object.fromEntries(rows.map((r) => [r.key, r.value as string]));
+export const getAllSettings = cache(
+  async function getAllSettings(): Promise<SettingsMap> {
+    try {
+      const rows = await Promise.race([
+        db.globalSetting.findMany({ where: { key: { in: [...SETTINGS_KEYS] } } }),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error("getAllSettings: timeout tras 8s")), 8000)
+        ),
+      ]);
+      const map = Object.fromEntries(rows.map((r) => [r.key, r.value as string]));
 
-    return Object.fromEntries(
-      SETTINGS_KEYS.map((key) => [key, map[key] ?? ""])
-    ) as SettingsMap;
-  } catch (error) {
-    console.error(
-      "[getAllSettings] fallo al leer ajustes, usando valores por defecto:",
-      error
-    );
+      return Object.fromEntries(
+        SETTINGS_KEYS.map((key) => [key, map[key] ?? ""])
+      ) as SettingsMap;
+    } catch (error) {
+      console.error(
+        "[getAllSettings] fallo al leer ajustes, usando valores por defecto:",
+        error
+      );
 
-    return EMPTY_SETTINGS;
+      return EMPTY_SETTINGS;
+    }
   }
-}
+);
