@@ -67,7 +67,7 @@ export default async function AdminCategoriesPage() {
                     )}
                     <Link
                       href={`/admin/categorias/${category.id}`}
-                      className="hover:text-gold-foreground"
+                      className="hover:text-gold"
                     >
                       {category.name}
                     </Link>

@@ -65,7 +65,7 @@ export default async function PaymentDetailPage({ params }: Props) {
               href={payment.proofFileUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm font-medium text-gold-foreground underline dark:text-gold"
+              className="flex items-center gap-2 text-sm font-medium text-gold underline dark:text-gold"
             >
               <FileText className="size-4" /> Ver justificante
             </a>

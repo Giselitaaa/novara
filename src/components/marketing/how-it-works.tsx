@@ -28,7 +28,7 @@ export function HowItWorks() {
             }}
             className="relative flex flex-col gap-3 border-t border-border pt-5"
           >
-            <span className="font-mono text-xs text-gold-foreground dark:text-gold">
+            <span className="font-mono text-xs text-gold dark:text-gold">
               {String(index + 1).padStart(2, "0")}
             </span>
             <h3 className="font-display text-xl tracking-tighter">

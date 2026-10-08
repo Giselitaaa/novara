@@ -43,7 +43,7 @@ export default async function AdminEmailsPage() {
                   <TableCell className="font-mono text-xs">
                     <Link
                       href={`/admin/correos/${template.id}`}
-                      className="hover:text-gold-foreground"
+                      className="hover:text-gold"
                     >
                       {template.key}
                     </Link>

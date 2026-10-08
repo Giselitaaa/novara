@@ -75,10 +75,7 @@ export default async function AdminUsersPage({ searchParams }: Props) {
             {users.map((user) => (
               <TableRow key={user.id}>
                 <TableCell className="font-medium">
-                  <Link
-                    href={`/admin/usuarios/${user.id}`}
-                    className="hover:text-gold-foreground"
-                  >
+                  <Link href={`/admin/usuarios/${user.id}`} className="hover:text-gold">
                     {user.profile
                       ? `${user.profile.firstName} ${user.profile.lastName}`
                       : user.email}

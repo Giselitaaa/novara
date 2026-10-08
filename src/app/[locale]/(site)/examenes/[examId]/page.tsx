@@ -97,7 +97,7 @@ export default async function ExamStartPage({ params }: Props) {
                 {attempt.submittedAt && (
                   <Link
                     href={`/examenes/${examId}/resultado/${attempt.id}`}
-                    className="text-xs font-medium text-gold-foreground underline dark:text-gold"
+                    className="text-xs font-medium text-gold underline dark:text-gold"
                   >
                     Ver resultado
                   </Link>

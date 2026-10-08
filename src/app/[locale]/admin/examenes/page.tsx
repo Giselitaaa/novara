@@ -61,10 +61,7 @@ export default async function ExamsPage() {
             {exams.map((exam) => (
               <TableRow key={exam.id}>
                 <TableCell className="font-medium">
-                  <Link
-                    href={`/admin/examenes/${exam.id}`}
-                    className="hover:text-gold-foreground"
-                  >
+                  <Link href={`/admin/examenes/${exam.id}`} className="hover:text-gold">
                     {exam.title}
                   </Link>
                 </TableCell>

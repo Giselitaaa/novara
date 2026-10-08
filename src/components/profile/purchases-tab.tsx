@@ -71,7 +71,7 @@ export function PurchasesTab({ purchases }: { purchases: Purchase[] }) {
               {purchase.invoice ? (
                 <a
                   href={`/api/facturas/${purchase.invoice.id}`}
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-gold-foreground hover:underline dark:text-gold"
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-gold hover:underline dark:text-gold"
                 >
                   <Download className="size-3.5" /> {purchase.invoice.invoiceNumber}
                 </a>

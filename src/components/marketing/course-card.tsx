@@ -41,7 +41,7 @@ export function CourseCard({ course }: { course: CourseCardDTO }) {
         <CardTitle>
           <Link
             href={`/cursos/${course.slug}`}
-            className="transition-colors hover:text-gold-foreground"
+            className="transition-colors hover:text-gold"
           >
             {course.title}
           </Link>

@@ -28,7 +28,7 @@ export default async function BlogIndexPage() {
           {posts.map((post) => (
             <article key={post.id} className="border-b border-border pb-8 last:border-0">
               <Link href={`/blog/${post.slug}`}>
-                <h2 className="font-display text-xl tracking-tighter hover:text-gold-foreground">
+                <h2 className="font-display text-xl tracking-tighter hover:text-gold">
                   {post.title}
                 </h2>
               </Link>

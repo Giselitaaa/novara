@@ -110,10 +110,7 @@ export default async function AdminCoursesPage({ searchParams }: Props) {
             {courses.map((course) => (
               <TableRow key={course.id}>
                 <TableCell className="max-w-64 truncate font-medium">
-                  <Link
-                    href={`/admin/cursos/${course.id}`}
-                    className="hover:text-gold-foreground"
-                  >
+                  <Link href={`/admin/cursos/${course.id}`} className="hover:text-gold">
                     {course.title}
                   </Link>
                 </TableCell>

@@ -47,7 +47,7 @@ export function CertificatesTab({ certificates }: { certificates: CertificateIte
             </a>
             <Link
               href={`/verificar/${certificate.uniqueCode}`}
-              className="flex items-center gap-1.5 text-sm font-medium text-gold-foreground hover:underline dark:text-gold"
+              className="flex items-center gap-1.5 text-sm font-medium text-gold hover:underline dark:text-gold"
             >
               <ShieldCheck className="size-4" /> Verificar / compartir
             </Link>

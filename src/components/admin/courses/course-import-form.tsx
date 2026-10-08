@@ -121,7 +121,7 @@ export function CourseImportForm({ options }: { options: Options }) {
           <button
             type="button"
             onClick={() => setJson(EXAMPLE_JSON)}
-            className="text-xs font-medium text-gold-foreground underline dark:text-gold"
+            className="text-xs font-medium text-gold underline dark:text-gold"
           >
             Rellenar con un ejemplo
           </button>

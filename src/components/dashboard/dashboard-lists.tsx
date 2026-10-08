@@ -67,7 +67,7 @@ export function NotificationsPreviewCard({
         )}
         <Link
           href="/notificaciones"
-          className="mt-1 text-xs font-medium text-gold-foreground underline dark:text-gold"
+          className="mt-1 text-xs font-medium text-gold underline dark:text-gold"
         >
           Ver todas
         </Link>
@@ -98,7 +98,7 @@ export function FavoriteCoursesCard({
             <Link
               key={c.id}
               href={`/cursos/${c.slug}`}
-              className="text-sm hover:text-gold-foreground"
+              className="text-sm hover:text-gold"
             >
               {c.title}
             </Link>
@@ -129,10 +129,7 @@ export function CompletedCoursesCard({
         ) : (
           courses.map((c) => (
             <div key={c.id} className="flex items-center justify-between text-sm">
-              <Link
-                href={`/cursos/${c.course.slug}`}
-                className="hover:text-gold-foreground"
-              >
+              <Link href={`/cursos/${c.course.slug}`} className="hover:text-gold">
                 {c.course.title}
               </Link>
               <Progress value={100} className="w-20" />

@@ -105,7 +105,7 @@ export function AICourseGenerator({ options }: { options: Options }) {
 
       {structure && (
         <div className="flex flex-col gap-6 rounded-lg border border-gold/30 bg-gold/5 p-5">
-          <p className="text-xs font-medium uppercase tracking-widest text-gold-foreground dark:text-gold">
+          <p className="text-xs font-medium uppercase tracking-widest text-gold dark:text-gold">
             Revisa y edita antes de crear el curso
           </p>
 

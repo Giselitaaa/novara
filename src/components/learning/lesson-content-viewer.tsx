@@ -96,7 +96,7 @@ export function LessonContentViewer({
           <a
             href={content.externalUrl}
             target="_blank"
-            className="flex w-fit items-center gap-1.5 text-sm font-medium text-gold-foreground hover:underline dark:text-gold"
+            className="flex w-fit items-center gap-1.5 text-sm font-medium text-gold hover:underline dark:text-gold"
           >
             Abrir en una pestaña nueva <ExternalLink className="size-3.5" />
           </a>

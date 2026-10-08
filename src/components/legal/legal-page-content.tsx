@@ -55,7 +55,7 @@ export function LegalPageContent({
 
       <Link
         href="/"
-        className="mt-12 inline-block text-sm font-medium text-gold-foreground underline underline-offset-2 dark:text-gold"
+        className="mt-12 inline-block text-sm font-medium text-gold underline underline-offset-2 dark:text-gold"
       >
         ← {backToHomeLabel}
       </Link>

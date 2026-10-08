@@ -30,7 +30,7 @@ const AccordionTrigger = React.forwardRef<
       className={cn(
         "group flex flex-1 items-center justify-between gap-4 py-5 text-left",
         "font-display text-lg tracking-tighter",
-        "transition-colors hover:text-gold-foreground",
+        "transition-colors hover:text-gold",
         className
       )}
       {...props}

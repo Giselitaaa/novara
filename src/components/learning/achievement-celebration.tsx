@@ -46,7 +46,7 @@ export function AchievementCelebration({
             <SealMark className="size-8 text-gold" />
           </motion.span>
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-widest text-gold-foreground dark:text-gold">
+            <p className="font-mono text-[11px] uppercase tracking-widest text-gold dark:text-gold">
               Logro desbloqueado
             </p>
             <p className="font-display text-base tracking-tighter">

@@ -58,10 +58,7 @@ export default async function AdminBlogPage() {
             {posts.map((post) => (
               <TableRow key={post.id}>
                 <TableCell className="font-medium">
-                  <Link
-                    href={`/admin/blog/${post.id}`}
-                    className="hover:text-gold-foreground"
-                  >
+                  <Link href={`/admin/blog/${post.id}`} className="hover:text-gold">
                     {post.title || "(sin título)"}
                   </Link>
                 </TableCell>

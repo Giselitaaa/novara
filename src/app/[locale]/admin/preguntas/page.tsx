@@ -97,7 +97,7 @@ export default async function AdminQuestionsPage({ searchParams }: Props) {
                   <div className="mt-3 flex flex-col gap-2 border-l-2 border-gold/30 pl-4">
                     {q.answers.map((a) => (
                       <div key={a.id}>
-                        <p className="text-xs font-medium text-gold-foreground dark:text-gold">
+                        <p className="text-xs font-medium text-gold dark:text-gold">
                           {a.user.profile
                             ? `${a.user.profile.firstName} ${a.user.profile.lastName}`
                             : "NOVARA"}

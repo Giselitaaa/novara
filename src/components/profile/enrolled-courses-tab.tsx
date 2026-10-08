@@ -27,7 +27,7 @@ export function EnrolledCoursesTab({ enrollments }: { enrollments: EnrolledCours
         action={
           <Link
             href="/cursos"
-            className="text-sm font-medium text-gold-foreground underline underline-offset-2 dark:text-gold"
+            className="text-sm font-medium text-gold underline underline-offset-2 dark:text-gold"
           >
             Explorar cursos
           </Link>
@@ -47,7 +47,7 @@ export function EnrolledCoursesTab({ enrollments }: { enrollments: EnrolledCours
               </p>
               <Link
                 href={`/cursos/${enrollment.course.slug}`}
-                className="font-display text-lg tracking-tighter hover:text-gold-foreground"
+                className="font-display text-lg tracking-tighter hover:text-gold"
               >
                 {enrollment.course.title}
               </Link>

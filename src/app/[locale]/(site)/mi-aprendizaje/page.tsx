@@ -149,13 +149,13 @@ export default async function StudentDashboardPage() {
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
         <Link
           href="/mi-aprendizaje/historial"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-gold-foreground hover:underline dark:text-gold"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-gold hover:underline dark:text-gold"
         >
           <History className="size-4" /> Ver historial completo de aprendizaje
         </Link>
         <Link
           href="/ranking"
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-gold-foreground hover:underline dark:text-gold"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-gold hover:underline dark:text-gold"
         >
           <Trophy className="size-4" /> Ver ranking
         </Link>

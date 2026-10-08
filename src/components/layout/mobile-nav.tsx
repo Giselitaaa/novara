@@ -42,7 +42,7 @@ export function MobileNav() {
               key={item.href}
               href={item.href}
               onClick={() => setOpen(false)}
-              className="rounded-md px-2 py-3 font-display text-lg tracking-tighter transition-colors hover:text-gold-foreground"
+              className="rounded-md px-2 py-3 font-display text-lg tracking-tighter transition-colors hover:text-gold"
             >
               {t(item.labelKey)}
             </Link>
@@ -51,7 +51,7 @@ export function MobileNav() {
             <Link
               href="/perfil"
               onClick={() => setOpen(false)}
-              className="rounded-md px-2 py-3 font-display text-lg tracking-tighter transition-colors hover:text-gold-foreground"
+              className="rounded-md px-2 py-3 font-display text-lg tracking-tighter transition-colors hover:text-gold"
             >
               {t("profile")}
             </Link>

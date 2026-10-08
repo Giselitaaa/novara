@@ -1,14 +1,16 @@
 import type { LessonBlock } from "@prisma/client";
 import { Download, FileText, Lightbulb, WalletCards } from "lucide-react";
 
-import { FlashcardsViewer, type FlashcardCard } from "@/components/learning/flashcards-viewer";
+import {
+  FlashcardsViewer,
+  type FlashcardCard,
+} from "@/components/learning/flashcards-viewer";
 
 // El bloque puede venir con su mazo y cartas ya cargados desde el servidor
 // (ver getCourseLearningData). Se renderizan directamente, sin fetch en cliente.
 export type LessonBlockWithDeck = LessonBlock & {
   deck?: { id: string; title: string; cards: FlashcardCard[] } | null;
 };
-
 
 function asStringArray(v: unknown): string[] {
   return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
@@ -25,7 +27,11 @@ export function LessonBlockRenderer({ block }: { block: LessonBlockWithDeck }) {
 
   switch (block.type) {
     case "TEXT":
-      return <div className="prose prose-sm max-w-none whitespace-pre-line dark:prose-invert">{block.content}</div>;
+      return (
+        <div className="prose prose-sm max-w-none whitespace-pre-line dark:prose-invert">
+          {block.content}
+        </div>
+      );
 
     case "GRAMMAR":
       return (
@@ -41,7 +47,8 @@ export function LessonBlockRenderer({ block }: { block: LessonBlockWithDeck }) {
 
     case "TIP":
     case "NOTES": {
-      const variant = (data?.variant as string) ?? (block.type === "TIP" ? "success" : "info");
+      const variant =
+        (data?.variant as string) ?? (block.type === "TIP" ? "success" : "info");
       return (
         <div
           className={`flex gap-3 rounded-lg border p-4 ${NOTE_STYLES[variant] ?? NOTE_STYLES.info}`}
@@ -59,7 +66,11 @@ export function LessonBlockRenderer({ block }: { block: LessonBlockWithDeck }) {
       return (
         <figure>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={block.imageUrl ?? ""} alt={block.content ?? ""} className="w-full rounded-lg" />
+          <img
+            src={block.imageUrl ?? ""}
+            alt={block.content ?? ""}
+            className="w-full rounded-lg"
+          />
           {block.content && (
             <figcaption className="mt-1.5 text-center text-xs text-muted-foreground">
               {block.content}
@@ -75,7 +86,12 @@ export function LessonBlockRenderer({ block }: { block: LessonBlockWithDeck }) {
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {images.map((src, i) => (
             // eslint-disable-next-line @next/next/no-img-element
-            <img key={i} src={src} alt="" className="aspect-square w-full rounded-md object-cover" />
+            <img
+              key={i}
+              src={src}
+              alt=""
+              className="aspect-square w-full rounded-md object-cover"
+            />
           ))}
         </div>
       );
@@ -84,7 +100,11 @@ export function LessonBlockRenderer({ block }: { block: LessonBlockWithDeck }) {
     case "VIDEO":
       return (
         // eslint-disable-next-line jsx-a11y/media-has-caption
-        <video controls src={block.videoUrl ?? ""} className="aspect-video w-full rounded-lg bg-black" />
+        <video
+          controls
+          src={block.videoUrl ?? ""}
+          className="aspect-video w-full rounded-lg bg-black"
+        />
       );
 
     case "AUDIO":
@@ -119,7 +139,7 @@ export function LessonBlockRenderer({ block }: { block: LessonBlockWithDeck }) {
               href={block.content}
               target="_blank"
               rel="noreferrer"
-              className="flex w-fit items-center gap-1.5 text-sm font-medium text-gold-foreground hover:underline dark:text-gold"
+              className="flex w-fit items-center gap-1.5 text-sm font-medium text-gold hover:underline dark:text-gold"
             >
               <FileText className="size-3.5" /> {block.title || "Abrir documento"}
             </a>
@@ -165,7 +185,9 @@ export function LessonBlockRenderer({ block }: { block: LessonBlockWithDeck }) {
         return (
           <div className="flex items-center gap-3 rounded-lg border border-gold/25 bg-gold/5 p-4">
             <WalletCards className="size-5 shrink-0 text-gold" />
-            <p className="text-sm font-medium">Este bloque de flashcards aún no tiene un mazo asignado.</p>
+            <p className="text-sm font-medium">
+              Este bloque de flashcards aún no tiene un mazo asignado.
+            </p>
           </div>
         );
       }

@@ -102,10 +102,7 @@ export default async function AdminSupportPage({ searchParams }: Props) {
             {tickets.map((ticket) => (
               <TableRow key={ticket.id}>
                 <TableCell className="font-medium">
-                  <Link
-                    href={`/admin/soporte/${ticket.id}`}
-                    className="hover:text-gold-foreground"
-                  >
+                  <Link href={`/admin/soporte/${ticket.id}`} className="hover:text-gold">
                     {ticket.subject}
                   </Link>
                 </TableCell>

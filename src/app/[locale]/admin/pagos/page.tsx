@@ -89,10 +89,7 @@ export default async function AdminPaymentsPage({ searchParams }: Props) {
             {payments.map((payment) => (
               <TableRow key={payment.id}>
                 <TableCell className="font-medium">
-                  <Link
-                    href={`/admin/pagos/${payment.id}`}
-                    className="hover:text-gold-foreground"
-                  >
+                  <Link href={`/admin/pagos/${payment.id}`} className="hover:text-gold">
                     {payment.user.profile
                       ? `${payment.user.profile.firstName} ${payment.user.profile.lastName}`
                       : payment.user.email}

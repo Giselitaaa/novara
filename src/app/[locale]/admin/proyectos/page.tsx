@@ -103,10 +103,7 @@ export default async function AdminProjectsPage({ searchParams }: Props) {
             {submissions.map((s) => (
               <TableRow key={s.id}>
                 <TableCell className="font-medium">
-                  <Link
-                    href={`/admin/proyectos/${s.id}`}
-                    className="hover:text-gold-foreground"
-                  >
+                  <Link href={`/admin/proyectos/${s.id}`} className="hover:text-gold">
                     {s.user.profile
                       ? `${s.user.profile.firstName} ${s.user.profile.lastName}`
                       : s.user.email}

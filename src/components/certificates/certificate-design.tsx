@@ -45,7 +45,7 @@ export function CertificateDesign({
           <p className="text-sm text-muted-foreground">
             ha completado con éxito el curso
           </p>
-          <h2 className="max-w-lg text-balance font-display text-xl italic tracking-tighter text-gold-foreground dark:text-gold sm:text-2xl">
+          <h2 className="max-w-lg text-balance font-display text-xl italic tracking-tighter text-gold dark:text-gold sm:text-2xl">
             {courseTitle}
           </h2>
         </div>
@@ -72,8 +72,9 @@ export function CertificateDesign({
           {/* Aviso obligatorio: es una acreditación interna, NO un título oficial. */}
           <p className="w-full border-t border-border pt-3 text-center text-[11px] leading-snug text-muted-foreground print:text-black/60">
             Acreditación interna de NOVARA que certifica la finalización de esta
-            preparación. <strong>No es un certificado oficial de Cambridge English</strong>{" "}
-            ni sustituye al examen oficial.
+            preparación.{" "}
+            <strong>No es un certificado oficial de Cambridge English</strong> ni
+            sustituye al examen oficial.
           </p>
         </div>
       </div>

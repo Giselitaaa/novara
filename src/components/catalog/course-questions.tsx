@@ -44,7 +44,7 @@ export function CourseQuestions({ questions }: { questions: CourseQuestionDTO[] 
             <div className="mt-4 flex flex-col gap-3 border-l-2 border-gold/30 pl-4">
               {question.answers.map((answer) => (
                 <div key={answer.id}>
-                  <p className="text-xs font-medium text-gold-foreground dark:text-gold">
+                  <p className="text-xs font-medium text-gold dark:text-gold">
                     {answer.authorName}
                   </p>
                   <p className="mt-1 text-sm text-foreground/90">{answer.body}</p>

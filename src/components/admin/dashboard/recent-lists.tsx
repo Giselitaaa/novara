@@ -57,7 +57,7 @@ export function RecentPaymentsCard({ payments }: { payments: RecentPayment[] }) 
         )}
         <Link
           href="/admin/pagos"
-          className="mt-2 text-sm font-medium text-gold-foreground underline underline-offset-2 dark:text-gold"
+          className="mt-2 text-sm font-medium text-gold underline underline-offset-2 dark:text-gold"
         >
           Ver todos los pagos
         </Link>
@@ -103,7 +103,7 @@ export function RecentUsersCard({ users }: { users: RecentUser[] }) {
         )}
         <Link
           href="/admin/usuarios"
-          className="mt-2 text-sm font-medium text-gold-foreground underline underline-offset-2 dark:text-gold"
+          className="mt-2 text-sm font-medium text-gold underline underline-offset-2 dark:text-gold"
         >
           Ver todos los usuarios
         </Link>
@@ -142,7 +142,7 @@ export function RecentCoursesCard({ courses }: { courses: RecentCourse[] }) {
               <div className="min-w-0">
                 <Link
                   href={`/admin/cursos/${course.id}`}
-                  className="truncate font-medium hover:text-gold-foreground"
+                  className="truncate font-medium hover:text-gold"
                 >
                   {course.title}
                 </Link>
@@ -156,7 +156,7 @@ export function RecentCoursesCard({ courses }: { courses: RecentCourse[] }) {
         )}
         <Link
           href="/admin/cursos"
-          className="mt-2 text-sm font-medium text-gold-foreground underline underline-offset-2 dark:text-gold"
+          className="mt-2 text-sm font-medium text-gold underline underline-offset-2 dark:text-gold"
         >
           Ver todos los cursos
         </Link>
