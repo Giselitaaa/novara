@@ -18,11 +18,15 @@ export async function GET() {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
+    // Nunca el mensaje crudo del error al cliente: endpoint público, sin
+    // autenticación — un driver de base de datos puede incluir detalles de
+    // infraestructura en su mensaje. Sí se registra server-side, para
+    // monitorización real.
+    console.error("[api/health] base de datos inalcanzable:", error);
     return NextResponse.json(
       {
         status: "error",
         database: "unreachable",
-        message: error instanceof Error ? error.message : "unknown error",
         timestamp: new Date().toISOString(),
       },
       { status: 503 }
