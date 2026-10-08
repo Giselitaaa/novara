@@ -22,10 +22,6 @@ const nextConfig: NextConfig = {
   // con query (?callbackUrl=…) usadas en redirect(); no aporta en runtime.
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion"],
-    // Ejecuta el middleware en Node.js (no Edge): necesario para desplegar en
-    // Vercel en modo "service" y compatible con Auth.js completo. La clave aún
-    // no está en los tipos de NextConfig, por eso se inyecta con spread.
-    ...({ nodeMiddleware: true } as Record<string, unknown>),
   },
   images: {
     formats: ["image/avif", "image/webp"],
@@ -84,8 +80,13 @@ const nextConfig: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
+            // `microphone=(self)`: Speaking (`speaking-conversation.tsx`)
+            // usa getUserMedia/MediaRecorder para el propio origen. Con
+            // `microphone=()` (vacío) el navegador bloquea el micrófono
+            // incluso same-origin — rompía la función por completo.
+            // Cámara y geolocalización siguen bloqueadas: no se usan.
             key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
+            value: "camera=(), microphone=(self), geolocation=()",
           },
           {
             key: "Strict-Transport-Security",
