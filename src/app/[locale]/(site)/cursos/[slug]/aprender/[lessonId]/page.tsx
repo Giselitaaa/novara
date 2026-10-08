@@ -220,16 +220,31 @@ export default async function LessonPlayerPage({ params }: Props) {
             </div>
           )}
 
-          <LessonContentViewer
-            lessonId={lessonId}
-            content={{
-              contentTypeKey: currentLesson.contentType.key,
-              body: currentLesson.content?.body ?? null,
-              externalUrl: currentLesson.content?.externalUrl ?? null,
-              exerciseInstructions: currentLesson.exercise?.instructions ?? null,
-              lastPositionSeconds: progress?.lastPositionSeconds ?? 0,
-            }}
-          />
+          {/* El contenido real de una lección de tipo "texto" vive en
+              `blocks` (editor de bloques); `content.body` es un campo
+              heredado que casi ninguna lección usa ya. Mostrar este
+              visor igualmente para "texto" sin body, habiendo ya
+              bloques reales arriba, solo añadía un confuso "Sin
+              contenido todavía." debajo del contenido que sí existe.
+              Sigue mostrándose si la lección de verdad no tiene nada
+              (ni bloques ni body) o si es vídeo/audio/PDF/enlace/
+              ejercicio, donde este visor aporta la reproducción real. */}
+          {!(
+            currentLesson.contentType.key === "texto" &&
+            !currentLesson.content?.body &&
+            currentLesson.blocks.length > 0
+          ) && (
+            <LessonContentViewer
+              lessonId={lessonId}
+              content={{
+                contentTypeKey: currentLesson.contentType.key,
+                body: currentLesson.content?.body ?? null,
+                externalUrl: currentLesson.content?.externalUrl ?? null,
+                exerciseInstructions: currentLesson.exercise?.instructions ?? null,
+                lastPositionSeconds: progress?.lastPositionSeconds ?? 0,
+              }}
+            />
+          )}
 
           {currentLesson.contentType.key === "ejercicio" && (
             <div className="mt-6">

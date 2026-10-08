@@ -19,7 +19,9 @@ export async function getNextObjectives(userId: string): Promise<NextObjective[]
   const objectives: NextObjective[] = [];
 
   const enrollments = await db.enrollment.findMany({
-    where: { userId, status: "activo" },
+    // course.deletedAt: null — un curso archivado no debe generar
+    // objetivos ("te quedan N lecciones de «curso archivado»").
+    where: { userId, status: "activo", course: { deletedAt: null } },
     include: { course: { select: { id: true, slug: true, title: true } } },
   });
 

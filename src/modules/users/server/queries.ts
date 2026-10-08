@@ -28,7 +28,10 @@ export async function getProfileByUserId(userId: string) {
 export async function getLearningDashboard(userId: string) {
   const [enrollments, certificates] = await Promise.all([
     db.enrollment.findMany({
-      where: { userId, status: "activo" },
+      // course.deletedAt: null — una inscripción histórica a un curso
+      // archivado no debe seguir "viva" en el dashboard (el curso ya no
+      // existe públicamente, su página da 404).
+      where: { userId, status: "activo", course: { deletedAt: null } },
       orderBy: { enrolledAt: "desc" },
       include: {
         course: {
@@ -44,7 +47,7 @@ export async function getLearningDashboard(userId: string) {
       },
     }),
     db.certificate.findMany({
-      where: { userId },
+      where: { userId, course: { deletedAt: null } },
       orderBy: { issuedAt: "desc" },
       include: { course: { select: { title: true, slug: true } } },
     }),

@@ -18,11 +18,15 @@ export async function GET(
     where: { uniqueCode: code.toUpperCase() },
     include: {
       user: { include: { profile: true } },
-      course: { select: { title: true } },
+      course: { select: { title: true, deletedAt: true } },
     },
   });
 
-  if (!certificate) return new Response("Certificado no encontrado", { status: 404 });
+  // Mismo criterio que /verificar/[code]: un curso archivado no debe
+  // seguir siendo descargable públicamente como PDF.
+  if (!certificate || certificate.course?.deletedAt) {
+    return new Response("Certificado no encontrado", { status: 404 });
+  }
 
   const studentName = certificate.user.profile
     ? `${certificate.user.profile.firstName} ${certificate.user.profile.lastName}`
