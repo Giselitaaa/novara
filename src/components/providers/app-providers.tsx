@@ -19,7 +19,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
       <ThemeProvider>
         <QueryProvider>
           {children}
-          <Toaster richColors position="top-center" closeButton />
+          <Toaster richColors position="top-center" closeButton offset={{ top: 96 }} />
         </QueryProvider>
       </ThemeProvider>
     </SessionProvider>

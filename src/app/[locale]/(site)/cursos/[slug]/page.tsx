@@ -219,7 +219,7 @@ export default async function CourseDetailPage({ params }: Props) {
           </section>
         </div>
 
-        <aside>
+        <aside className="order-first lg:order-none">
           <CourseSidebar
             course={course}
             enrollment={enrollment}

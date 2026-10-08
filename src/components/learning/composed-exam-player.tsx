@@ -241,29 +241,31 @@ export function ComposedExamPlayer({
             })()}
           </Card>
 
-          <div className="flex items-center justify-between gap-3">
-            <Button
-              variant="outline"
-              disabled={currentIndex === 0}
-              onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
-            >
-              <ChevronLeft className="size-4" /> Anterior
-            </Button>
-            {currentIndex < sections.length - 1 ? (
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center justify-between gap-3 sm:justify-start">
               <Button
                 variant="outline"
-                onClick={() =>
-                  setCurrentIndex((i) => Math.min(sections.length - 1, i + 1))
-                }
+                disabled={currentIndex === 0}
+                onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
               >
-                Siguiente <ChevronRight className="size-4" />
+                <ChevronLeft className="size-4" /> Anterior
               </Button>
-            ) : null}
+              {currentIndex < sections.length - 1 ? (
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    setCurrentIndex((i) => Math.min(sections.length - 1, i + 1))
+                  }
+                >
+                  Siguiente <ChevronRight className="size-4" />
+                </Button>
+              ) : null}
+            </div>
             <Button
               variant="gold"
               onClick={submit}
               disabled={isPending}
-              className="ml-auto"
+              className="w-full sm:ml-auto sm:w-auto"
             >
               {isPending ? "Corrigiendo…" : "Finalizar examen"}
             </Button>
