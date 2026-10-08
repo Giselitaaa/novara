@@ -70,7 +70,7 @@ export function SiteFooter() {
         <span>
           © {year} {siteConfig.name} — {t("rights")}
         </span>
-        <span className="font-mono uppercase tracking-widest">Aprende de verdad</span>
+        <span className="font-mono uppercase tracking-widest">{t("tagline")}</span>
       </Container>
     </footer>
   );
