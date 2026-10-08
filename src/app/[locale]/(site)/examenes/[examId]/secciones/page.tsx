@@ -50,15 +50,9 @@ export default async function ComposedExamPage({ params }: Props) {
           sections={exam.sections.map((s) => ({
             id: s.id,
             weight: Number(s.weight),
-            category: s.exercise.category,
-            exerciseTitle: s.exercise.title,
-            instructions: s.exercise.instructions,
-            config: (s.exercise.config ?? null) as Record<string, unknown> | null,
-            questions: s.exercise.questions.map((q) => ({
-              id: q.id,
-              kind: q.kind,
-              data: q.data as Record<string, unknown>,
-            })),
+            category: s.category,
+            exerciseTitle: s.exerciseTitle,
+            questionCount: s.questionCount,
           }))}
         />
       )}

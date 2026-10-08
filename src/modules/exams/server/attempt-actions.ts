@@ -3,6 +3,7 @@
 import { db } from "@/lib/db";
 import { requireSession } from "@/lib/require-session";
 import { issueCertificateIfEligible } from "@/modules/certificates/server/actions";
+import { getExamSectionDetail } from "@/modules/exams/server/composition-queries";
 import { computeWeightedExamScore, isPassing } from "@/modules/exams/shared/scoring";
 import { gradeExercise } from "@/modules/exercises/shared/grade";
 import type { Question, Response } from "@/modules/exercises/shared/question-types";
@@ -11,6 +12,20 @@ import {
   checkAndAwardAchievements,
   touchStreak,
 } from "@/modules/gamification/server/actions";
+
+/**
+ * Carga a demanda el contenido de UNA sección (texto/audio +
+ * preguntas) cuando el alumno navega a ella en `ComposedExamPlayer` —
+ * nunca se manda el examen completo de golpe (ver `getExamSectionDetail`).
+ */
+export async function loadExamSectionDetail(examId: string, sectionId: string) {
+  const session = await requireSession();
+  if (!session?.user?.id) throw new Error("Inicia sesión para hacer el examen.");
+
+  const detail = await getExamSectionDetail(examId, sectionId);
+  if (!detail) throw new Error("Sección no encontrada.");
+  return detail;
+}
 
 export type ComposedExamResult = {
   finalScore: number;
