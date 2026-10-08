@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  AlertCircle,
-  Building2,
-  CheckCircle2,
-  Clock,
-  CreditCard,
-  Paperclip,
-  Smartphone,
-} from "lucide-react";
+import { AlertCircle, CheckCircle2, Clock, CreditCard, Paperclip } from "lucide-react";
 import { useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -17,11 +9,7 @@ import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "@/i18n/navigation";
 import { formatPrice } from "@/lib/format";
-import {
-  requestPurchase,
-  startCardCheckout,
-  uploadPaymentProof,
-} from "@/modules/payments/server/actions";
+import { startCardCheckout, uploadPaymentProof } from "@/modules/payments/server/actions";
 
 type PaymentState = {
   id: string;
@@ -61,20 +49,6 @@ export function CheckoutFlow({
           error instanceof Error
             ? error.message
             : "No se pudo iniciar el pago con tarjeta."
-        );
-      }
-    });
-  }
-
-  function handleRequest(methodKey: "bizum" | "transferencia_bancaria") {
-    startTransition(async () => {
-      try {
-        await requestPurchase(courseId, methodKey);
-        toast.success("Pedido generado. Sigue las instrucciones de pago.");
-        router.refresh();
-      } catch (error) {
-        toast.error(
-          error instanceof Error ? error.message : "No se pudo generar el pedido."
         );
       }
     });
@@ -195,46 +169,19 @@ export function CheckoutFlow({
         </p>
 
         {cardEnabled && (
-          <>
-            <Button
-              variant="gold"
-              className="h-auto flex-col gap-2 py-6"
-              disabled={isPending}
-              onClick={handleCardCheckout}
-            >
-              <CreditCard className="size-6" />
-              Pagar con tarjeta
-              <span className="text-xs font-normal opacity-80">
-                Pago inmediato y seguro con Stripe
-              </span>
-            </Button>
-            <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground">
-              <span className="h-px flex-1 bg-border" />o paga manualmente
-              <span className="h-px flex-1 bg-border" />
-            </div>
-          </>
+          <Button
+            variant="gold"
+            className="h-auto flex-col gap-2 py-6"
+            disabled={isPending}
+            onClick={handleCardCheckout}
+          >
+            <CreditCard className="size-6" />
+            Pagar con tarjeta
+            <span className="text-xs font-normal opacity-80">
+              Pago inmediato y seguro con Stripe
+            </span>
+          </Button>
         )}
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Button
-            variant="outline"
-            className="h-auto flex-col gap-2 py-6"
-            disabled={isPending}
-            onClick={() => handleRequest("bizum")}
-          >
-            <Smartphone className="size-6" />
-            Bizum
-          </Button>
-          <Button
-            variant="outline"
-            className="h-auto flex-col gap-2 py-6"
-            disabled={isPending}
-            onClick={() => handleRequest("transferencia_bancaria")}
-          >
-            <Building2 className="size-6" />
-            Transferencia bancaria
-          </Button>
-        </div>
       </div>
     );
   }
@@ -265,31 +212,6 @@ export function CheckoutFlow({
               {isPending ? "Abriendo…" : "Reintentar con tarjeta"}
             </Button>
           </Card>
-
-          <div className="flex items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground">
-            <span className="h-px flex-1 bg-border" />o paga con otro método
-            <span className="h-px flex-1 bg-border" />
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 py-6"
-              disabled={isPending}
-              onClick={() => handleRequest("bizum")}
-            >
-              <Smartphone className="size-6" />
-              Bizum
-            </Button>
-            <Button
-              variant="outline"
-              className="h-auto flex-col gap-2 py-6"
-              disabled={isPending}
-              onClick={() => handleRequest("transferencia_bancaria")}
-            >
-              <Building2 className="size-6" />
-              Transferencia bancaria
-            </Button>
-          </div>
         </div>
       );
     }
