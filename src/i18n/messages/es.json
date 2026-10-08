@@ -186,7 +186,7 @@
         },
         {
           "heading": "4. Pagos y reembolsos",
-          "body": "El acceso a un curso premium se concede tras verificar el justificante de pago subido por el alumno. Si el pago es rechazado, se indicará el motivo y podrás subir un nuevo justificante. Las solicitudes de reembolso se gestionan de forma individual contactando con soporte."
+          "body": "El acceso a un curso premium se concede automáticamente en cuanto Stripe confirma el pago. Las solicitudes de reembolso se gestionan de forma individual contactando con soporte."
         },
         {
           "heading": "5. Certificados",

@@ -186,7 +186,7 @@
         },
         {
           "heading": "4. Payments and refunds",
-          "body": "Access to a premium course is granted after verifying the proof of payment uploaded by the student. If a payment is rejected, the reason will be shown and you may upload a new proof. Refund requests are handled individually by contacting support."
+          "body": "Access to a premium course is granted automatically once Stripe confirms the payment. Refund requests are handled individually by contacting support."
         },
         {
           "heading": "5. Certificates",
