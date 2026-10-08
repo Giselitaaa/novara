@@ -22,56 +22,118 @@ type SendTransactionalEmailInput = {
   variables?: Record<string, string>;
 };
 
-/** Remitente configurado en `EMAIL_FROM` ("NOVARA <novaracademy@proton.me>"). */
-function parseFrom(): { name: string; email: string } {
-  const raw = process.env.EMAIL_FROM ?? `${siteConfig.name} <onboarding@resend.dev>`;
+function parseFromRaw(raw: string): { name: string; email: string } {
   const m = raw.match(/^\s*(.*?)\s*<([^>]+)>\s*$/);
   if (m && m[2]) return { name: m[1] || siteConfig.name, email: m[2] };
   return { name: siteConfig.name, email: raw.trim() };
 }
 
+/** Remitente configurado en `EMAIL_FROM` ("NOVARA <novaracademy@outlook.es>"). */
+function parseFrom(): { name: string; email: string } {
+  return parseFromRaw(
+    process.env.EMAIL_FROM ?? `${siteConfig.name} <onboarding@resend.dev>`
+  );
+}
+
 /**
- * Entrega el correo por el proveedor ACTIVO, sin acoplar el resto del dominio:
+ * Remitente PARA RESEND específicamente. Resend exige que el dominio del
+ * remitente esté verificado por DNS en su panel — el dominio de
+ * `EMAIL_FROM` (el remitente de Brevo, que no necesita eso) no lo está,
+ * así que usarlo aquí hace que Resend rechace el envío siempre, incluso
+ * al propio titular de la cuenta. Si existe `RESEND_FROM` (un dominio ya
+ * verificado), se usa; si no, cae al remitente de pruebas de Resend
+ * (`onboarding@resend.dev`), que no requiere verificación pero solo
+ * puede entregar al email del titular de la cuenta — mejor que fallar
+ * siempre, aunque no sirve todavía como respaldo general para cualquier
+ * alumno hasta que se verifique un dominio propio en resend.com/domains.
+ */
+function parseResendFrom(): { name: string; email: string } {
+  if (process.env.RESEND_FROM) return parseFromRaw(process.env.RESEND_FROM);
+  return { name: siteConfig.name, email: "onboarding@resend.dev" };
+}
+
+async function deliverViaBrevo(
+  from: { name: string; email: string },
+  to: string,
+  subject: string,
+  html: string
+): Promise<{ id?: string }> {
+  const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+    method: "POST",
+    headers: {
+      "api-key": process.env.BREVO_API_KEY!,
+      "content-type": "application/json",
+      accept: "application/json",
+    },
+    body: JSON.stringify({
+      sender: from,
+      to: [{ email: to }],
+      subject,
+      htmlContent: html,
+    }),
+  });
+  if (!res.ok) throw new Error(`Brevo ${res.status}: ${await res.text()}`);
+  const data = (await res.json().catch(() => ({}))) as { messageId?: string };
+  return { id: data.messageId };
+}
+
+async function deliverViaResend(
+  from: { name: string; email: string },
+  to: string,
+  subject: string,
+  html: string
+): Promise<{ id?: string }> {
+  if (!resend) throw new Error("resend-no-configurado");
+  const result = await resend.emails.send({
+    from: `${from.name} <${from.email}>`,
+    to,
+    subject,
+    html,
+  });
+  if (result.error) throw new Error(String(result.error.message ?? result.error));
+  return { id: result.data?.id };
+}
+
+/**
+ * Entrega el correo con Brevo como proveedor PRINCIPAL y Resend como
+ * RESPALDO — nunca al revés, y nunca a los dos a la vez (si Brevo
+ * entrega correctamente, Resend no se llama en absoluto; solo se
+ * intenta Resend cuando la llamada a Brevo lanza una excepción, así
+ * que no hay riesgo de correo duplicado).
+ *
  *  • Brevo (gratis, 300/día, remitente verificado sin dominio) si hay BREVO_API_KEY.
- *  • Resend si hay RESEND_API_KEY (requiere dominio verificado).
- * Devuelve el id del proveedor. Lanza si el proveedor responde error.
+ *  • Si Brevo falla (o no está configurado) y hay RESEND_API_KEY, se reintenta con Resend.
+ *
+ * Devuelve el id del proveedor que realmente entregó el correo y cuál
+ * fue. Lanza solo si TODOS los proveedores disponibles fallan.
  */
 async function deliver(
   to: string,
   subject: string,
   html: string
-): Promise<{ id?: string }> {
-  const from = parseFrom();
+): Promise<{ id?: string; provider: string }> {
   const brevoKey = process.env.BREVO_API_KEY;
+
   if (brevoKey) {
-    const res = await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        "api-key": brevoKey,
-        "content-type": "application/json",
-        accept: "application/json",
-      },
-      body: JSON.stringify({
-        sender: from,
-        to: [{ email: to }],
-        subject,
-        htmlContent: html,
-      }),
-    });
-    if (!res.ok) throw new Error(`Brevo ${res.status}: ${await res.text()}`);
-    const data = (await res.json().catch(() => ({}))) as { messageId?: string };
-    return { id: data.messageId };
+    try {
+      const { id } = await deliverViaBrevo(parseFrom(), to, subject, html);
+      return { id, provider: "brevo" };
+    } catch (brevoError) {
+      if (!resend) throw brevoError;
+      console.error(
+        "[mail] Brevo falló, reintentando con Resend como respaldo:",
+        brevoError
+      );
+      const { id } = await deliverViaResend(parseResendFrom(), to, subject, html);
+      return { id, provider: "resend-fallback" };
+    }
   }
+
   if (resend) {
-    const result = await resend.emails.send({
-      from: `${from.name} <${from.email}>`,
-      to,
-      subject,
-      html,
-    });
-    if (result.error) throw new Error(String(result.error.message ?? result.error));
-    return { id: result.data?.id };
+    const { id } = await deliverViaResend(parseResendFrom(), to, subject, html);
+    return { id, provider: "resend" };
   }
+
   throw new Error("no-provider");
 }
 
@@ -122,14 +184,18 @@ export async function sendTransactionalEmail({
   }
 
   try {
-    const { id } = await deliver(to, finalSubject, finalHtml);
+    const { id, provider } = await deliver(to, finalSubject, finalHtml);
     await db.emailLog.create({
       data: {
         userId,
         templateKey,
         sentTo: to,
         status: "enviado",
-        providerMessageId: id,
+        // Prefijo con el proveedor que entregó de verdad (relevante sobre
+        // todo cuando es "resend-fallback": indica que Brevo falló para
+        // este envío concreto). No hay columna dedicada — se evita una
+        // migración solo para esto.
+        providerMessageId: id ? `${provider}:${id}` : provider,
         sentAt: new Date(),
       },
     });
