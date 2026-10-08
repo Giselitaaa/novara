@@ -63,11 +63,21 @@ export async function getPaymentDetail(id: string) {
  * código. Con valores por defecto vacíos si el admin no las ha
  * rellenado todavía.
  */
+/**
+ * Forma mínima para <CheckoutFlow> (componente cliente): solo campos
+ * planos. El registro completo de Payment incluye un `amount` Decimal
+ * de Prisma, que React no puede serializar de servidor a cliente.
+ */
 export async function getActivePaymentForUserCourse(userId: string, courseId: string) {
   return db.payment.findFirst({
     where: { userId, courseId },
     orderBy: { createdAt: "desc" },
-    include: { status: true, paymentMethod: true },
+    select: {
+      id: true,
+      adminNotes: true,
+      status: { select: { key: true, label: true } },
+      paymentMethod: { select: { key: true, label: true } },
+    },
   });
 }
 
