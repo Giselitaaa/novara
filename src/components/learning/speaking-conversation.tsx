@@ -34,7 +34,10 @@ type Status = "idle" | "loading" | "recording" | "active" | "unavailable" | "eva
 // en la nube. Safari/Chrome lo exponen (webkitSpeechRecognition). Tipos mínimos.
 type SRAlternative = { transcript: string };
 type SRResult = { isFinal: boolean } & Record<number, SRAlternative>;
-type SRResultEvent = { resultIndex: number; results: { length: number } & Record<number, SRResult> };
+type SRResultEvent = {
+  resultIndex: number;
+  results: { length: number } & Record<number, SRResult>;
+};
 type SpeechRecognitionLike = {
   lang: string;
   interimResults: boolean;
@@ -121,7 +124,15 @@ export function SpeakingConversation({
       res = await fetch("/api/speaking/turn", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ language, level, scenario, objective, keywords, history, withAudio: true }),
+        body: JSON.stringify({
+          language,
+          level,
+          scenario,
+          objective,
+          keywords,
+          history,
+          withAudio: true,
+        }),
       });
     } catch {
       toast.error("Sin conexión con el servidor. ¿Está arrancado NOVARA?");
@@ -133,7 +144,10 @@ export function SpeakingConversation({
     }
     if (!res.ok) {
       toast.error(
-        await errorMessage(res, "No se pudo continuar la conversación. ¿Está arrancado Ollama (LLM local)?")
+        await errorMessage(
+          res,
+          "No se pudo continuar la conversación. ¿Está arrancado Ollama (LLM local)?"
+        )
       );
       return false;
     }
@@ -190,7 +204,9 @@ export function SpeakingConversation({
     rec.onerror = (e) => {
       if (e.error === "not-allowed" || e.error === "service-not-allowed") {
         permissionError = true;
-        toast.error("Has bloqueado el micrófono. Permítelo en la barra de direcciones y reintenta.");
+        toast.error(
+          "Has bloqueado el micrófono. Permítelo en la barra de direcciones y reintenta."
+        );
       }
     };
     rec.onend = () => {
@@ -198,7 +214,9 @@ export function SpeakingConversation({
       if (finalText.trim()) {
         void handleTranscript(finalText.trim());
       } else if (!permissionError) {
-        toast.error("No te he entendido bien. Inténtalo de nuevo, hablando claro y un poco más largo.");
+        toast.error(
+          "No te he entendido bien. Inténtalo de nuevo, hablando claro y un poco más largo."
+        );
         setStatus("active");
       } else {
         setStatus("active");
@@ -222,10 +240,12 @@ export function SpeakingConversation({
 
     // 2) Respaldo: grabar y transcribir en el servidor.
     // getUserMedia solo existe en contextos SEGUROS: localhost o HTTPS. Si la
-    // app se abre por la IP de red (http://192.168.x.x) el micrófono se bloquea.
+    // app se abre por una IP de red (http://192.168.x.x) o por HTTP sin ser
+    // localhost, el navegador ni siquiera expone la API — mensaje genérico,
+    // válido en cualquier entorno (nunca un puerto/host de desarrollo).
     if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
       toast.error(
-        "Tu navegador bloquea el micrófono aquí. Abre la app en http://localhost:3001 (no en la IP de red) o usa HTTPS."
+        "Tu navegador no permite usar el micrófono en esta conexión. Accede a NOVARA mediante HTTPS."
       );
       return;
     }
@@ -249,15 +269,25 @@ export function SpeakingConversation({
       // Elegimos un formato que el navegador ADMITA de verdad. Chrome/Edge usan
       // webm/opus; Safari solo admite audio/mp4. Sin esto, Safari grababa mp4
       // pero se enviaba como .webm y la transcripción fallaba ("error al detener").
-      const candidates = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"];
+      const candidates = [
+        "audio/webm;codecs=opus",
+        "audio/webm",
+        "audio/mp4",
+        "audio/ogg",
+      ];
       const supported =
-        typeof MediaRecorder !== "undefined" && typeof MediaRecorder.isTypeSupported === "function"
+        typeof MediaRecorder !== "undefined" &&
+        typeof MediaRecorder.isTypeSupported === "function"
           ? candidates.find((t) => MediaRecorder.isTypeSupported(t))
           : undefined;
-      recorder = supported ? new MediaRecorder(stream, { mimeType: supported }) : new MediaRecorder(stream);
+      recorder = supported
+        ? new MediaRecorder(stream, { mimeType: supported })
+        : new MediaRecorder(stream);
     } catch {
       stream.getTracks().forEach((t) => t.stop());
-      toast.error("Tu navegador no admite la grabación de audio. Prueba con Chrome o Edge actualizados.");
+      toast.error(
+        "Tu navegador no admite la grabación de audio. Prueba con Chrome o Edge actualizados."
+      );
       setStatus("active");
       return;
     }
@@ -309,13 +339,14 @@ export function SpeakingConversation({
     // La extensión del fichero debe coincidir con el formato REAL grabado
     // (Safari = mp4, Chrome = webm); si no, el servicio de transcripción lo rechaza.
     const type = blob.type || "audio/webm";
-    const ext = type.includes("mp4") || type.includes("mpeg") || type.includes("m4a")
-      ? "mp4"
-      : type.includes("ogg")
-        ? "ogg"
-        : type.includes("wav")
-          ? "wav"
-          : "webm";
+    const ext =
+      type.includes("mp4") || type.includes("mpeg") || type.includes("m4a")
+        ? "mp4"
+        : type.includes("ogg")
+          ? "ogg"
+          : type.includes("wav")
+            ? "wav"
+            : "webm";
     const form = new FormData();
     form.append("audio", blob, `turn.${ext}`);
     form.append("language", language);
@@ -332,7 +363,9 @@ export function SpeakingConversation({
       return;
     }
     if (!res.ok) {
-      toast.error(await errorMessage(res, "No se pudo transcribir tu voz. ¿Está arrancado Whisper?"));
+      toast.error(
+        await errorMessage(res, "No se pudo transcribir tu voz. ¿Está arrancado Whisper?")
+      );
       setStatus("active");
       return;
     }
@@ -363,9 +396,10 @@ export function SpeakingConversation({
   if (status === "unavailable") {
     return (
       <div className="rounded-md border border-dashed border-border p-4 text-sm text-muted-foreground">
-        La práctica conversacional por voz no está disponible: requiere un proveedor de IA y de
-        voz configurado (claves de API). El escenario y el objetivo ya están definidos por el
-        profesor; en cuanto se configuren las claves, la conversación funcionará aquí.
+        La práctica conversacional por voz no está disponible: requiere un proveedor de IA
+        y de voz configurado (claves de API). El escenario y el objetivo ya están
+        definidos por el profesor; en cuanto se configuren las claves, la conversación
+        funcionará aquí.
       </div>
     );
   }
@@ -374,7 +408,9 @@ export function SpeakingConversation({
     <div className="flex flex-col gap-3">
       <div className="rounded-md border border-gold/25 bg-gold/5 p-3 text-sm">
         <p className="font-medium">Escenario: {scenario}</p>
-        <p className="text-muted-foreground">Objetivo: {objective} · Nivel {level}</p>
+        <p className="text-muted-foreground">
+          Objetivo: {objective} · Nivel {level}
+        </p>
       </div>
 
       {turns.length > 0 && (
@@ -420,7 +456,12 @@ export function SpeakingConversation({
             <Button variant="gold" size="sm" onClick={startRecording}>
               <Mic className="size-4" /> Hablar
             </Button>
-            <Button variant="outline" size="sm" onClick={finish} disabled={turns.length === 0}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={finish}
+              disabled={turns.length === 0}
+            >
               Finalizar y evaluar
             </Button>
           </>
