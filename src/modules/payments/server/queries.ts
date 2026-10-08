@@ -58,12 +58,6 @@ export async function getPaymentDetail(id: string) {
 }
 
 /**
- * Instrucciones de pago (nº de Bizum, IBAN...) leídas de
- * `GlobalSetting` — configurables desde el Módulo 10 sin desplegar
- * código. Con valores por defecto vacíos si el admin no las ha
- * rellenado todavía.
- */
-/**
  * Forma mínima para <CheckoutFlow> (componente cliente): solo campos
  * planos. El registro completo de Payment incluye un `amount` Decimal
  * de Prisma, que React no puede serializar de servidor a cliente.
@@ -79,19 +73,4 @@ export async function getActivePaymentForUserCourse(userId: string, courseId: st
       paymentMethod: { select: { key: true, label: true } },
     },
   });
-}
-
-export async function getPaymentInstructions() {
-  const settings = await db.globalSetting.findMany({
-    where: {
-      key: { in: ["payment_bizum_number", "payment_bank_iban", "payment_bank_holder"] },
-    },
-  });
-  const map = Object.fromEntries(settings.map((s) => [s.key, s.value as string]));
-
-  return {
-    bizumNumber: map.payment_bizum_number ?? "",
-    bankIban: map.payment_bank_iban ?? "",
-    bankHolder: map.payment_bank_holder ?? "",
-  };
 }

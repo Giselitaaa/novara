@@ -52,7 +52,11 @@ export function SettingsForm({ settings }: { settings: SettingsMap }) {
 
       {/* El tema visual se gestiona en el apartado «Temas». Conservamos su
           valor aquí para no sobrescribirlo al guardar esta configuración. */}
-      <input type="hidden" name="active_theme" defaultValue={settings.active_theme || "none"} />
+      <input
+        type="hidden"
+        name="active_theme"
+        defaultValue={settings.active_theme || "none"}
+      />
       <section>
         <h2 className="mb-2 font-display text-lg tracking-tighter">Tema visual</h2>
         <p className="text-sm text-muted-foreground">
@@ -103,36 +107,6 @@ export function SettingsForm({ settings }: { settings: SettingsMap }) {
               id="contact_phone"
               name="contact_phone"
               defaultValue={settings.contact_phone}
-            />
-          </FormField>
-        </div>
-      </section>
-
-      <section>
-        <h2 className="mb-4 font-display text-lg tracking-tighter">Métodos de pago</h2>
-        <p className="mb-4 text-sm text-muted-foreground">
-          Se muestran al alumno en el checkout de cursos premium.
-        </p>
-        <div className="flex flex-col gap-4">
-          <FormField id="payment_bizum_number" label="Número de Bizum">
-            <Input
-              id="payment_bizum_number"
-              name="payment_bizum_number"
-              defaultValue={settings.payment_bizum_number}
-            />
-          </FormField>
-          <FormField id="payment_bank_iban" label="IBAN">
-            <Input
-              id="payment_bank_iban"
-              name="payment_bank_iban"
-              defaultValue={settings.payment_bank_iban}
-            />
-          </FormField>
-          <FormField id="payment_bank_holder" label="Titular de la cuenta">
-            <Input
-              id="payment_bank_holder"
-              name="payment_bank_holder"
-              defaultValue={settings.payment_bank_holder}
             />
           </FormField>
         </div>

@@ -1,15 +1,13 @@
 "use client";
 
-import { AlertCircle, CheckCircle2, Clock, CreditCard, Paperclip } from "lucide-react";
-import { useRef, useState, useTransition } from "react";
+import { AlertCircle, CheckCircle2, Clock, CreditCard } from "lucide-react";
+import { useTransition } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { useRouter } from "@/i18n/navigation";
 import { formatPrice } from "@/lib/format";
-import { startCardCheckout, uploadPaymentProof } from "@/modules/payments/server/actions";
+import { startCardCheckout } from "@/modules/payments/server/actions";
 
 type PaymentState = {
   id: string;
@@ -22,7 +20,6 @@ interface CheckoutFlowProps {
   courseId: string;
   courseTitle: string;
   price: number;
-  instructions: { bizumNumber: string; bankIban: string; bankHolder: string };
   existingPayment: PaymentState;
   /** Solo true si Stripe está configurado (STRIPE_SECRET_KEY presente). */
   cardEnabled?: boolean;
@@ -32,11 +29,9 @@ export function CheckoutFlow({
   courseId,
   courseTitle,
   price,
-  instructions,
   existingPayment,
   cardEnabled = false,
 }: CheckoutFlowProps) {
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   function handleCardCheckout() {
@@ -54,98 +49,7 @@ export function CheckoutFlow({
     });
   }
 
-  const ALLOWED_PROOF_TYPES = [
-    "application/pdf",
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-  ];
-  const [proofFile, setProofFile] = useState<File | null>(null);
-  const [useUrlFallback, setUseUrlFallback] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  function handleSelectFile(file: File | null) {
-    if (!file) {
-      setProofFile(null);
-      return;
-    }
-    if (!ALLOWED_PROOF_TYPES.includes(file.type)) {
-      toast.error("Formato no admitido. Usa PDF, JPG, PNG o WEBP.");
-      return;
-    }
-    if (file.size > 8 * 1024 * 1024) {
-      toast.error("El archivo supera el tamaño máximo (8 MB).");
-      return;
-    }
-    setProofFile(file);
-  }
-
-  function handleUploadProof() {
-    if (!existingPayment || !proofFile) return;
-    const file = proofFile;
-    startTransition(async () => {
-      try {
-        const presignRes = await fetch("/api/upload", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contentType: file.type,
-            size: file.size,
-            folder: "payment-proofs",
-          }),
-        });
-        const presignData = await presignRes.json();
-        if (!presignRes.ok) {
-          if (presignData.error === "not_configured") {
-            setUseUrlFallback(true);
-            toast.error(
-              "La subida de archivos no está disponible; pega la URL manualmente."
-            );
-            return;
-          }
-          toast.error(presignData.message ?? "No se pudo preparar la subida.");
-          return;
-        }
-
-        const putRes = await fetch(presignData.uploadUrl, {
-          method: "PUT",
-          headers: { "Content-Type": file.type },
-          body: file,
-        });
-        if (!putRes.ok) {
-          toast.error("No se pudo subir el archivo.");
-          return;
-        }
-
-        const result = await uploadPaymentProof(
-          existingPayment.id,
-          presignData.publicUrl
-        );
-        toast.success(result.message);
-        setProofFile(null);
-        if (fileInputRef.current) fileInputRef.current.value = "";
-        router.refresh();
-      } catch {
-        toast.error("No se pudo subir el justificante.");
-      }
-    });
-  }
-
-  function handleUploadProofUrl(formData: FormData) {
-    if (!existingPayment) return;
-    const proofFileUrl = String(formData.get("proofFileUrl") ?? "").trim();
-    if (!proofFileUrl) {
-      toast.error("Indica la URL del justificante.");
-      return;
-    }
-    startTransition(async () => {
-      const result = await uploadPaymentProof(existingPayment.id, proofFileUrl);
-      toast.success(result.message);
-      router.refresh();
-    });
-  }
-
-  // Estado 1: sin pedido todavía — elegir método de pago.
+  // Estado 1: sin pedido todavía — pagar con tarjeta (Stripe).
   if (!existingPayment || existingPayment.status.key === "rechazado") {
     return (
       <div className="flex flex-col gap-6">
@@ -186,10 +90,11 @@ export function CheckoutFlow({
     );
   }
 
-  // Estado 2: pedido pendiente — mostrar instrucciones + subir justificante
-  // (Bizum/transferencia), o permitir reintentar (tarjeta abandonada).
+  // Estado 2: pedido pendiente de una compra anterior. Hoy NOVARA solo
+  // acepta tarjeta (Stripe); un pedido pendiente con un método antiguo
+  // se conserva en la base de datos para auditoría, pero ya no se
+  // gestiona desde aquí — se deriva a soporte.
   if (existingPayment.status.key === "pendiente") {
-    const isBizum = existingPayment.paymentMethod.key === "bizum";
     const isTarjeta = existingPayment.paymentMethod.key === "tarjeta";
 
     if (isTarjeta) {
@@ -217,83 +122,16 @@ export function CheckoutFlow({
     }
 
     return (
-      <div className="flex flex-col gap-6">
-        <Card className="p-5">
-          <h3 className="mb-3 font-display text-lg tracking-tighter">
-            Instrucciones de pago
-          </h3>
-          {isBizum ? (
-            <p className="text-sm">
-              Envía <strong>{formatPrice(price)}</strong> por Bizum al número{" "}
-              <span className="font-mono">
-                {instructions.bizumNumber || "(pendiente de configurar)"}
-              </span>{" "}
-              indicando tu nombre en el concepto.
-            </p>
-          ) : (
-            <div className="flex flex-col gap-1 text-sm">
-              <p>
-                Transfiere <strong>{formatPrice(price)}</strong> a:
-              </p>
-              <p className="font-mono">
-                {instructions.bankIban || "(pendiente de configurar)"}
-              </p>
-              <p>Titular: {instructions.bankHolder || "(pendiente de configurar)"}</p>
-            </div>
-          )}
-        </Card>
-
-        {useUrlFallback ? (
-          <form action={handleUploadProofUrl} className="flex flex-col gap-3">
-            <Label htmlFor="proofFileUrl">
-              URL del justificante (captura o PDF ya subido)
-            </Label>
-            <div className="flex gap-2">
-              <input
-                id="proofFileUrl"
-                name="proofFileUrl"
-                placeholder="https://…"
-                required
-                className="h-11 flex-1 rounded-md border border-input bg-background px-3.5 text-sm"
-              />
-              <Button type="submit" variant="gold" disabled={isPending}>
-                Enviar justificante
-              </Button>
-            </div>
-          </form>
-        ) : (
-          <div className="flex flex-col gap-3">
-            <Label htmlFor="proofFile">
-              Justificante (PDF, JPG, PNG o WEBP — máx. 8 MB)
-            </Label>
-            <div className="flex gap-2">
-              <input
-                ref={fileInputRef}
-                id="proofFile"
-                type="file"
-                accept="application/pdf,image/jpeg,image/png,image/webp"
-                onChange={(e) => handleSelectFile(e.target.files?.[0] ?? null)}
-                className="h-11 flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
-              />
-              <Button
-                type="button"
-                variant="gold"
-                disabled={isPending || !proofFile}
-                onClick={handleUploadProof}
-              >
-                <Paperclip className="size-4" />
-                {isPending ? "Subiendo…" : "Enviar justificante"}
-              </Button>
-            </div>
-            {proofFile && (
-              <p className="text-xs text-muted-foreground">
-                Seleccionado: {proofFile.name} (
-                {(proofFile.size / 1024 / 1024).toFixed(1)} MB)
-              </p>
-            )}
-          </div>
-        )}
-      </div>
+      <Card className="flex flex-col items-center gap-3 p-8 text-center">
+        <AlertCircle className="size-8 text-muted-foreground" />
+        <h3 className="font-display text-lg tracking-tighter">
+          Este pedido ya no se puede completar por este medio
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          NOVARA gestiona todos los pagos mediante Stripe. Contacta con soporte para
+          resolver este pedido pendiente.
+        </p>
+      </Card>
     );
   }
 

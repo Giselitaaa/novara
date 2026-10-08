@@ -7,10 +7,7 @@ import { Breadcrumbs } from "@/components/layout/breadcrumbs";
 import { Container } from "@/components/layout/container";
 import { requireSession } from "@/lib/require-session";
 import { getCourseBySlug } from "@/modules/courses/server/queries";
-import {
-  getActivePaymentForUserCourse,
-  getPaymentInstructions,
-} from "@/modules/payments/server/queries";
+import { getActivePaymentForUserCourse } from "@/modules/payments/server/queries";
 
 export const metadata: Metadata = { title: "Comprar curso" };
 
@@ -26,10 +23,7 @@ export default async function CheckoutPage({ params }: Props) {
   const course = await getCourseBySlug(slug);
   if (!course || course.accessType !== "premium") notFound();
 
-  const [existingPayment, instructions] = await Promise.all([
-    getActivePaymentForUserCourse(session.user.id, course.id),
-    getPaymentInstructions(),
-  ]);
+  const existingPayment = await getActivePaymentForUserCourse(session.user.id, course.id);
 
   return (
     <Container className="max-w-xl py-10 sm:py-14">
@@ -49,7 +43,6 @@ export default async function CheckoutPage({ params }: Props) {
         courseId={course.id}
         courseTitle={course.title}
         price={course.price ?? 0}
-        instructions={instructions}
         existingPayment={existingPayment}
         cardEnabled={Boolean(process.env.STRIPE_SECRET_KEY)}
       />
